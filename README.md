@@ -1,129 +1,127 @@
-Mi Colección de Camisetas
+# Backend para Inventario de Camisetas
 
-Mi Colección de Camisetas es una aplicación web para gestionar un inventario de camisetas de fútbol. Permite agregar, visualizar, editar y eliminar camisetas con información detallada como equipo, talla, tipo y stock disponible.
+Este es el backend del proyecto **Mi Colección de Camisetas**, desarrollado con **Spring Boot** y conectado a una base de datos MySQL. Su propósito es gestionar un inventario de camisetas de fútbol de manera eficiente y sencilla.
 
-Tecnologías Utilizadas
+---
 
-Frontend
+## **Características principales**
 
-Framework: React
+- API RESTful para gestionar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) relacionadas con el inventario.
+- Integración con una base de datos relacional MySQL para almacenamiento persistente.
+- Uso de Spring Data JPA para interacción con la base de datos.
+- Configuración modular y lista para despliegue en cualquier entorno compatible con Java.
 
-Librerías:
+---
 
-Axios (para llamadas HTTP)
+## **Requisitos previos**
 
-React Router DOM (para manejo de rutas)
+### **Software necesario**
 
-Backend
+1. **Java Development Kit (JDK)**
 
-Framework: Spring Boot
+   - Versión: 21 o superior
+   - [Descargar e instalar JDK](https://www.oracle.com/java/technologies/javase-downloads.html)
 
-Lenguaje: Java
+2. **Maven**
 
-Dependencias:
+   - Herramienta de gestión de dependencias.
+   - Comando para instalar (en distribuciones Linux basadas en Debian):
+     ```bash
+     sudo apt install maven
+     ```
 
-Spring Web
+3. **MySQL**
+   - Configurado y en ejecución.
+   - Usuario y base de datos creados previamente.
 
-Spring Data JPA
+---
 
-MySQL Driver
+## **Configuración inicial**
 
-Base de Datos
+1. **Clonar el repositorio:**
 
-Sistema: MySQL
+   ```bash
+   git clone <URL_DEL_REPOSITORIO>
+   cd backend-coleccion-camisetas
+   ```
 
-Estructura: Una tabla para almacenar información de camisetas.
+2. **Configurar el archivo `application.properties`:**
+   Ubicado en `src/main/resources/application.properties`.
 
-Características Principales
+   Asegúrate de configurar los datos de conexión a la base de datos:
 
-Agregar Camisetas: Permite registrar una nueva camiseta en el inventario.
+   ```properties
+   spring.datasource.url=jdbc:mysql://localhost:3306/<nombre_base_datos>
+   spring.datasource.username=<usuario_mysql>
+   spring.datasource.password=<contraseña_mysql>
+   spring.jpa.hibernate.ddl-auto=update
+   spring.jpa.show-sql=true
+   ```
 
-Listar Camisetas: Visualiza todas las camisetas registradas en el sistema.
+3. **Construir el proyecto:**
 
-Editar Camisetas: Modifica la información de una camiseta existente.
+   ```bash
+   mvn clean install
+   ```
 
-Eliminar Camisetas: Borra camisetas del inventario.
+4. **Ejecutar el backend:**
+   ```bash
+   mvn spring-boot:run
+   ```
 
-Requisitos Previos
+---
 
-Frontend
+## **Endpoints disponibles**
 
-Node.js v16 o superior
+| Método | Endpoint              | Descripción                       |
+| ------ | --------------------- | --------------------------------- |
+| GET    | `/api/camisetas`      | Obtener todas las camisetas.      |
+| GET    | `/api/camisetas/{id}` | Obtener una camiseta por ID.      |
+| POST   | `/api/camisetas`      | Crear una nueva camiseta.         |
+| PUT    | `/api/camisetas/{id}` | Actualizar datos de una camiseta. |
+| DELETE | `/api/camisetas/{id}` | Eliminar una camiseta por ID.     |
 
-npm (administrador de paquetes de Node.js)
+---
 
-Backend
+## **Estructura del proyecto**
 
-Java 17 o superior
+El proyecto sigue la estructura estándar de Spring Boot:
 
-Maven (gestor de dependencias para Java)
+```
+backend-coleccion-camisetas/
+├── src/
+│   ├── main/
+│   │   ├── java/
+│   │   │   └── com/mi/coleccion/camisetas/
+│   │   │       ├── controller/
+│   │   │       ├── model/
+│   │   │       ├── repository/
+│   │   │       └── service/
+│   │   └── resources/
+│   │       ├── application.properties
+│   │       └── static/
+│   └── test/
+├── pom.xml
+└── README.md
+```
 
-MySQL Server
+---
 
-Instalación y Configuración
+## **Tecnologías utilizadas**
 
-1. Clonar el Repositorio
+- **Java 21**: Lenguaje principal.
+- **Spring Boot 3.4.1**: Framework para el desarrollo del backend.
+- **MySQL**: Base de datos relacional para persistencia.
+- **Maven**: Gestión de dependencias y construcción del proyecto.
 
-git clone https://github.com/tu-usuario/mi-coleccion-camisetas.git
-cd mi-coleccion-camisetas
+---
 
-2. Configurar el Backend
+## **Contribuciones**
 
-Ve a la carpeta del backend:
+¡Las contribuciones son bienvenidas! Si tienes ideas, correcciones o mejoras, por favor, abre un **issue** o envía un **pull request**.
 
-cd backend
+---
 
-Configura la conexión a la base de datos en src/main/resources/application.properties:
+## **Licencia**
 
-spring.datasource.url=jdbc:mysql://localhost:3306/camisetas_db
-spring.datasource.username=tu_usuario
-spring.datasource.password=tu_contraseña
-
-spring.jpa.hibernate.ddl-auto=update
-spring.jpa.show-sql=true
-
-Ejecuta el backend:
-
-./mvnw spring-boot:run
-
-3. Configurar el Frontend
-
-Ve a la carpeta del frontend:
-
-cd frontend
-
-Instala las dependencias:
-
-npm install
-
-Inicia el servidor de desarrollo:
-
-npm start
-
-4. Probar la Aplicación
-
-El backend estará disponible en http://localhost:8080.
-
-El frontend estará disponible en http://localhost:3000.
-
-Contribución
-
-Realiza un fork del repositorio.
-
-Crea una rama nueva para tus cambios:
-
-git checkout -b mi-nueva-funcionalidad
-
-Haz tus cambios y realiza commits:
-
-git commit -m "Agrega mi nueva funcionalidad"
-
-Envía un pull request.
-
-Licencia
-
-Este proyecto está bajo la licencia MIT. Puedes ver más detalles en el archivo LICENSE.
-
-Autor
-
-Creado por lminervino18.
+Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
