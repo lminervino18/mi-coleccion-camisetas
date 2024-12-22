@@ -1,127 +1,86 @@
-# Backend para Inventario de Camisetas
+# Mi Colección de Camisetas
 
-Este es el backend del proyecto **Mi Colección de Camisetas**, desarrollado con **Spring Boot** y conectado a una base de datos MySQL. Su propósito es gestionar un inventario de camisetas de fútbol de manera eficiente y sencilla.
+**Mi Colección de Camisetas** es una aplicación web diseñada para gestionar un inventario personalizado de camisetas de fútbol. La plataforma permite a los usuarios almacenar y organizar su colección personal, con características como subir imágenes, añadir información detallada de cada camiseta y realizar consultas de manera eficiente.
 
----
+## Tecnologías utilizadas
 
-## **Características principales**
+### Frontend
 
-- API RESTful para gestionar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) relacionadas con el inventario.
-- Integración con una base de datos relacional MySQL para almacenamiento persistente.
-- Uso de Spring Data JPA para interacción con la base de datos.
-- Configuración modular y lista para despliegue en cualquier entorno compatible con Java.
+- **React**: Usado para construir una interfaz de usuario moderna y responsiva. React facilita la creación de componentes reutilizables que mejoran la experiencia del usuario.
+- **CSS/Bootstrap**: Para estilizar y diseñar la interfaz.
 
----
+### Backend
 
-## **Requisitos previos**
+- **Spring Boot**: Un framework robusto de Java que permite construir aplicaciones backend escalables y seguras.
+- **Maven**: Para gestionar las dependencias del proyecto y simplificar la construcción del backend.
 
-### **Software necesario**
+### Base de datos
 
-1. **Java Development Kit (JDK)**
-
-   - Versión: 21 o superior
-   - [Descargar e instalar JDK](https://www.oracle.com/java/technologies/javase-downloads.html)
-
-2. **Maven**
-
-   - Herramienta de gestión de dependencias.
-   - Comando para instalar (en distribuciones Linux basadas en Debian):
-     ```bash
-     sudo apt install maven
-     ```
-
-3. **MySQL**
-   - Configurado y en ejecución.
-   - Usuario y base de datos creados previamente.
+- **MySQL**: Base de datos relacional utilizada para almacenar la información de los usuarios y sus camisetas.
 
 ---
 
-## **Configuración inicial**
+## Funcionalidades principales
 
-1. **Clonar el repositorio:**
+### Usuarios
 
-   ```bash
-   git clone <URL_DEL_REPOSITORIO>
-   cd backend-coleccion-camisetas
-   ```
+Cada usuario tiene su propia cuenta con:
 
-2. **Configurar el archivo `application.properties`:**
-   Ubicado en `src/main/resources/application.properties`.
+- Nombre de usuario
+- Contraseña (encriptada para mayor seguridad)
+- Foto de perfil
 
-   Asegúrate de configurar los datos de conexión a la base de datos:
+### Colección de camisetas
 
-   ```properties
-   spring.datasource.url=jdbc:mysql://localhost:3306/<nombre_base_datos>
-   spring.datasource.username=<usuario_mysql>
-   spring.datasource.password=<contraseña_mysql>
-   spring.jpa.hibernate.ddl-auto=update
-   spring.jpa.show-sql=true
-   ```
+Cada usuario puede gestionar su propia colección de camisetas, añadiendo detalles como:
 
-3. **Construir el proyecto:**
-
-   ```bash
-   mvn clean install
-   ```
-
-4. **Ejecutar el backend:**
-   ```bash
-   mvn spring-boot:run
-   ```
+- Imagen de la camiseta
+- Club al que pertenece
+- País de origen
+- Número/dorsal de la camiseta
+- Talle (S, M, L, etc.)
+- Número de equipación (primera, segunda, tercera, etc.)
+- Comentarios adicionales
 
 ---
 
-## **Endpoints disponibles**
+## Estructura general de la aplicación
 
-| Método | Endpoint              | Descripción                       |
-| ------ | --------------------- | --------------------------------- |
-| GET    | `/api/camisetas`      | Obtener todas las camisetas.      |
-| GET    | `/api/camisetas/{id}` | Obtener una camiseta por ID.      |
-| POST   | `/api/camisetas`      | Crear una nueva camiseta.         |
-| PUT    | `/api/camisetas/{id}` | Actualizar datos de una camiseta. |
-| DELETE | `/api/camisetas/{id}` | Eliminar una camiseta por ID.     |
+### Frontend
 
----
+El frontend está desarrollado en React y permite a los usuarios:
 
-## **Estructura del proyecto**
+1. Registrarse y autenticarse.
+2. Subir imágenes y detalles de sus camisetas.
+3. Visualizar, editar o eliminar camisetas de su colección.
 
-El proyecto sigue la estructura estándar de Spring Boot:
+### Backend
 
-```
-backend-coleccion-camisetas/
-├── src/
-│   ├── main/
-│   │   ├── java/
-│   │   │   └── com/mi/coleccion/camisetas/
-│   │   │       ├── controller/
-│   │   │       ├── model/
-│   │   │       ├── repository/
-│   │   │       └── service/
-│   │   └── resources/
-│   │       ├── application.properties
-│   │       └── static/
-│   └── test/
-├── pom.xml
-└── README.md
-```
+El backend está desarrollado en Spring Boot y provee una API REST para:
 
----
+1. Gestión de usuarios (registro, autenticación y perfil).
+2. Operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para las camisetas.
 
-## **Tecnologías utilizadas**
+### Base de datos
 
-- **Java 21**: Lenguaje principal.
-- **Spring Boot 3.4.1**: Framework para el desarrollo del backend.
-- **MySQL**: Base de datos relacional para persistencia.
-- **Maven**: Gestión de dependencias y construcción del proyecto.
+El modelo de la base de datos asegura que cada usuario tenga una colección única. Aquí está la estructura simplificada:
+
+- **Usuarios**:
+
+  - ID (clave primaria)
+  - Nombre
+  - Contraseña (hashed)
+  - Foto de perfil
+
+- **Camisetas**:
+  - ID (clave primaria)
+  - UsuarioID (clave foránea)
+  - Imagen
+  - Club
+  - País
+  - Dorsal
+  - Talle
+  - Número de equipación
+  - Comentarios extra
 
 ---
-
-## **Contribuciones**
-
-¡Las contribuciones son bienvenidas! Si tienes ideas, correcciones o mejoras, por favor, abre un **issue** o envía un **pull request**.
-
----
-
-## **Licencia**
-
-Este proyecto está licenciado bajo la [Licencia MIT](LICENSE).
