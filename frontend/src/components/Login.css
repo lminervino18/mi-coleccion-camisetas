@@ -1,0 +1,114 @@
+/* Estilo general del contenedor */
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: url('../assets/background.jpg') no-repeat center center;
+  background-size: cover; /* Ajusta automáticamente para cubrir el área */
+  background-attachment: fixed; /* Opcional: crea un efecto de paralaje */
+  position: relative;
+}
+
+
+/* Superposición oscura sobre el fondo */
+.overlay {
+  background-color: rgba(0, 0, 0, 0.8); /* Oscurece más el fondo */
+  padding: 2rem;
+  border-radius: 8px;
+  color: #fff;
+  text-align: center;
+  max-width: 400px;
+  width: 90%; /* Adaptativo para pantallas pequeñas */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8); /* Sombra para resaltar el formulario */
+}
+
+/* Estilo del logo y el título */
+.logo-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.logo {
+  height: 50px;
+  margin-right: 10px;
+}
+
+.title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Contorno oscuro para resaltar */
+}
+
+/* Estilo del subtítulo */
+.subtitle {
+  font-size: 1rem;
+  margin-bottom: 2rem;
+  color: #ddd;
+}
+
+/* Estilo del formulario */
+.login-form .form-group {
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.login-form .form-group label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.login-form .form-group input {
+  width: 100%;
+  padding: 0.8rem;
+  border: none;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-size: 1rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Resalta el input */
+  margin-bottom: 1rem;
+}
+
+.login-form .form-group input:focus {
+  outline: none;
+  border: 1px solid #007bff;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Botones */
+.form-buttons {
+  display: flex;
+  justify-content: space-between;
+}
+
+.btn {
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: #fff;
+}
+
+.btn-secondary:hover {
+  background-color: #545b62;
+}
