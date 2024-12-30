@@ -17,7 +17,7 @@ function Login() {
             <img src={logo} alt="Logo" className="logo" />
             <h1 className="title">Mi Colección de Camisetas</h1>
           </div>
-          <p className="subtitle">Gestiona tu colección con estilo y facilidad</p>
+          <p className="subtitle">Gestiona tu colección de Casacas</p>
           <form className="login-form">
             <div className="form-group">
               <label htmlFor="username">Nombre de Usuario</label>
