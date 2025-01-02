@@ -12,102 +12,57 @@ import java.util.Optional;
 @Service
 public class UsuarioService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder;
+    public UsuarioService(UsuarioRepository usuarioRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.usuarioRepository = usuarioRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-    /**
-     * Registra un nuevo usuario después de realizar las validaciones necesarias.
-     *
-     * @param usuario Datos del usuario a registrar.
-     * @return Usuario registrado.
-     */
-    public Usuario registrarUsuario(Usuario usuario) {
-        if (usuarioRepository.existsByUsername(usuario.getUsername())) {
-            throw new IllegalArgumentException("El nombre de usuario ya existe.");
-        }
-
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
-            throw new IllegalArgumentException("El correo ya está registrado.");
-        }
-
+    // Crear un nuevo usuario
+    public Usuario createUsuario(Usuario usuario) {
+        // Encriptar la contraseña antes de guardar
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-
         return usuarioRepository.save(usuario);
     }
 
-    /**
-     * Obtiene un usuario por su ID.
-     *
-     * @param id Identificador del usuario.
-     * @return Usuario encontrado o null si no existe.
-     */
-    public Optional<Usuario> obtenerUsuarioPorId(Long id) {
-        return usuarioRepository.findById(id);
-    }
-
-    /**
-     * Busca un usuario por su nombre de usuario.
-     *
-     * @param nombre Nombre de usuario a buscar.
-     * @return Usuario encontrado o null si no existe.
-     */
-    public Optional<Usuario> buscarUsuarioPorNombre(String nombre) {
-        return usuarioRepository.findByUsername(nombre);
-    }
-
-    /**
-     * Obtiene todos los usuarios registrados.
-     *
-     * @return Lista de usuarios.
-     */
-    public List<Usuario> listarUsuarios() {
+    // Obtener todos los usuarios
+    public List<Usuario> getAllUsuarios() {
         return usuarioRepository.findAll();
     }
 
-    /**
-     * Actualiza los datos de un usuario.
-     *
-     * @param id      Identificador del usuario a actualizar.
-     * @param usuario Datos actualizados.
-     * @return Usuario actualizado.
-     */
-    public Usuario actualizarUsuario(Long id, Usuario usuario) {
-        Usuario usuarioExistente = usuarioRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("El usuario no existe."));
-
-        usuarioExistente.setUsername(usuario.getUsername());
-        usuarioExistente.setEmail(usuario.getEmail());
-        if (usuario.getPassword() != null && !usuario.getPassword().isEmpty()) {
-            usuarioExistente.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        }
-
-        return usuarioRepository.save(usuarioExistente);
+    // Buscar un usuario por ID
+    public Optional<Usuario> getUsuarioById(Long id) {
+        return usuarioRepository.findById(id);
     }
 
-    /**
-     * Elimina un usuario por su ID.
-     *
-     * @param id Identificador del usuario a eliminar.
-     */
-    public void eliminarUsuario(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new IllegalArgumentException("El usuario no existe.");
-        }
-        usuarioRepository.deleteById(id);
+    // Buscar un usuario por ID
+    public Optional<Usuario> getUsuarioByNombre(String username) {
+        return usuarioRepository.findByUsername(username);
     }
 
-    /**
-     * Verifica si la contraseña sin encriptar coincide con la contraseña
-     * encriptada.
-     *
-     * @param rawPassword     Contraseña sin encriptar.
-     * @param encodedPassword Contraseña encriptada.
-     * @return true si coinciden, false de lo contrario.
-     */
-    public boolean verificarPassword(String rawPassword, String encodedPassword) {
-        return passwordEncoder.matches(rawPassword, encodedPassword);
+    // Actualizar un usuario existente
+    public Usuario updateUsuario(Long id, Usuario usuarioDetails) {
+        return usuarioRepository.findById(id).map(usuario -> {
+            usuario.setUsername(usuarioDetails.getUsername());
+            usuario.setEmail(usuarioDetails.getEmail());
+            // Actualizar la contraseña solo si se proporciona una nueva
+            if (usuarioDetails.getPassword() != null && !usuarioDetails.getPassword().isEmpty()) {
+                usuario.setPassword(passwordEncoder.encode(usuarioDetails.getPassword()));
+            }
+            usuario.setRole(usuarioDetails.getRole());
+            return usuarioRepository.save(usuario);
+        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+    }
+
+    // Eliminar un usuario
+    public void deleteUsuario(Long id) {
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Usuario no encontrado con ID: " + id);
+        }
     }
 }

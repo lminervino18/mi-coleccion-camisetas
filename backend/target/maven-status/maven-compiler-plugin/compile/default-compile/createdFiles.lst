@@ -1,9 +1,6 @@
 com/mi_coleccion_camisetas/repository/UsuarioRepository.class
-com/mi_coleccion_camisetas/service/CustomUserDetailsService.class
 com/mi_coleccion_camisetas/service/UsuarioService.class
 com/mi_coleccion_camisetas/backend_coleccion_camisetas/BackendColeccionCamisetasApplication.class
-com/mi_coleccion_camisetas/controller/CsrfController.class
-com/mi_coleccion_camisetas/controller/HomeController.class
-com/mi_coleccion_camisetas/config/SecurityConfig.class
+com/mi_coleccion_camisetas/model/Usuario$Role.class
 com/mi_coleccion_camisetas/controller/UsuarioController.class
 com/mi_coleccion_camisetas/model/Usuario.class

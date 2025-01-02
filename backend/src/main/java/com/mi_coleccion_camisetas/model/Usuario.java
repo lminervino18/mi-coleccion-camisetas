@@ -4,11 +4,13 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotEmpty;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 import java.util.Objects;
 
 @Entity
+@Table(name = "usuarios")
 public class Usuario {
 
     @Id
@@ -19,22 +21,27 @@ public class Usuario {
     private String username;
 
     @Email(message = "Debe ser un correo electrónico válido.")
+    @NotEmpty(message = "El correo es obligatorio.")
     private String email;
 
     @NotEmpty(message = "La contraseña es obligatoria.")
     private String password;
 
-    private String role;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @CreationTimestamp
     @Column(updatable = false)
     private Timestamp createdAt;
 
+    @UpdateTimestamp
+    private Timestamp updatedAt;
+
     // Constructores
     public Usuario() {
     }
 
-    public Usuario(String username, String email, String password, String role) {
+    public Usuario(String username, String email, String password, Role role) {
         this.username = username;
         this.email = email;
         this.password = password;
@@ -58,12 +65,16 @@ public class Usuario {
         return password;
     }
 
-    public String getRole() {
+    public Role getRole() {
         return role;
     }
 
     public Timestamp getCreatedAt() {
         return createdAt;
+    }
+
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
     }
 
     // Setters
@@ -79,7 +90,7 @@ public class Usuario {
         this.password = password;
     }
 
-    public void setRole(String role) {
+    public void setRole(Role role) {
         this.role = role;
     }
 
@@ -90,7 +101,7 @@ public class Usuario {
                 "id=" + id +
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
-                ", role='" + role + '\'' +
+                ", role=" + role +
                 '}';
     }
 
@@ -101,11 +112,16 @@ public class Usuario {
         if (o == null || getClass() != o.getClass())
             return false;
         Usuario usuario = (Usuario) o;
-        return id.equals(usuario.id);
+        return Objects.equals(id, usuario.id);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    // Enum para roles
+    public enum Role {
+        ADMIN, USER
     }
 }

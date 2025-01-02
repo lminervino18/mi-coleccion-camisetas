@@ -1,12 +1,12 @@
 package com.mi_coleccion_camisetas.backend_coleccion_camisetas;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
+import org.springframework.boot.SpringApplication;
 
-@SpringBootApplication(exclude = { UserDetailsServiceAutoConfiguration.class }) // Deshabilitar configuración automática
+@SpringBootApplication(scanBasePackages = "com.mi_coleccion_camisetas")
+@EnableJpaRepositories(basePackages = "com.mi_coleccion_camisetas")
 public class BackendColeccionCamisetasApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(BackendColeccionCamisetasApplication.class, args);
 	}
