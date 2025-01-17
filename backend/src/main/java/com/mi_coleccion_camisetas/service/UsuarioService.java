@@ -23,6 +23,14 @@ public class UsuarioService {
 
     // Crear un nuevo usuario
     public Usuario createUsuario(Usuario usuario) {
+        // Verificar si el email o el username ya existen
+        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+            throw new IllegalArgumentException("El correo electrónico ya está registrado.");
+        }
+
+        if (usuarioRepository.existsByUsername(usuario.getUsername())) {
+            throw new IllegalArgumentException("El nombre de usuario ya está registrado.");
+        }
         // Encriptar la contraseña antes de guardar
         usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
         return usuarioRepository.save(usuario);

@@ -90,4 +90,29 @@
   .btn-secondary:hover {
     background-color: rgba(255, 255, 255, 0.2); /* Más translúcido al pasar */
   }
+
+  /* Estilo para los mensajes de error */
+.error-message {
+  color: red; /* Color rojo para los errores */
+  font-size: 14px; /* Tamaño de fuente */
+  margin-bottom: 10px; /* Espaciado inferior */
+  text-align: center; /* Centrado del texto */
+  font-weight: bold; /* Negrita para destacar */
+}
+
+.success-message {
+  text-align: center;
+  color: #ffffff;
+}
+
+.success-message h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.success-message p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
   

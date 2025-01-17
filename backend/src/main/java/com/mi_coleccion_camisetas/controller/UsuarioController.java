@@ -24,9 +24,15 @@ public class UsuarioController {
 
     // Crear un nuevo usuario
     @PostMapping
-    public ResponseEntity<Usuario> createUsuario(@Validated @RequestBody Usuario usuario) {
-        Usuario nuevoUsuario = usuarioService.createUsuario(usuario);
-        return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+    public ResponseEntity<?> createUsuario(@Validated @RequestBody Usuario usuario) {
+        try {
+            Usuario nuevoUsuario = usuarioService.createUsuario(usuario);
+            return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error interno del servidor", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     // Obtener todos los usuarios
