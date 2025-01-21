@@ -51,6 +51,17 @@ public class UsuarioService {
         return usuarioRepository.findByUsername(username);
     }
 
+    public Usuario findByUsernameAndPassword(String username, String password) {
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByUsername(username);
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get(); // Obtener el usuario si está presente
+            if (passwordEncoder.matches(password, usuario.getPassword())) {
+                return usuario; // Si la contraseña es correcta, devolver el usuario
+            }
+        }
+        return null; // Si el usuario no existe o la contraseña no coincide
+    }
+
     // Actualizar un usuario existente
     public Usuario updateUsuario(Long id, Usuario usuarioDetails) {
         return usuarioRepository.findById(id).map(usuario -> {

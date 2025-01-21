@@ -187,7 +187,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
 
   const handleNavigateHome = () => {
     setSuccessMessage(false);
-    window.location.href = "/api/usuarios";  // Esto redirige a la página principal
+    window.location.href = "/login";  // Esto redirige a la página principal
   };
 
   return (

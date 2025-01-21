@@ -1,8 +1,11 @@
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/controller/UsuarioController.java
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/service/UsuarioService.java
+/home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/model/AuthResponse.java
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/repository/UsuarioRepository.java
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/model/Usuario.java
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/controller/HomeController.java
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/config/AppConfig.java
+/home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/controller/AuthController.java
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/config/CorsConfig.java
+/home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/util/JwtUtil.java
 /home/lminervino18/Escritorio/Personal Projects/mi-coleccion-camisetas/mi-coleccion-camisetas/backend/src/main/java/com/mi_coleccion_camisetas/BackendColeccionCamisetasApplication.java
