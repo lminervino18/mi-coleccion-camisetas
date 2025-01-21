@@ -1,0 +1,75 @@
+.camisetas-container {
+    padding: 20px;
+    background-color: #f4f4f4;
+    min-height: 100vh;
+  }
+  
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .top-bar input {
+    padding: 10px;
+    font-size: 1rem;
+    width: 40%;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  .camiseta-item {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    transition: transform 0.2s;
+  }
+  
+  .camiseta-item:hover {
+    transform: scale(1.05);
+  }
+  
+  .camiseta-item img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+  
+  .camiseta-info {
+    padding: 15px;
+    text-align: center;
+  }
+  
+  .camiseta-info h3 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: #333;
+  }
+  
+  .camiseta-info p {
+    margin: 5px 0;
+    color: #666;
+  }
+  
