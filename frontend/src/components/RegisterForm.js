@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import "./RegisterForm.css";
 
+
 function RegisterForm({ onClose, onNavigateToHome }) {
   const [formData, setFormData] = useState({
     username: "",
@@ -10,9 +11,10 @@ function RegisterForm({ onClose, onNavigateToHome }) {
   });
 
   const [errors, setErrors] = useState({
-    email: "",
+    emailExists: "",
     passwordMatch: "",
     userExists: "",
+    passwordStrength: "",
   });
 
   const [isCheckingUser, setIsCheckingUser] = useState(false);
@@ -23,9 +25,21 @@ function RegisterForm({ onClose, onNavigateToHome }) {
     return emailRegex.test(email);
   };
 
+  const validatePasswordStrength = (password) => {
+    // Verifica si la contraseña tiene al menos 8 caracteres, 1 número y 1 letra
+    const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+    return passwordRegex.test(password);
+  };
+
   const handleChange = async (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+
+    // Limpiar errores antes de realizar la validación
+    setErrors((prevErrors) => ({
+      ...prevErrors,
+      [name]: "", // Limpiar el error del campo específico
+    }));
 
     // Validaciones dinámicas
     if (name === "email") {
@@ -34,22 +48,20 @@ function RegisterForm({ onClose, onNavigateToHome }) {
           ...prev,
           email: "El correo no tiene un formato válido",
         }));
-      } else {
-        setErrors((prev) => ({ ...prev, email: "" }));
       }
     }
 
     if (name === "password" || name === "confirmPassword") {
-      if (
-        name === "confirmPassword" &&
-        formData.password !== value &&
-        formData.password !== ""
-      ) {
+      if (!validatePasswordStrength(value)) {
         setErrors((prev) => ({
           ...prev,
-          passwordMatch: "Las contraseñas no coinciden",
+          passwordStrength: "La contraseña debe tener al menos 8 caracteres, una letra y un número.",
         }));
-      } else if (name === "password" && value !== formData.confirmPassword) {
+      } else {
+        setErrors((prev) => ({ ...prev, passwordStrength: "" }));
+      }
+
+      if (name === "confirmPassword" && formData.password !== value) {
         setErrors((prev) => ({
           ...prev,
           passwordMatch: "Las contraseñas no coinciden",
@@ -64,7 +76,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(true);
       try {
         const response = await fetch(
-          `http://localhost:8080/api/usuarios/buscar?nombre=${value.trim()}`
+          `http://localhost:8080/api/usuarios/?nombre=${value.trim()}`
         );
         if (response.ok) {
           setErrors((prev) => ({
@@ -83,30 +95,57 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       }
       setIsCheckingUser(false);
     }
+
+    if (name === "email" && value.trim() !== "") {
+      // Validación en tiempo real para verificar si el email ya existe
+      setIsCheckingUser(true);
+      try {
+        const response = await fetch(
+          `http://localhost:8080/api/usuarios/?email=${value.trim()}`
+        );
+        if (response.ok) {
+          setErrors((prev) => ({
+            ...prev,
+            emailExists: "El correo electrónico ya está en uso",
+          }));
+        } else {
+          setErrors((prev) => ({ ...prev, emailExists: "" }));
+        }
+      } catch (error) {
+        console.error("Error al verificar el correo:", error);
+        setErrors((prev) => ({
+          ...prev,
+          emailExists: "",
+        }));
+      }
+      setIsCheckingUser(false);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     // Validaciones finales antes de enviar
+    let validationErrors = {};
+
     if (!validateEmail(formData.email)) {
-      setErrors((prev) => ({
-        ...prev,
-        email: "El correo no tiene un formato válido",
-      }));
-      return;
+      validationErrors.email = "El correo no tiene un formato válido";
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setErrors((prev) => ({
-        ...prev,
-        passwordMatch: "Las contraseñas no coinciden",
-      }));
-      return;
+      validationErrors.passwordMatch = "Las contraseñas no coinciden";
     }
 
     if (errors.userExists) {
-      alert("No se puede registrar: el nombre de usuario ya existe.");
+      validationErrors.userExists = "El nombre de usuario ya esta registrado";
+    }
+
+    if (errors.emailExists) {
+      validationErrors.emailExists = "El email ya esta en uso";
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
       return;
     }
 
@@ -124,10 +163,11 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       });
 
       if (response.status === 409) {
-        // Si el usuario ya existe
+        // Si el usuario ya existe, mostramos el error en el formulario
         setErrors((prev) => ({
           ...prev,
-          userExists: "El usuario o correo ya están registrados",
+          userExists: "El usuario ya esta registrado",
+          emailExists: "El email ya esta en uso",
         }));
         return;
       }
@@ -147,7 +187,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
 
   const handleNavigateHome = () => {
     setSuccessMessage(false);
-    onNavigateToHome(); // Redirige a la página principal
+    window.location.href = "/api/usuarios";  // Esto redirige a la página principal
   };
 
   return (
@@ -161,7 +201,9 @@ function RegisterForm({ onClose, onNavigateToHome }) {
             {/* Mostrar errores dinámicos */}
             {errors.email && <p className="error-message">{errors.email}</p>}
             {errors.passwordMatch && <p className="error-message">{errors.passwordMatch}</p>}
+            {errors.passwordStrength && <p className="error-message">{errors.passwordStrength}</p>}
             {errors.userExists && <p className="error-message">{errors.userExists}</p>}
+            {errors.emailExists && <p className="error-message">{errors.emailExists}</p>}
 
             <form onSubmit={handleSubmit}>
               <div className="form-group">
@@ -173,6 +215,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
                   placeholder="Ingresa tu nombre de usuario"
                   value={formData.username}
                   onChange={handleChange}
+                  className={errors.userExists ? "error" : ""}
                   required
                 />
               </div>
@@ -185,6 +228,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
                   placeholder="Ingresa tu correo"
                   value={formData.email}
                   onChange={handleChange}
+                  className={errors.emailExists ? "error" : ""}
                   required
                 />
               </div>
@@ -197,6 +241,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
                   placeholder="Crea tu contraseña"
                   value={formData.password}
                   onChange={handleChange}
+                  className={errors.passwordStrength ? "error" : ""}
                   required
                 />
               </div>
@@ -209,6 +254,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
                   placeholder="Confirma tu contraseña"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  className={errors.passwordMatch ? "error" : ""}
                   required
                 />
               </div>
@@ -221,11 +267,11 @@ function RegisterForm({ onClose, onNavigateToHome }) {
             </button>
           </>
         ) : (
-          <div className="success-message">
+          <div className="success-message" style={{ border: "2px solid #4CAF50", padding: "20px", borderRadius: "8px" }}>
             <h2>Usuario creado correctamente</h2>
-            <p>Bienvenido a la página. Haz clic en el botón para continuar.</p>
-            <button className="btn btn-primary" onClick={"http://localhost:3000/"}>
-              Ir a la página principal
+            <p>Bienvenido. Haz clic en el botón para continuar.</p>
+            <button className="btn btn-primary" onClick={handleNavigateHome}>
+              Loguearse
             </button>
           </div>
         )}

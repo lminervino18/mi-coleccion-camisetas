@@ -22,10 +22,20 @@ public class UsuarioController {
         this.usuarioService = usuarioService;
     }
 
-    // Crear un nuevo usuario
     @PostMapping
     public ResponseEntity<?> createUsuario(@Validated @RequestBody Usuario usuario) {
         try {
+            // Verificar si el correo ya está registrado
+            if (usuarioService.existsByEmail(usuario.getEmail())) {
+                return new ResponseEntity<>("El correo ya está registrado", HttpStatus.CONFLICT);
+            }
+
+            // Verificar si el nombre de usuario ya está registrado
+            if (usuarioService.existsByUsername(usuario.getUsername())) {
+                return new ResponseEntity<>("El nombre de usuario ya está en uso", HttpStatus.CONFLICT);
+            }
+
+            // Crear el nuevo usuario
             Usuario nuevoUsuario = usuarioService.createUsuario(usuario);
             return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {

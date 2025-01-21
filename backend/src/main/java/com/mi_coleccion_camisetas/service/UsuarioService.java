@@ -73,4 +73,13 @@ public class UsuarioService {
             throw new RuntimeException("Usuario no encontrado con ID: " + id);
         }
     }
+
+    public boolean existsByEmail(String email) {
+        return usuarioRepository.existsByEmail(email);
+    }
+
+    public boolean existsByUsername(String username) {
+        return usuarioRepository.existsByUsername(username);
+    }
+
 }
