@@ -1,0 +1,140 @@
+/* Estilo general del contenedor del formulario */
+.register-form-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Superposición oscura sobre el fondo */
+.register-overlay {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Oscurece más el fondo */
+}
+
+/* Estilo del formulario */
+.register-form {
+  background-color: rgba(0, 0, 0, 0.8); /* Fondo negro translúcido */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  width: 90%;
+  max-width: 400px;
+}
+
+/* Título del formulario */
+.register-title {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #ffffff; /* Texto blanco */
+  text-shadow: 1px 1px 5px rgba(0, 0, 0, 0.8); /* Sombra para resaltar */
+}
+
+/* Estilo de los campos del formulario */
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #ffffff; /* Etiquetas en blanco */
+}
+
+.form-group input {
+  width: 100%;
+  padding: 8px;
+  font-size: 1rem;
+  border: 1px solid #555; /* Borde gris oscuro */
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+  color: #ffffff; /* Texto blanco */
+}
+
+.form-group input::placeholder {
+  color: #cccccc; /* Color del placeholder */
+}
+
+/* Estilo para los campos con error */
+.form-group input.error {
+  border: 1px solid red; /* Borde rojo si hay un error */
+  background-color: rgba(255, 0, 0, 0.1); /* Fondo ligeramente rojo */
+}
+
+/* Estilo cuando el campo con error está en foco */
+.form-group input.error:focus {
+  border-color: #ff0000; /* Bordes más intensos en rojo */
+  background-color: rgba(255, 0, 0, 0.2); /* Fondo más oscuro */
+}
+
+/* Estilos para los botones */
+.btn-primary {
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  background-color: #007bff;
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.btn-secondary {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Más translúcido al pasar */
+}
+
+/* Estilo para los mensajes de error */
+.error-message {
+  color: red; /* Color rojo para los errores */
+  font-size: 14px; /* Tamaño de fuente */
+  margin-bottom: 10px; /* Espaciado inferior */
+  text-align: center; /* Centrado del texto */
+  font-weight: bold; /* Negrita para destacar */
+}
+
+/* Estilo para el mensaje de éxito */
+.success-message {
+  text-align: center;
+  color: #ffffff;
+  border: 2px solid #4CAF50; /* Borde verde claro */
+  padding: 20px;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro translúcido */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Sombra para resaltar */
+}
+
+.success-message h2 {
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+}
+
+.success-message p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
