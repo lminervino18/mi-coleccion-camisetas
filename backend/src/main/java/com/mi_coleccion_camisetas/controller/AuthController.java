@@ -1,7 +1,7 @@
 package com.mi_coleccion_camisetas.controller;
 
-import com.mi_coleccion_camisetas.util.JwtUtil; // Importa la clase JwtUtil para la generación del token
-import com.mi_coleccion_camisetas.model.AuthResponse; // Importa la clase AuthResponse para devolver el token
+import java.util.Map;
+import com.mi_coleccion_camisetas.util.JwtUtil; // Importa la clase JwtUtil para la generación del token 
 import com.mi_coleccion_camisetas.model.Usuario;
 import com.mi_coleccion_camisetas.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +20,19 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Usuario usuario) {
-        // Verificar si el usuario existe y la contraseña es correcta
         Usuario foundUser = usuarioService.findByUsernameAndPassword(usuario.getUsername(), usuario.getPassword());
 
         if (foundUser == null) {
             return ResponseEntity.status(401).body("Usuario o contraseña incorrectos");
         }
 
-        // Generar el token JWT
-        String token = jwtUtil.generateToken(foundUser.getUsername());
-        return ResponseEntity.ok(new AuthResponse(token));
+        // Generar token con usuarioId incluido
+        String token = jwtUtil.generateToken(foundUser.getUsername(), foundUser.getId());
+
+        // Enviar token y usuarioId en la respuesta
+        return ResponseEntity.ok(Map.of(
+                "token", token,
+                "usuarioId", foundUser.getId()));
     }
+
 }

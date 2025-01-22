@@ -1,6 +1,6 @@
 package com.mi_coleccion_camisetas.controller;
 
-import com.mi_coleccion_camisetas.model.Usuario;
+import com.mi_coleccion_camisetas.dto.UsuarioDTO;
 import com.mi_coleccion_camisetas.service.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,20 +23,20 @@ public class UsuarioController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createUsuario(@Validated @RequestBody Usuario usuario) {
+    public ResponseEntity<?> createUsuario(@Validated @RequestBody UsuarioDTO usuarioDTO) {
         try {
             // Verificar si el correo ya está registrado
-            if (usuarioService.existsByEmail(usuario.getEmail())) {
+            if (usuarioService.existsByEmail(usuarioDTO.getEmail())) {
                 return new ResponseEntity<>("El correo ya está registrado", HttpStatus.CONFLICT);
             }
 
             // Verificar si el nombre de usuario ya está registrado
-            if (usuarioService.existsByUsername(usuario.getUsername())) {
+            if (usuarioService.existsByUsername(usuarioDTO.getUsername())) {
                 return new ResponseEntity<>("El nombre de usuario ya está en uso", HttpStatus.CONFLICT);
             }
 
-            // Crear el nuevo usuario
-            Usuario nuevoUsuario = usuarioService.createUsuario(usuario);
+            // Crear el nuevo usuario utilizando el DTO
+            UsuarioDTO nuevoUsuario = usuarioService.createUsuario(usuarioDTO);
             return new ResponseEntity<>(nuevoUsuario, HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
@@ -45,28 +45,28 @@ public class UsuarioController {
         }
     }
 
-    // Obtener todos los usuarios
+    // Obtener todos los usuarios como DTOs
     @GetMapping
-    public ResponseEntity<List<Usuario>> getAllUsuarios() {
-        List<Usuario> usuarios = usuarioService.getAllUsuarios();
+    public ResponseEntity<List<UsuarioDTO>> getAllUsuarios() {
+        List<UsuarioDTO> usuarios = usuarioService.getAllUsuarios();
         return new ResponseEntity<>(usuarios, HttpStatus.OK);
     }
 
-    // Obtener un usuario por ID
+    // Obtener un usuario por ID como DTO
     @GetMapping("/{id}")
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
-        Optional<Usuario> usuario = usuarioService.getUsuarioById(id);
+    public ResponseEntity<UsuarioDTO> getUsuarioById(@PathVariable Long id) {
+        Optional<UsuarioDTO> usuario = usuarioService.getUsuarioById(id);
         return usuario.map(value -> new ResponseEntity<>(value, HttpStatus.OK))
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // Actualizar un usuario
+    // Actualizar un usuario con DTO
     @PutMapping("/{id}")
-    public ResponseEntity<Usuario> updateUsuario(
+    public ResponseEntity<UsuarioDTO> updateUsuario(
             @PathVariable Long id,
-            @Validated @RequestBody Usuario usuarioDetails) {
+            @Validated @RequestBody UsuarioDTO usuarioDTO) {
         try {
-            Usuario usuarioActualizado = usuarioService.updateUsuario(id, usuarioDetails);
+            UsuarioDTO usuarioActualizado = usuarioService.updateUsuario(id, usuarioDTO);
             return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

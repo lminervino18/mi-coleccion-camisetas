@@ -2,21 +2,22 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import Login from './components/Login';
 import Camisetas from './components/Camisetas';
+import PrivateRoute from './PrivateRoute';  // Importa el componente PrivateRoute
 
 function App() {
-  const isLoggedIn = localStorage.getItem('token'); // Verifica si hay un token guardado
+  const isLoggedIn = localStorage.getItem('token');
 
   return (
     <Router>
       <Routes>
-        {/* Si el usuario no está autenticado, redirige automáticamente al login */}
+        {/* Redirige a la página correcta según si el usuario está logueado o no */}
         <Route path="/" element={isLoggedIn ? <Navigate to="/camisetas" /> : <Navigate to="/login" />} />
 
-        {/* Ruta para el login */}
+        {/* Ruta pública para login */}
         <Route path="/login" element={<Login />} />
 
-        {/* Ruta para la página de camisetas */}
-        <Route path="/camisetas" element={isLoggedIn ? <Camisetas /> : <Navigate to="/login" />} />
+        {/* Ruta protegida para camisetas */}
+        <Route path="/camisetas" element={<PrivateRoute element={<Camisetas />} />} />
       </Routes>
     </Router>
   );

@@ -32,7 +32,14 @@ function AgregarCamiseta({ onClose, onAdd }) {
       return;
     }
 
+    const usuarioId = localStorage.getItem('usuarioId');
+    if (!usuarioId) {
+      alert('Error: Usuario no autenticado.');
+      return;
+    }
+
     const formData = new FormData();
+    formData.append('usuarioId', localStorage.getItem('usuarioId'));
     formData.append('imagen', newCamiseta.imagen);
     formData.append('club', newCamiseta.club);
     formData.append('pais', newCamiseta.pais);

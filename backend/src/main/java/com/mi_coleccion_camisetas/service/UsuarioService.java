@@ -1,5 +1,6 @@
 package com.mi_coleccion_camisetas.service;
 
+import com.mi_coleccion_camisetas.dto.UsuarioDTO;
 import com.mi_coleccion_camisetas.model.Usuario;
 import com.mi_coleccion_camisetas.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,68 +22,32 @@ public class UsuarioService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // Crear un nuevo usuario
-    public Usuario createUsuario(Usuario usuario) {
-        // Verificar si el email o el username ya existen
-        if (usuarioRepository.existsByEmail(usuario.getEmail())) {
+    // Crear un nuevo usuario con DTO
+    public UsuarioDTO createUsuario(UsuarioDTO usuarioDTO) {
+        if (usuarioRepository.existsByEmail(usuarioDTO.getEmail())) {
             throw new IllegalArgumentException("El correo electrónico ya está registrado.");
         }
 
-        if (usuarioRepository.existsByUsername(usuario.getUsername())) {
+        if (usuarioRepository.existsByUsername(usuarioDTO.getUsername())) {
             throw new IllegalArgumentException("El nombre de usuario ya está registrado.");
         }
-        // Encriptar la contraseña antes de guardar
-        usuario.setPassword(passwordEncoder.encode(usuario.getPassword()));
-        return usuarioRepository.save(usuario);
+
+        Usuario usuario = new Usuario();
+        usuario.setUsername(usuarioDTO.getUsername());
+        usuario.setEmail(usuarioDTO.getEmail());
+        usuario.setRole(usuarioDTO.getRole());
+        usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
+
+        Usuario savedUsuario = usuarioRepository.save(usuario);
+        return new UsuarioDTO(savedUsuario);
     }
 
     // Obtener todos los usuarios
-    public List<Usuario> getAllUsuarios() {
-        return usuarioRepository.findAll();
-    }
-
-    // Buscar un usuario por ID
-    public Optional<Usuario> getUsuarioById(Long id) {
-        return usuarioRepository.findById(id);
-    }
-
-    // Buscar un usuario por ID
-    public Optional<Usuario> getUsuarioByNombre(String username) {
-        return usuarioRepository.findByUsername(username);
-    }
-
-    public Usuario findByUsernameAndPassword(String username, String password) {
-        Optional<Usuario> optionalUsuario = usuarioRepository.findByUsername(username);
-        if (optionalUsuario.isPresent()) {
-            Usuario usuario = optionalUsuario.get(); // Obtener el usuario si está presente
-            if (passwordEncoder.matches(password, usuario.getPassword())) {
-                return usuario; // Si la contraseña es correcta, devolver el usuario
-            }
-        }
-        return null; // Si el usuario no existe o la contraseña no coincide
-    }
-
-    // Actualizar un usuario existente
-    public Usuario updateUsuario(Long id, Usuario usuarioDetails) {
-        return usuarioRepository.findById(id).map(usuario -> {
-            usuario.setUsername(usuarioDetails.getUsername());
-            usuario.setEmail(usuarioDetails.getEmail());
-            // Actualizar la contraseña solo si se proporciona una nueva
-            if (usuarioDetails.getPassword() != null && !usuarioDetails.getPassword().isEmpty()) {
-                usuario.setPassword(passwordEncoder.encode(usuarioDetails.getPassword()));
-            }
-            usuario.setRole(usuarioDetails.getRole());
-            return usuarioRepository.save(usuario);
-        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
-    }
-
-    // Eliminar un usuario
-    public void deleteUsuario(Long id) {
-        if (usuarioRepository.existsById(id)) {
-            usuarioRepository.deleteById(id);
-        } else {
-            throw new RuntimeException("Usuario no encontrado con ID: " + id);
-        }
+    public List<UsuarioDTO> getAllUsuarios() {
+        return usuarioRepository.findAll()
+                .stream()
+                .map(UsuarioDTO::new)
+                .toList();
     }
 
     public boolean existsByEmail(String email) {
@@ -91,6 +56,44 @@ public class UsuarioService {
 
     public boolean existsByUsername(String username) {
         return usuarioRepository.existsByUsername(username);
+    }
+
+    // Buscar un usuario por ID
+    public Optional<UsuarioDTO> getUsuarioById(Long id) {
+        return usuarioRepository.findById(id).map(UsuarioDTO::new);
+    }
+
+    public Usuario findByUsernameAndPassword(String username, String password) {
+        Optional<Usuario> optionalUsuario = usuarioRepository.findByUsername(username);
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get();
+            if (passwordEncoder.matches(password, usuario.getPassword())) {
+                return usuario;
+            }
+        }
+        return null;
+    }
+
+    // Actualizar usuario
+    public UsuarioDTO updateUsuario(Long id, UsuarioDTO usuarioDTO) {
+        return usuarioRepository.findById(id).map(usuario -> {
+            usuario.setUsername(usuarioDTO.getUsername());
+            usuario.setEmail(usuarioDTO.getEmail());
+            if (usuarioDTO.getPassword() != null && !usuarioDTO.getPassword().isEmpty()) {
+                usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
+            }
+            usuario.setRole(usuarioDTO.getRole());
+            Usuario updatedUsuario = usuarioRepository.save(usuario);
+            return new UsuarioDTO(updatedUsuario);
+        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+    }
+
+    public void deleteUsuario(Long id) {
+        if (usuarioRepository.existsById(id)) {
+            usuarioRepository.deleteById(id);
+        } else {
+            throw new RuntimeException("Usuario no encontrado con ID: " + id);
+        }
     }
 
 }

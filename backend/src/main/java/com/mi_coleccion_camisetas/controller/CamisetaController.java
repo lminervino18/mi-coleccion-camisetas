@@ -1,7 +1,6 @@
 package com.mi_coleccion_camisetas.controller;
 
-import com.mi_coleccion_camisetas.model.Camiseta;
-import com.mi_coleccion_camisetas.model.Usuario;
+import com.mi_coleccion_camisetas.dto.CamisetaDTO;
 import com.mi_coleccion_camisetas.service.CamisetaService;
 import com.mi_coleccion_camisetas.service.UsuarioService;
 import org.springframework.http.HttpStatus;
@@ -11,14 +10,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/camisetas")
 public class CamisetaController {
 
     private final CamisetaService camisetaService;
-    private final UsuarioService usuarioService; // Agregar el servicio de usuario
+    private final UsuarioService usuarioService;
 
     public CamisetaController(CamisetaService camisetaService, UsuarioService usuarioService) {
         this.camisetaService = camisetaService;
@@ -38,37 +36,45 @@ public class CamisetaController {
             @RequestParam("numeroEquipacion") int numeroEquipacion,
             @RequestParam("comentarios") String comentarios) {
         try {
-            Optional<Usuario> usuario = usuarioService.getUsuarioById(usuarioId);
-            if (usuario.isEmpty()) {
-                return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+            // Verificar si el usuario existe
+            if (usuarioService.getUsuarioById(usuarioId).isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
             }
 
-            Camiseta camiseta = new Camiseta();
-            camiseta.setUsuario(usuario.get());
-            camiseta.setClub(club);
-            camiseta.setPais(pais);
-            camiseta.setDorsal(dorsal);
-            camiseta.setNombre(nombre);
-            camiseta.setTalle(talle);
-            camiseta.setColores(List.of(colores.split(","))); // Convierte colores a lista
-            camiseta.setNumeroEquipacion(numeroEquipacion);
-            camiseta.setComentarios(comentarios);
+            // Construir DTO de camiseta
+            CamisetaDTO camisetaDTO = new CamisetaDTO();
+            camisetaDTO.setUsuarioId(usuarioId);
+            camisetaDTO.setClub(club);
+            camisetaDTO.setPais(pais);
+            camisetaDTO.setDorsal(dorsal);
+            camisetaDTO.setNombre(nombre);
+            camisetaDTO.setTalle(talle);
+            camisetaDTO.setColores(List.of(colores.split(","))); // Convertir colores a lista
+            camisetaDTO.setNumeroEquipacion(numeroEquipacion);
+            camisetaDTO.setComentarios(comentarios);
 
-            Camiseta nuevaCamiseta = camisetaService.saveCamiseta(camiseta, imagen);
-            return new ResponseEntity<>(nuevaCamiseta, HttpStatus.CREATED);
+            // Guardar camiseta
+            CamisetaDTO nuevaCamiseta = camisetaService.saveCamiseta(camisetaDTO, imagen);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCamiseta);
+
         } catch (IOException e) {
-            return new ResponseEntity<>("Error al procesar la imagen", HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar la imagen");
         }
     }
 
     @GetMapping("/{usuarioId}")
-    public ResponseEntity<List<Camiseta>> getCamisetasByUsuario(@PathVariable Long usuarioId) {
-        return ResponseEntity.ok(camisetaService.getCamisetasByUsuario(usuarioId));
+    public ResponseEntity<List<CamisetaDTO>> getCamisetasByUsuario(@PathVariable Long usuarioId) {
+        List<CamisetaDTO> camisetas = camisetaService.getCamisetasByUsuario(usuarioId);
+        return ResponseEntity.ok(camisetas);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCamiseta(@PathVariable Long id) {
-        camisetaService.deleteCamiseta(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<?> deleteCamiseta(@PathVariable Long id) {
+        try {
+            camisetaService.deleteCamiseta(id);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Camiseta no encontrada con ID: " + id);
+        }
     }
 }

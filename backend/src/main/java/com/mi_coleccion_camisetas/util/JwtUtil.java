@@ -12,11 +12,11 @@ public class JwtUtil {
 
     private String secretKey = "mi_secreto_super_seguro";
 
-    // Generar el token
-    public String generateToken(String username) {
+    public String generateToken(String username, Long usuarioId) {
         Algorithm algorithm = Algorithm.HMAC256(secretKey);
         return JWT.create()
                 .withSubject(username)
+                .withClaim("usuarioId", usuarioId)
                 .withIssuedAt(new Date())
                 .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Expira en 1 hora
                 .sign(algorithm);
@@ -28,6 +28,13 @@ public class JwtUtil {
                 .build()
                 .verify(token);
         return decodedJWT.getSubject();
+    }
+
+    public Long extractUsuarioId(String token) {
+        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secretKey))
+                .build()
+                .verify(token);
+        return decodedJWT.getClaim("usuarioId").asLong();
     }
 
     // Verificar si el token ha expirado

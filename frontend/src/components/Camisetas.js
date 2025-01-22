@@ -54,10 +54,12 @@ function Camisetas() {
           .filter((camiseta) => camiseta.club.toLowerCase().includes(search.toLowerCase()))
           .map((camiseta) => (
             <div key={camiseta.id} className="camiseta-item">
-              <img src={`data:image/jpeg;base64,${camiseta.imagen}`} alt={camiseta.club} />
+              <div className="camiseta-image-wrapper">
+                <img src={`data:image/jpeg;base64,${camiseta.imagen}`} alt={camiseta.club} />
+              </div>
               <div className="camiseta-info">
                 <h3>{camiseta.club}</h3>
-                <p>{camiseta.pais}</p>
+                <p>País: {camiseta.pais}</p>
                 <p>Dorsal: {camiseta.dorsal}</p>
                 <p>Talle: {camiseta.talle}</p>
               </div>
