@@ -1,17 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import './Camisetas.css';
+import AgregarCamiseta from './AgregarCamiseta';
 
 function Camisetas() {
   const [camisetas, setCamisetas] = useState([]);
   const [search, setSearch] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
-    // Obtener las camisetas desde la API
     const fetchCamisetas = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/camisetas', {
+        const usuarioId = localStorage.getItem('usuarioId'); // Obtener usuarioId del localStorage
+        const response = await fetch(`http://localhost:8080/api/camisetas/${usuarioId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`, // Token del login
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
         if (response.ok) {
@@ -28,6 +30,11 @@ function Camisetas() {
     fetchCamisetas();
   }, []);
 
+  const handleAgregarCamiseta = (nuevaCamiseta) => {
+    setCamisetas([...camisetas, nuevaCamiseta]);
+    setShowForm(false);
+  };
+
   return (
     <div className="camisetas-container">
       <div className="top-bar">
@@ -37,18 +44,17 @@ function Camisetas() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button className="btn">Agregar</button>
-        <button className="btn">Filtrar</button>
-        <button className="btn">Ordenar</button>
+        <button className="btn" onClick={() => setShowForm(true)}>Agregar</button>
       </div>
+
+      {showForm && <AgregarCamiseta onClose={() => setShowForm(false)} onAgregar={handleAgregarCamiseta} />}
+
       <div className="grid-container">
         {camisetas
-          .filter((camiseta) =>
-            camiseta.club.toLowerCase().includes(search.toLowerCase())
-          )
+          .filter((camiseta) => camiseta.club.toLowerCase().includes(search.toLowerCase()))
           .map((camiseta) => (
             <div key={camiseta.id} className="camiseta-item">
-              <img src={camiseta.imagen} alt={camiseta.club} />
+              <img src={`data:image/jpeg;base64,${camiseta.imagen}`} alt={camiseta.club} />
               <div className="camiseta-info">
                 <h3>{camiseta.club}</h3>
                 <p>{camiseta.pais}</p>

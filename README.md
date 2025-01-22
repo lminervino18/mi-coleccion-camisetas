@@ -65,30 +65,6 @@ El backend está desarrollado en Spring Boot y provee una API REST para:
 1. Gestión de usuarios (registro, autenticación y perfil).
 2. Operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para las camisetas.
 
-### Base de datos
-
-El modelo de la base de datos asegura que cada usuario tenga una colección única. Aquí está la estructura simplificada:
-
-- **Usuarios**:
-
-  - ID (clave primaria)
-  - Nombre
-  - Contraseña (hashed)
-  - Foto de perfil
-
-- **Camisetas**:
-  - ID (clave primaria)
-  - UsuarioID (clave foránea)
-  - Imagen
-  - Club
-  - País
-  - Dorsal
-  - Talle
-  - Número de equipación
-  - Comentarios extra
-
----
-
 ## Cómo agregar una foto
 
 Para agregar una foto de perfil al usuario, asegúrate de subir la imagen a través del formulario de registro o perfil en la aplicación. La foto se almacena en la base de datos y puede ser editada en cualquier momento desde la sección de perfil del usuario.
@@ -98,5 +74,3 @@ Para agregar una foto de perfil al usuario, asegúrate de subir la imagen a trav
 **Nota:** Asegúrate de tener todos los servicios corriendo, tanto el frontend como el backend, antes de realizar cualquier acción en la aplicación.
 
 ---
-
-Este README está actualizado para reflejar las modificaciones que hemos hecho, incluyendo la foto de perfil y las validaciones dinámicas para el registro de usuario.
