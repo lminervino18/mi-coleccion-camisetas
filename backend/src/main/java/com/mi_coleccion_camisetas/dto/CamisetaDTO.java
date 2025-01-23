@@ -1,6 +1,7 @@
 package com.mi_coleccion_camisetas.dto;
 
 import com.mi_coleccion_camisetas.model.Camiseta;
+import java.util.Base64;
 import java.util.List;
 
 public class CamisetaDTO {
@@ -13,7 +14,9 @@ public class CamisetaDTO {
     private String talle;
     private List<String> colores;
     private int numeroEquipacion;
+    private String temporada;
     private String comentarios;
+    private String imagenBase64; // Campo para almacenar la imagen en formato Base64 con prefijo
 
     // Constructor vacío
     public CamisetaDTO() {
@@ -31,6 +34,9 @@ public class CamisetaDTO {
         this.colores = camiseta.getColores();
         this.numeroEquipacion = camiseta.getNumeroEquipacion();
         this.comentarios = camiseta.getComentarios();
+        if (camiseta.getImagen() != null && camiseta.getImagen().length > 0) {
+            this.imagenBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(camiseta.getImagen());
+        }
     }
 
     // Getters
@@ -74,6 +80,10 @@ public class CamisetaDTO {
         return comentarios;
     }
 
+    public String getImagenBase64() {
+        return imagenBase64;
+    }
+
     // Setters
     public void setId(Long id) {
         this.id = id;
@@ -111,7 +121,19 @@ public class CamisetaDTO {
         this.numeroEquipacion = numeroEquipacion;
     }
 
+    public String getTemporada() {
+        return temporada;
+    }
+
+    public void setTemporada(String temporada) {
+        this.temporada = temporada;
+    }
+
     public void setComentarios(String comentarios) {
         this.comentarios = comentarios;
+    }
+
+    public void setImagenBase64(String imagenBase64) {
+        this.imagenBase64 = imagenBase64;
     }
 }

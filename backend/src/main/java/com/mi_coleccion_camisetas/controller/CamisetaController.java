@@ -34,6 +34,7 @@ public class CamisetaController {
             @RequestParam("talle") String talle,
             @RequestParam("colores") String colores,
             @RequestParam("numeroEquipacion") int numeroEquipacion,
+            @RequestParam("temporada") String temporada,
             @RequestParam("comentarios") String comentarios) {
         try {
             // Verificar si el usuario existe
@@ -51,6 +52,7 @@ public class CamisetaController {
             camisetaDTO.setTalle(talle);
             camisetaDTO.setColores(List.of(colores.split(","))); // Convertir colores a lista
             camisetaDTO.setNumeroEquipacion(numeroEquipacion);
+            camisetaDTO.setTemporada(temporada);
             camisetaDTO.setComentarios(comentarios);
 
             // Guardar camiseta

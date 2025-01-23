@@ -39,6 +39,8 @@ public class Camiseta {
     @Column(name = "numero_equipacion")
     private Integer numeroEquipacion;
 
+    private String temporada;
+
     @Column(columnDefinition = "TEXT")
     private String comentarios;
 
@@ -47,7 +49,7 @@ public class Camiseta {
     }
 
     public Camiseta(Usuario usuario, byte[] imagen, String club, String pais, Integer dorsal, String nombre,
-            String talle, List<String> colores, Integer numeroEquipacion, String comentarios) {
+            String talle, List<String> colores, Integer numeroEquipacion, String temporada, String comentarios) {
         this.usuario = usuario;
         this.imagen = imagen;
         this.club = club;
@@ -57,6 +59,7 @@ public class Camiseta {
         this.talle = talle;
         this.colores = colores;
         this.numeroEquipacion = numeroEquipacion;
+        this.temporada = temporada;
         this.comentarios = comentarios;
     }
 
@@ -139,6 +142,14 @@ public class Camiseta {
 
     public void setNumeroEquipacion(Integer numeroEquipacion) {
         this.numeroEquipacion = numeroEquipacion;
+    }
+
+    public String getTemporada() {
+        return temporada;
+    }
+
+    public void setTemporada(String temporada) {
+        this.temporada = temporada;
     }
 
     public String getComentarios() {

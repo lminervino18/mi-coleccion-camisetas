@@ -1,6 +1,6 @@
 .camisetas-container {
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.9); /* Fondo mucho más oscuro */
+  background-color: rgba(0, 0, 0, 0.9); /* Fondo más oscuro */
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -8,7 +8,7 @@
   align-items: center;
   background-image: url('../assets/background.jpg'); /* Fondo */
   background-size: cover;
-  background-position: center; /* Centrar la imagen de fondo */
+  background-position: center;
 }
 
 .top-bar {
@@ -17,7 +17,7 @@
   align-items: center;
   width: 80%;
   margin-bottom: 20px;
-  background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro translúcido para la barra superior */
+  background-color: rgba(0, 0, 0, 0.8); /* Fondo oscuro translúcido */
   padding: 10px;
   border-radius: 8px;
 }
@@ -28,7 +28,7 @@
   width: 40%;
   border: 1px solid #ccc;
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.2); /* Fondo más oscuro para el input */
+  background-color: rgba(255, 255, 255, 0.2);
   color: white;
 }
 
@@ -41,65 +41,67 @@
   border-radius: 5px;
   cursor: pointer;
   margin-left: 10px;
-  transition: all 0.3s ease-in-out;
 }
 
 .top-bar button:hover {
   background-color: #0056b3;
-  transform: scale(1.05);
 }
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(3, 1fr); /* Tres columnas */
   gap: 20px;
   width: 80%;
   margin-top: 20px;
 }
 
 .camiseta-item {
-  background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro más fuerte */
-  border-radius: 15px;
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.7);
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro */
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
   overflow: hidden;
-  transition: transform 0.3s ease-in-out;
-  cursor: pointer;
+  transition: transform 0.2s ease-in-out;
+  height: 250px; /* Altura fija */
 }
 
 .camiseta-item:hover {
-  transform: scale(1.1);
+  transform: scale(1.05);
 }
 
 .camiseta-image-wrapper {
-  width: 100%;
-  height: 250px;
-  overflow: hidden;
-}
-
-.camiseta-item img {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  transition: transform 0.3s ease-in-out;
+  background-size: cover;
+  background-position: center;
+  filter: grayscale(50%); /* Imagen en escala de grises */
+  transition: filter 0.3s ease-in-out;
 }
 
-.camiseta-item:hover img {
-  transform: scale(1.1);
+.camiseta-item:hover .camiseta-image-wrapper {
+  filter: grayscale(0); /* Mostrar colores originales */
 }
 
 .camiseta-info {
-  padding: 20px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro para texto */
+  padding: 15px;
   text-align: center;
   color: white;
 }
 
 .camiseta-info h3 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 1.2rem;
 }
 
 .camiseta-info p {
-  margin: 10px 0;
+  margin: 5px 0;
   color: #ccc;
-  font-size: 1.2rem;
 }

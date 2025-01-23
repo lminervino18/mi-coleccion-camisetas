@@ -1,97 +1,186 @@
 .form-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9); /* Fondo oscuro */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-image: url('../assets/background.jpg'); /* Fondo */
-    background-size: cover;
-    background-position: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9); /* Fondo oscuro */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-y: auto;
+  padding: 20px;
+  background-image: url('../assets/background.jpg'); /* Fondo con imagen */
+  background-size: cover;
+  background-position: center;
+}
+
+.camiseta-form {
+  background-color: rgba(0, 0, 0, 0.85); /* Fondo traslúcido */
+  padding: 20px;
+  border-radius: 10px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  color: white;
+}
+
+.camiseta-form h2 {
+  color: #ffffff; /* Texto blanco */
+  font-size: 1.8rem;
+  margin-bottom: 20px;
+}
+
+/* Estilo uniforme para todos los campos de entrada */
+.camiseta-form input,
+.camiseta-form select,
+.camiseta-form textarea {
+  width: calc(100% - 20px);
+  padding: 12px;
+  margin-bottom: 15px;
+  font-size: 1rem;
+  border: 1px solid #666;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+  color: white;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.camiseta-form input::placeholder,
+.camiseta-form textarea::placeholder {
+  color: #bbb;
+}
+
+.camiseta-form select {
+  appearance: none;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  cursor: pointer;
+}
+
+/* Opciones de select */
+.camiseta-form select option {
+  background-color: #333;
+  color: white;
+  font-size: 1rem;
+}
+
+.camiseta-form textarea {
+  resize: none;
+  height: 80px;
+}
+
+/* Botones */
+.camiseta-form .btn {
+  width: 100%;
+  padding: 12px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.camiseta-form .btn-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.camiseta-form .btn-primary:hover {
+  background-color: #0056b3;
+}
+
+.camiseta-form .btn-secondary {
+  margin-top: 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.camiseta-form .btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.4);
+}
+
+/* Animación del formulario */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
   }
-  
-  .camiseta-form {
-    background-color: rgba(0, 0, 0, 0.85); /* Fondo oscuro translúcido */
-    padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 400px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
-    text-align: center;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .camiseta-form h2 {
-    color: white;
-    font-size: 1.8rem;
-    margin-bottom: 20px;
-  }
-  
-  .camiseta-form input,
-  .camiseta-form textarea {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    font-size: 1rem;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.2); /* Fondo translúcido */
-    color: white;
-  }
-  
-  .camiseta-form input::placeholder,
-  .camiseta-form textarea::placeholder {
-    color: #ccc;
-  }
-  
-  .camiseta-form textarea {
-    resize: none;
-    height: 80px;
-  }
-  
-  .camiseta-form .btn {
-    width: 100%;
-    padding: 10px;
-    font-size: 1rem;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-  }
-  
-  .camiseta-form .btn-primary {
-    background-color: #007bff;
-    color: white;
-  }
-  
-  .camiseta-form .btn-primary:hover {
-    background-color: #0056b3;
-  }
-  
-  .camiseta-form .btn-secondary {
-    margin-top: 10px;
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-  }
-  
-  .camiseta-form .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.4);
-  }
-  
-  /* Agregar una animación sutil al abrir */
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .camiseta-form {
-    animation: fadeIn 0.3s ease-in-out;
-  }
-  
+}
+
+.camiseta-form {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Previsualización de imagen */
+.preview-image {
+  width: 100%;
+  max-width: 150px;
+  border-radius: 8px;
+  margin: 10px auto;
+  display: block;
+}
+
+/* Mejora de la selección de colores */
+.color-selection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.color-selection select {
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Espacio reservado para los colores seleccionados */
+.selected-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 10px;
+  min-height: 50px; /* Espacio reservado antes de seleccionar */
+  border: 1px solid #666;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.color-tag {
+  background-color: rgba(255, 255, 255, 0.3);
+  padding: 8px 12px;
+  border-radius: 5px;
+  color: white;
+  display: flex;
+  align-items: center;
+  font-size: 0.9rem;
+}
+
+.color-tag button {
+  background: none;
+  border: none;
+  color: red;
+  margin-left: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+/* Tamaño uniforme para select e inputs */
+input[type="text"],
+input[type="file"],
+select,
+textarea {
+  font-size: 1rem;
+}
+
+/* Tamaño más uniforme para selects */
+.camiseta-form select {
+  height: 45px;
+}
