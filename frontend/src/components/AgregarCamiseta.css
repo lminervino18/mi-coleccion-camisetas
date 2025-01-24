@@ -4,19 +4,19 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.9); /* Fondo oscuro */
+  background-color: rgba(0, 0, 0, 0.9);
   display: flex;
   justify-content: center;
   align-items: center;
   overflow-y: auto;
   padding: 20px;
-  background-image: url('../assets/background.jpg'); /* Fondo con imagen */
+  background-image: url('../assets/background.jpg');
   background-size: cover;
   background-position: center;
 }
 
 .camiseta-form {
-  background-color: rgba(0, 0, 0, 0.85); /* Fondo traslúcido */
+  background-color: rgba(0, 0, 0, 0.85);
   padding: 20px;
   border-radius: 10px;
   width: 90%;
@@ -24,15 +24,16 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
   text-align: center;
   color: white;
+  overflow-y: auto;
+  max-height: 90vh;
 }
 
 .camiseta-form h2 {
-  color: #ffffff; /* Texto blanco */
+  color: white;
   font-size: 1.8rem;
   margin-bottom: 20px;
 }
 
-/* Estilo uniforme para todos los campos de entrada */
 .camiseta-form input,
 .camiseta-form select,
 .camiseta-form textarea {
@@ -42,11 +43,12 @@
   font-size: 1rem;
   border: 1px solid #666;
   border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+  background-color: rgba(255, 255, 255, 0.2);
   color: white;
   display: block;
   margin-left: auto;
   margin-right: auto;
+  box-sizing: border-box;
 }
 
 .camiseta-form input::placeholder,
@@ -56,14 +58,14 @@
 
 .camiseta-form select {
   appearance: none;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #fff;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
   cursor: pointer;
+  padding-right: 30px;
 }
 
-/* Opciones de select */
 .camiseta-form select option {
-  background-color: #333;
+  background-color: rgba(0, 0, 0, 0.85);
   color: white;
   font-size: 1rem;
 }
@@ -73,7 +75,53 @@
   height: 80px;
 }
 
-/* Botones */
+/* Ocultar contenedor de colores seleccionados cuando está vacío */
+.selected-colors {
+  display: none;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 10px;
+  border-radius: 5px;
+  max-width: 100%;
+  box-sizing: border-box;
+  justify-content: center;
+}
+
+.selected-colors {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  justify-content: center; /* Centra los elementos horizontalmente */
+  align-items: center;  /* Centra verticalmente */
+  margin: 10px auto;  /* Agrega margen superior e inferior */
+  padding: 0;
+  width: 100%;  /* Asegura que ocupe todo el ancho del formulario */
+  max-width: 100%;  /* Para evitar desbordamientos */
+}
+
+.color-tag {
+  background: none;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 5px;
+  color: white;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.color-tag button {
+  background: none;
+  border: none;
+  color: red;
+  font-size: 0.9rem;
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+
+/* Ajuste de los botones */
 .camiseta-form .btn {
   width: 100%;
   padding: 12px;
@@ -81,6 +129,8 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  margin-bottom: 10px;
+  box-sizing: border-box;
 }
 
 .camiseta-form .btn-primary {
@@ -93,7 +143,6 @@
 }
 
 .camiseta-form .btn-secondary {
-  margin-top: 10px;
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
 }
@@ -102,85 +151,58 @@
   background-color: rgba(255, 255, 255, 0.4);
 }
 
-/* Animación del formulario */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.camiseta-form {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Previsualización de imagen */
+/* Estilo para la previsualización de la imagen más pequeña */
 .preview-image {
   width: 100%;
-  max-width: 150px;
+  max-width: 120px;
   border-radius: 8px;
-  margin: 10px auto;
+  margin-top: 10px;
   display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Mejora de la selección de colores */
-.color-selection {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+/* Ajuste de márgenes para evitar superposición */
+.selected-colors + input,
+.selected-colors + textarea {
+  margin-top: 10px;
 }
 
-.color-selection select {
+.preview-image {
   width: 100%;
-  max-width: 400px;
+  max-width: 100px;
+  border-radius: 8px;
+  margin-top: 10px;
+  margin-bottom: 15px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-/* Espacio reservado para los colores seleccionados */
 .selected-colors {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 5px;
   justify-content: center;
   margin-top: 10px;
-  min-height: 50px; /* Espacio reservado antes de seleccionar */
-  border: 1px solid #666;
-  padding: 10px;
-  border-radius: 5px;
-  background-color: rgba(255, 255, 255, 0.1);
 }
 
 .color-tag {
-  background-color: rgba(255, 255, 255, 0.3);
-  padding: 8px 12px;
+  background: none;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
   border-radius: 5px;
   color: white;
-  display: flex;
+  font-size: 0.85rem;
+  display: inline-flex;
   align-items: center;
-  font-size: 0.9rem;
 }
 
 .color-tag button {
   background: none;
   border: none;
   color: red;
-  margin-left: 5px;
+  font-size: 0.9rem;
+  margin-left: 8px;
   cursor: pointer;
-  font-weight: bold;
-}
-
-/* Tamaño uniforme para select e inputs */
-input[type="text"],
-input[type="file"],
-select,
-textarea {
-  font-size: 1rem;
-}
-
-/* Tamaño más uniforme para selects */
-.camiseta-form select {
-  height: 45px;
 }
