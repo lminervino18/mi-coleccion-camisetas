@@ -13,7 +13,7 @@ public class CamisetaDTO {
     private String nombre;
     private String talle;
     private List<String> colores;
-    private int numeroEquipacion;
+    private String numeroEquipacion;
     private String temporada;
     private String comentarios;
     private String imagenBase64; // Campo para almacenar la imagen en formato Base64 con prefijo
@@ -72,7 +72,7 @@ public class CamisetaDTO {
         return colores;
     }
 
-    public int getNumeroEquipacion() {
+    public String getNumeroEquipacion() {
         return numeroEquipacion;
     }
 
@@ -117,7 +117,7 @@ public class CamisetaDTO {
         this.colores = colores;
     }
 
-    public void setNumeroEquipacion(int numeroEquipacion) {
+    public void setNumeroEquipacion(String numeroEquipacion) {
         this.numeroEquipacion = numeroEquipacion;
     }
 

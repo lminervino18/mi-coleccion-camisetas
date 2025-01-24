@@ -37,7 +37,7 @@ public class Camiseta {
     private List<String> colores; // Lista de colores
 
     @Column(name = "numero_equipacion")
-    private Integer numeroEquipacion;
+    private String numeroEquipacion;
 
     private String temporada;
 
@@ -49,7 +49,7 @@ public class Camiseta {
     }
 
     public Camiseta(Usuario usuario, byte[] imagen, String club, String pais, Integer dorsal, String nombre,
-            String talle, List<String> colores, Integer numeroEquipacion, String temporada, String comentarios) {
+            String talle, List<String> colores, String numeroEquipacion, String temporada, String comentarios) {
         this.usuario = usuario;
         this.imagen = imagen;
         this.club = club;
@@ -136,11 +136,11 @@ public class Camiseta {
         this.colores = colores;
     }
 
-    public Integer getNumeroEquipacion() {
+    public String getNumeroEquipacion() {
         return numeroEquipacion;
     }
 
-    public void setNumeroEquipacion(Integer numeroEquipacion) {
+    public void setNumeroEquipacion(String numeroEquipacion) {
         this.numeroEquipacion = numeroEquipacion;
     }
 

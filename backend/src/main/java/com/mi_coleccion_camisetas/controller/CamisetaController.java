@@ -33,7 +33,7 @@ public class CamisetaController {
             @RequestParam("nombre") String nombre,
             @RequestParam("talle") String talle,
             @RequestParam("colores") String colores,
-            @RequestParam("numeroEquipacion") int numeroEquipacion,
+            @RequestParam("numeroEquipacion") String numeroEquipacion,
             @RequestParam("temporada") String temporada,
             @RequestParam("comentarios") String comentarios) {
         try {
