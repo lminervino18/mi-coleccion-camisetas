@@ -102,7 +102,7 @@ public class CamisetaDTO {
         this.pais = pais;
     }
 
-    public void setDorsal(int dorsal) {
+    public void setDorsal(Integer dorsal) {
         this.dorsal = dorsal;
     }
 

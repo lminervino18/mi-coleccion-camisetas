@@ -25,6 +25,7 @@ public class Camiseta {
     @Column(nullable = false)
     private String pais;
 
+    @Column(nullable = true)
     private Integer dorsal;
 
     private String nombre;

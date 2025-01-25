@@ -29,7 +29,7 @@ public class CamisetaController {
             @RequestParam("imagen") MultipartFile imagen,
             @RequestParam("club") String club,
             @RequestParam("pais") String pais,
-            @RequestParam("dorsal") int dorsal,
+            @RequestParam(required = false) Integer dorsal,
             @RequestParam("nombre") String nombre,
             @RequestParam("talle") String talle,
             @RequestParam("colores") String colores,

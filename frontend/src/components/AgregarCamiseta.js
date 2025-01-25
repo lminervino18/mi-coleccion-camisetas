@@ -24,13 +24,15 @@ function AgregarCamiseta({ onClose, onAgregar }) {
   const [selectorPosition, setSelectorPosition] = useState({ x: 0, y: 0 });
   const [imageFormat, setImageFormat] = useState('image/jpeg');
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
+  const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
 
   const SELECTOR_SIZE = 300;
 
-  const talles = ['XS', 'S', 'M', 'L', 'XL'];
+  const talles = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Otro'];
   const equipaciones = [
     'Titular', 'Suplente', 'Tercera', 'Arquero',
     'Arquero Suplente', 'Arquero Tercera', 'Entrenamiento', 'Edición especial', 'Otra'
@@ -57,9 +59,17 @@ function AgregarCamiseta({ onClose, onAgregar }) {
 
     if (isFinite(width) && isFinite(height)) {
       setImageSize({ width, height });
+      setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
+      
+      // Calcular el offset de la imagen
+      const offsetX = (containerRect.width - width) / 2;
+      const offsetY = (containerRect.height - height) / 2;
+      setImageOffset({ x: offsetX, y: offsetY });
+
+      // Centrar el selector en la imagen
       setSelectorPosition({
-        x: Math.max(0, (width - SELECTOR_SIZE) / 2),
-        y: Math.max(0, (height - SELECTOR_SIZE) / 2)
+        x: offsetX + (width - SELECTOR_SIZE) / 2,
+        y: offsetY + (height - SELECTOR_SIZE) / 2
       });
     }
   };
@@ -70,14 +80,15 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       const container = containerRef.current;
       const containerRect = container.getBoundingClientRect();
 
-      if (img.complete) {
+      const handleImageLoad = () => {
         calculateImageDimensions(img, containerRect);
         setImageLoaded(true);
+      };
+
+      if (img.complete) {
+        handleImageLoad();
       } else {
-        img.onload = () => {
-          calculateImageDimensions(img, containerRect);
-          setImageLoaded(true);
-        };
+        img.onload = handleImageLoad;
       }
     }
   }, [showImageModal]);
@@ -115,29 +126,37 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     const scaleX = img.naturalWidth / imageSize.width;
     const scaleY = img.naturalHeight / imageSize.height;
 
+    // Calcular las coordenadas relativas a la imagen
+    const relativeX = (selectorPosition.x - imageOffset.x) * scaleX;
+    const relativeY = (selectorPosition.y - imageOffset.y) * scaleY;
+
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-    ctx.drawImage(
-      img,
-      selectorPosition.x * scaleX,
-      selectorPosition.y * scaleY,
-      SELECTOR_SIZE * scaleX,
-      SELECTOR_SIZE * scaleY,
-      0,
-      0,
-      SELECTOR_SIZE,
-      SELECTOR_SIZE
-    );
+    try {
+      ctx.drawImage(
+        img,
+        relativeX,
+        relativeY,
+        SELECTOR_SIZE * scaleX,
+        SELECTOR_SIZE * scaleY,
+        0,
+        0,
+        SELECTOR_SIZE,
+        SELECTOR_SIZE
+      );
 
-    canvas.toBlob((blob) => {
-      if (blob) {
-        const croppedImageUrl = URL.createObjectURL(blob);
-        setPreviewImage(croppedImageUrl);
-        setFormData(prev => ({ ...prev, imagen: blob }));
-        setShowImageModal(false);
-      }
-    }, imageFormat);
+      canvas.toBlob((blob) => {
+        if (blob) {
+          const croppedImageUrl = URL.createObjectURL(blob);
+          setPreviewImage(croppedImageUrl);
+          setFormData(prev => ({ ...prev, imagen: blob }));
+          setShowImageModal(false);
+        }
+      }, imageFormat, 1);
+    } catch (error) {
+      console.error('Error al recortar la imagen:', error);
+    }
   };
 
   const handleColorChange = (e) => {
@@ -196,67 +215,68 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     }
   };
 
-  const ImageModal = () => (
-    <div className="image-modal-overlay">
-      <div className="image-modal">
-        <h3>Seleccionar área de la imagen</h3>
-        <p className="image-instructions">
-          Mueve el selector para elegir el área que se mostrará
-        </p>
-        <div className="image-container" ref={containerRef}>
-          {originalImage && (
-            <>
-              <img
-                ref={imageRef}
-                src={originalImage}
-                alt="Original"
-                className="original-image"
-                style={{
-                  width: imageSize.width,
-                  height: imageSize.height
-                }}
-              />
-              {imageLoaded && (
-                <Rnd
-                  size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
-                  position={selectorPosition}
-                  onDragStop={(e, d) => {
-                    setSelectorPosition({ x: d.x, y: d.y });
-                  }}
-                  bounds="parent"
-                  enableResizing={false}
-                  className="selector"
-                >
-                  <div className="selector-overlay" />
-                </Rnd>
-              )}
-            </>
-          )}
-        </div>
-        <div className="image-modal-buttons">
-          <button 
-            type="button" 
-            className="modal-button primary"
-            onClick={handleImageSelect}
-            disabled={!imageLoaded}
-          >
-            Seleccionar
-          </button>
-          <button 
-            type="button" 
-            className="modal-button secondary"
-            onClick={() => setShowImageModal(false)}
-          >
-            Cancelar
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="form-overlay">
-      {showImageModal && <ImageModal />}
+      {showImageModal && (
+        <div className="image-modal-overlay">
+          <div className="image-modal">
+            <h3>Seleccionar área de la imagen</h3>
+            <p className="image-instructions">
+              Mueve el selector para elegir el área que se mostrará
+            </p>
+            <div className="image-container" ref={containerRef}>
+              {originalImage && (
+                <>
+                  <img
+                    ref={imageRef}
+                    src={originalImage}
+                    alt="Original"
+                    className="original-image"
+                    style={{
+                      width: imageSize.width,
+                      height: imageSize.height,
+                      left: imageOffset.x,
+                      top: imageOffset.y,
+                      transform: 'none'
+                    }}
+                  />
+                  {imageLoaded && (
+                    <Rnd
+                      size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
+                      position={selectorPosition}
+                      onDragStop={(e, d) => {
+                        setSelectorPosition({ x: d.x, y: d.y });
+                      }}
+                      bounds="parent"
+                      enableResizing={false}
+                      className="selector"
+                    >
+                      <div className="selector-overlay" />
+                    </Rnd>
+                  )}
+                </>
+              )}
+            </div>
+            <div className="image-modal-buttons">
+              <button 
+                type="button" 
+                className="modal-button primary"
+                onClick={handleImageSelect}
+                disabled={!imageLoaded}
+              >
+                Seleccionar
+              </button>
+              <button 
+                type="button" 
+                className="modal-button secondary"
+                onClick={() => setShowImageModal(false)}
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <form className="camiseta-form" onSubmit={handleSubmit}>
         <h2>Agregar Camiseta</h2>
 
@@ -374,11 +394,11 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           onChange={handleChange} 
         />
 
-        <div className="form-buttons">
-          <button type="submit" className="btn btn-primary">Agregar Camiseta</button>
-          <button type="button" className="btn btn-secondary" onClick={onClose}>
-            Cancelar
-          </button>
+        <div className="form-buttons-container">
+          <div className="form-buttons">
+            <button type="submit" className="btn btn-primary">Agregar Camiseta</button>
+            <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+          </div>
         </div>
       </form>
     </div>
