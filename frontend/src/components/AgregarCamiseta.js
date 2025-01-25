@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { Rnd } from 'react-rnd';
 import './AgregarCamiseta.css';
 
 function AgregarCamiseta({ onClose, onAgregar }) {
-  const [newCamiseta, setNewCamiseta] = useState({
+  const [formData, setFormData] = useState({
     imagen: null,
     club: '',
     pais: '',
@@ -15,51 +16,145 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     comentarios: '',
   });
 
-  const [previewImage, setPreviewImage] = useState(null);
   const [selectedColors, setSelectedColors] = useState([]);
+  const [showImageModal, setShowImageModal] = useState(false);
+  const [originalImage, setOriginalImage] = useState(null);
+  const [previewImage, setPreviewImage] = useState(null);
+  const [imageSize, setImageSize] = useState({ width: 'auto', height: 'auto' });
+  const [selectorPosition, setSelectorPosition] = useState({ x: 0, y: 0 });
+  const [imageFormat, setImageFormat] = useState('image/jpeg');
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const imageRef = useRef(null);
+  const containerRef = useRef(null);
+
+  const SELECTOR_SIZE = 300;
 
   const talles = ['XS', 'S', 'M', 'L', 'XL'];
   const equipaciones = [
     'Titular', 'Suplente', 'Tercera', 'Arquero',
-    'Arquero Suplente', 'Arquero Tercera', 'Entrenamiento', 'Edición especial'
+    'Arquero Suplente', 'Arquero Tercera', 'Entrenamiento', 'Edición especial', 'Otra'
   ];
   const coloresDisponibles = [
     'Rojo', 'Azul', 'Verde', 'Amarillo', 'Negro', 'Blanco', 'Gris',
     'Naranja', 'Violeta', 'Celeste', 'Bordó', 'Rosa', 'Dorado', 'Plateado', 'Marrón'
   ];
 
+  const calculateImageDimensions = (img, containerRect) => {
+    if (!img.naturalWidth || !img.naturalHeight) return;
+
+    const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+    const containerAspectRatio = containerRect.width / containerRect.height;
+    let width, height;
+
+    if (imgAspectRatio > containerAspectRatio) {
+      width = containerRect.width;
+      height = width / imgAspectRatio;
+    } else {
+      height = containerRect.height;
+      width = height * imgAspectRatio;
+    }
+
+    if (isFinite(width) && isFinite(height)) {
+      setImageSize({ width, height });
+      setSelectorPosition({
+        x: Math.max(0, (width - SELECTOR_SIZE) / 2),
+        y: Math.max(0, (height - SELECTOR_SIZE) / 2)
+      });
+    }
+  };
+
+  useEffect(() => {
+    if (showImageModal && imageRef.current && containerRef.current) {
+      const img = imageRef.current;
+      const container = containerRef.current;
+      const containerRect = container.getBoundingClientRect();
+
+      if (img.complete) {
+        calculateImageDimensions(img, containerRect);
+        setImageLoaded(true);
+      } else {
+        img.onload = () => {
+          calculateImageDimensions(img, containerRect);
+          setImageLoaded(true);
+        };
+      }
+    }
+  }, [showImageModal]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setNewCamiseta({ ...newCamiseta, [name]: value });
+    setFormData(prev => ({ ...prev, [name]: value }));
   };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
-    setNewCamiseta({ ...newCamiseta, imagen: file });
+    if (file) {
+      setImageFormat(file.type || 'image/jpeg');
+      setImageLoaded(false);
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setOriginalImage(reader.result);
+        setShowImageModal(true);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setPreviewImage(reader.result);
-    };
-    reader.readAsDataURL(file);
+  const handleImageSelect = () => {
+    if (!imageRef.current || !imageLoaded) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = SELECTOR_SIZE;
+    canvas.height = SELECTOR_SIZE;
+
+    const img = imageRef.current;
+    const scaleX = img.naturalWidth / imageSize.width;
+    const scaleY = img.naturalHeight / imageSize.height;
+
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.drawImage(
+      img,
+      selectorPosition.x * scaleX,
+      selectorPosition.y * scaleY,
+      SELECTOR_SIZE * scaleX,
+      SELECTOR_SIZE * scaleY,
+      0,
+      0,
+      SELECTOR_SIZE,
+      SELECTOR_SIZE
+    );
+
+    canvas.toBlob((blob) => {
+      if (blob) {
+        const croppedImageUrl = URL.createObjectURL(blob);
+        setPreviewImage(croppedImageUrl);
+        setFormData(prev => ({ ...prev, imagen: blob }));
+        setShowImageModal(false);
+      }
+    }, imageFormat);
   };
 
   const handleColorChange = (e) => {
     const color = e.target.value;
     if (color && !selectedColors.includes(color)) {
-      setSelectedColors([...selectedColors, color]);
+      setSelectedColors(prev => [...prev, color]);
     }
   };
 
   const removeColor = (color) => {
-    const updatedColors = selectedColors.filter((c) => c !== color);
-    setSelectedColors(updatedColors);
+    setSelectedColors(prev => prev.filter(c => c !== color));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!newCamiseta.club || !newCamiseta.pais || !newCamiseta.temporada) {
+    if (!formData.club || !formData.pais || !formData.temporada) {
       alert('Los campos "Club", "País" y "Temporada" son obligatorios.');
       return;
     }
@@ -70,18 +165,15 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('usuarioId', usuarioId);
-    formData.append('imagen', newCamiseta.imagen);
-    formData.append('club', newCamiseta.club);
-    formData.append('pais', newCamiseta.pais);
-    formData.append('temporada', newCamiseta.temporada);
-    formData.append('nombre', newCamiseta.nombre);
-    formData.append('dorsal', newCamiseta.dorsal);
-    formData.append('colores', selectedColors.join(','));
-    formData.append('talle', newCamiseta.talle);
-    formData.append('numeroEquipacion', newCamiseta.numeroEquipacion);
-    formData.append('comentarios', newCamiseta.comentarios);
+    const submitFormData = new FormData();
+    submitFormData.append('usuarioId', usuarioId);
+    Object.keys(formData).forEach(key => {
+      if (key === 'colores') {
+        submitFormData.append(key, selectedColors.join(','));
+      } else {
+        submitFormData.append(key, formData[key]);
+      }
+    });
 
     try {
       const response = await fetch('http://localhost:8080/api/camisetas', {
@@ -89,7 +181,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
-        body: formData,
+        body: submitFormData,
       });
 
       if (response.ok) {
@@ -104,29 +196,147 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     }
   };
 
+  const ImageModal = () => (
+    <div className="image-modal-overlay">
+      <div className="image-modal">
+        <h3>Seleccionar área de la imagen</h3>
+        <p className="image-instructions">
+          Mueve el selector para elegir el área que se mostrará
+        </p>
+        <div className="image-container" ref={containerRef}>
+          {originalImage && (
+            <>
+              <img
+                ref={imageRef}
+                src={originalImage}
+                alt="Original"
+                className="original-image"
+                style={{
+                  width: imageSize.width,
+                  height: imageSize.height
+                }}
+              />
+              {imageLoaded && (
+                <Rnd
+                  size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
+                  position={selectorPosition}
+                  onDragStop={(e, d) => {
+                    setSelectorPosition({ x: d.x, y: d.y });
+                  }}
+                  bounds="parent"
+                  enableResizing={false}
+                  className="selector"
+                >
+                  <div className="selector-overlay" />
+                </Rnd>
+              )}
+            </>
+          )}
+        </div>
+        <div className="image-modal-buttons">
+          <button 
+            type="button" 
+            className="modal-button primary"
+            onClick={handleImageSelect}
+            disabled={!imageLoaded}
+          >
+            Seleccionar
+          </button>
+          <button 
+            type="button" 
+            className="modal-button secondary"
+            onClick={() => setShowImageModal(false)}
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="form-overlay">
+      {showImageModal && <ImageModal />}
       <form className="camiseta-form" onSubmit={handleSubmit}>
         <h2>Agregar Camiseta</h2>
 
-        <input type="text" name="club" placeholder="Club" value={newCamiseta.club} onChange={handleChange} required />
-        <input type="text" name="pais" placeholder="País" value={newCamiseta.pais} onChange={handleChange} required />
-        <input type="text" name="temporada" placeholder="Temporada (ej: 2017/2018)" value={newCamiseta.temporada} onChange={handleChange} required />
+        <input 
+          type="text" 
+          name="club" 
+          placeholder="Club" 
+          value={formData.club} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="pais" 
+          placeholder="País" 
+          value={formData.pais} 
+          onChange={handleChange} 
+          required 
+        />
+        <input 
+          type="text" 
+          name="temporada" 
+          placeholder="Temporada (ej: 2017/2018)" 
+          value={formData.temporada} 
+          onChange={handleChange} 
+          required 
+        />
 
-        <input type="file" accept="image/*" onChange={handleImageChange} required />
-        {previewImage && <img src={previewImage} alt="Previsualización" className="preview-image" />}
+        <input 
+          type="file" 
+          accept="image/*" 
+          onChange={handleImageChange} 
+          required 
+        />
+        {previewImage && (
+          <div className="preview-container">
+            <img 
+              src={previewImage} 
+              alt="Previsualización" 
+              className="preview-image" 
+            />
+          </div>
+        )}
 
-        <input type="text" name="nombre" placeholder="Nombre" value={newCamiseta.nombre} onChange={handleChange} />
-        <input type="text" name="dorsal" placeholder="Dorsal" value={newCamiseta.dorsal} onChange={handleChange} />
+        <input 
+          type="text" 
+          name="nombre" 
+          placeholder="Nombre" 
+          value={formData.nombre} 
+          onChange={handleChange} 
+        />
+        <input 
+          type="text" 
+          name="dorsal" 
+          placeholder="Dorsal" 
+          value={formData.dorsal} 
+          onChange={(e) => setFormData(prev => ({ 
+            ...prev, 
+            dorsal: e.target.value ? parseInt(e.target.value) : '' 
+          }))} 
+        />
 
-        <select name="talle" value={newCamiseta.talle} onChange={handleChange} required className="select-input">
+        <select 
+          name="talle" 
+          value={formData.talle} 
+          onChange={handleChange} 
+          required 
+          className="select-input"
+        >
           <option value="" disabled hidden>Selecciona un talle</option>
           {talles.map((talle) => (
             <option key={talle} value={talle}>{talle}</option>
           ))}
         </select>
 
-        <select onChange={handleColorChange} value="" className="select-input">
+        <select 
+          onChange={handleColorChange} 
+          value="" 
+          className="select-input"
+        >
           <option value="" disabled hidden>Seleccione los colores</option>
           {coloresDisponibles.map((color) => (
             <option key={color} value={color}>{color}</option>
@@ -137,23 +347,39 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           <div className="selected-colors active">
             {selectedColors.map((color, index) => (
               <span key={index} className="color-tag">
-                {color} <button type="button" onClick={() => removeColor(color)}>x</button>
+                {color} 
+                <button type="button" onClick={() => removeColor(color)}>x</button>
               </span>
             ))}
           </div>
         )}
 
-        <select name="numeroEquipacion" value={newCamiseta.numeroEquipacion} onChange={handleChange} required className="select-input">
+        <select 
+          name="numeroEquipacion" 
+          value={formData.numeroEquipacion} 
+          onChange={handleChange} 
+          required 
+          className="select-input"
+        >
           <option value="" disabled hidden>Selecciona número de equipación</option>
           {equipaciones.map((equipacion) => (
             <option key={equipacion} value={equipacion}>{equipacion}</option>
           ))}
         </select>
 
-        <textarea name="comentarios" placeholder="Comentarios extra" value={newCamiseta.comentarios} onChange={handleChange} />
+        <textarea 
+          name="comentarios" 
+          placeholder="Comentarios extra" 
+          value={formData.comentarios} 
+          onChange={handleChange} 
+        />
 
-        <button type="submit" className="btn btn-primary">Guardar</button>
-        <button type="button" className="btn btn-secondary" onClick={onClose}>Cancelar</button>
+        <div className="form-buttons">
+          <button type="submit" className="btn btn-primary">Agregar Camiseta</button>
+          <button type="button" className="btn btn-secondary" onClick={onClose}>
+            Cancelar
+          </button>
+        </div>
       </form>
     </div>
   );

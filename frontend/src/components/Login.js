@@ -89,7 +89,7 @@ function Login() {
             <img src={logo} alt="Logo" className="logo" />
             <h1 className="title">Mi Colección de Camisetas</h1>
           </div>
-          <p className="subtitle">Gestiona tu colección de Casacas</p>
+          <p className="subtitle">Las camisetas que amás, ahora organizadas.</p>
           <form className="login-form" onSubmit={handleSubmit}>
             {error && <p className="error-message">{error}</p>}
             <div className="form-group">

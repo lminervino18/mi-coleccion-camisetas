@@ -68,6 +68,7 @@ function Camisetas() {
                 </div>
                 <div className="camiseta-info">
                   <h3>{camiseta.club} {camiseta.temporada}</h3>
+                  <h3>{camiseta.numeroEquipacion}</h3>
                 </div>
               </div>
             ))}

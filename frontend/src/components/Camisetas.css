@@ -49,7 +49,7 @@
 
 .grid-container {
   display: grid;
-  grid-template-columns: repeat(3, 1fr); /* Tres columnas */
+  grid-template-columns: repeat(5, 1fr); /* Tres columnas */
   gap: 20px;
   width: 80%;
   margin-top: 20px;
@@ -62,7 +62,7 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.6);
   overflow: hidden;
   transition: transform 0.2s ease-in-out;
-  height: 250px; /* Altura fija */
+  height: 300px; /* Altura fija */
 }
 
 .camiseta-item:hover {

@@ -9,7 +9,7 @@ public class CamisetaDTO {
     private Long usuarioId; // Relacionar con el usuario
     private String club;
     private String pais;
-    private int dorsal;
+    private Integer dorsal;
     private String nombre;
     private String talle;
     private List<String> colores;
@@ -32,6 +32,7 @@ public class CamisetaDTO {
         this.nombre = camiseta.getNombre();
         this.talle = camiseta.getTalle();
         this.colores = camiseta.getColores();
+        this.temporada = camiseta.getTemporada();
         this.numeroEquipacion = camiseta.getNumeroEquipacion();
         this.comentarios = camiseta.getComentarios();
         if (camiseta.getImagen() != null && camiseta.getImagen().length > 0) {
@@ -56,7 +57,7 @@ public class CamisetaDTO {
         return pais;
     }
 
-    public int getDorsal() {
+    public Integer getDorsal() {
         return dorsal;
     }
 

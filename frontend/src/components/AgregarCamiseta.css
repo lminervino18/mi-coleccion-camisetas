@@ -75,28 +75,16 @@
   height: 80px;
 }
 
-/* Ocultar contenedor de colores seleccionados cuando está vacío */
-.selected-colors {
-  display: none;
-  flex-wrap: wrap;
-  gap: 8px;
-  padding: 10px;
-  border-radius: 5px;
-  max-width: 100%;
-  box-sizing: border-box;
-  justify-content: center;
-}
-
 .selected-colors {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  justify-content: center; /* Centra los elementos horizontalmente */
-  align-items: center;  /* Centra verticalmente */
-  margin: 10px auto;  /* Agrega margen superior e inferior */
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
   padding: 0;
-  width: 100%;  /* Asegura que ocupe todo el ancho del formulario */
-  max-width: 100%;  /* Para evitar desbordamientos */
+  width: 100%;
+  max-width: 100%;
 }
 
 .color-tag {
@@ -120,89 +108,206 @@
   cursor: pointer;
 }
 
+.form-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
 
-/* Ajuste de los botones */
-.camiseta-form .btn {
-  width: 100%;
+.btn {
   padding: 12px;
   font-size: 1rem;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-bottom: 10px;
-  box-sizing: border-box;
+  flex: 1;
+  transition: background-color 0.3s ease;
 }
 
-.camiseta-form .btn-primary {
+.btn-primary {
   background-color: #007bff;
   color: white;
 }
 
-.camiseta-form .btn-primary:hover {
+.btn-primary:hover {
   background-color: #0056b3;
 }
 
-.camiseta-form .btn-secondary {
+.btn-secondary {
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
 }
 
-.camiseta-form .btn-secondary:hover {
+.btn-secondary:hover {
   background-color: rgba(255, 255, 255, 0.4);
 }
 
-/* Estilo para la previsualización de la imagen más pequeña */
-.preview-image {
-  width: 100%;
-  max-width: 120px;
-  border-radius: 8px;
-  margin-top: 10px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+/* Estilos del modal de imagen */
+.image-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
 }
 
-/* Ajuste de márgenes para evitar superposición */
+.image-modal {
+  background-color: rgba(0, 0, 0, 0.85);
+  padding: 20px;
+  border-radius: 10px;
+  width: 95%;
+  max-width: 1000px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.image-modal h3 {
+  color: white;
+  text-align: center;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.image-instructions {
+  color: #ccc;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.image-container {
+  position: relative;
+  width: 800px;
+  height: 600px;
+  background-color: #000;
+  border-radius: 5px;
+  overflow: hidden;
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.original-image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.selector {
+  border: 2px solid #007bff !important;
+  background-color: rgba(0, 123, 255, 0.1);
+  cursor: move !important;
+  z-index: 2;
+}
+
+.selector-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
+}
+
+.image-modal-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.modal-button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  min-width: 120px;
+  transition: all 0.3s ease;
+}
+
+.modal-button.primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.modal-button.primary:hover:not(:disabled) {
+  background-color: #0056b3;
+}
+
+.modal-button.primary:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.modal-button.secondary {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+}
+
+.modal-button.secondary:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Estilos de previsualización */
+.preview-container {
+  width: 100%;
+  max-width: 300px;
+  height: 300px;
+  margin: 15px auto;
+  border-radius: 8px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Ajustes adicionales */
 .selected-colors + input,
 .selected-colors + textarea {
   margin-top: 10px;
 }
 
-.preview-image {
-  width: 100%;
-  max-width: 100px;
-  border-radius: 8px;
-  margin-top: 10px;
-  margin-bottom: 15px;
-  display: block;
-  margin-left: auto;
-  margin-right: auto;
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .image-container {
+    width: 100%;
+    height: 400px;
+  }
+
+  .image-modal {
+    width: 95%;
+    padding: 15px;
+  }
 }
 
-.selected-colors {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  justify-content: center;
-  margin-top: 10px;
+/* Ajustes para el selector */
+.react-draggable {
+  cursor: move !important;
 }
 
-.color-tag {
-  background: none;
-  border: 1px solid #ccc;
-  padding: 5px 10px;
-  border-radius: 5px;
-  color: white;
-  font-size: 0.85rem;
-  display: inline-flex;
-  align-items: center;
+.react-draggable:active {
+  cursor: grabbing !important;
 }
 
-.color-tag button {
-  background: none;
-  border: none;
-  color: red;
-  font-size: 0.9rem;
-  margin-left: 8px;
-  cursor: pointer;
+/* Ajustes para la imagen original */
+.original-image {
+  user-select: none;
+  -webkit-user-drag: none;
 }
