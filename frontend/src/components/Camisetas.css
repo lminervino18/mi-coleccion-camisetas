@@ -32,19 +32,19 @@
   color: white;
 }
 
-.top-bar button {
+.camisetas-container .top-bar button {
   padding: 10px 20px;
   font-size: 1rem;
   border: none;
-  background-color: #007bff;
-  color: white;
+  background-color: rgb(243, 239, 239);
+  color: black;
   border-radius: 5px;
   cursor: pointer;
   margin-left: 10px;
 }
 
 .top-bar button:hover {
-  background-color: #0056b3;
+  background-color: #666969;
 }
 
 .grid-container {

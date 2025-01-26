@@ -34,6 +34,13 @@
   margin-bottom: 20px;
 }
 
+/* Placeholder en gris para inputs, textareas y selects */
+.camiseta-form input::placeholder,
+.camiseta-form textarea::placeholder,
+.camiseta-form select::placeholder {
+  color: #8d8989;
+}
+
 .camiseta-form input,
 .camiseta-form select,
 .camiseta-form textarea {
@@ -44,22 +51,15 @@
   border: 1px solid #666;
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.2);
-  color: white;
+  color: rgb(241, 241, 241);
   display: block;
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
 }
 
-.camiseta-form input::placeholder,
-.camiseta-form textarea::placeholder {
-  color: #bbb;
-}
-
 .camiseta-form select {
   appearance: none;
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
   cursor: pointer;
   padding-right: 30px;
 }
@@ -99,23 +99,30 @@
   justify-content: center;
 }
 
+/* Estilo mejorado para la cruz de eliminación */
 .color-tag button {
   background: none;
   border: none;
-  color: red;
-  font-size: 0.9rem;
+  color: white;
+  font-size: 1rem;
   margin-left: 8px;
   cursor: pointer;
+  transition: color 0.3s ease;
 }
 
-.form-buttons-container {
+.color-tag button:hover {
+  color: #6e6b6b;
+  transform: scale(1.2);
+}
+
+.camiseta-form .form-buttons-container {
   width: 100%;
   margin-top: 20px;
   display: flex;
   justify-content: center;
 }
 
-.form-buttons {
+.camiseta-form .form-buttons {
   display: flex;
   justify-content: center;
   gap: 20px;
@@ -124,9 +131,18 @@
   padding: 0 10px;
 }
 
-.btn {
-  width: 200px;
-  padding: 12px 0;
+.camiseta-form .btn-primary {
+  width: 80%;
+  padding: 1px 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.camiseta-form .btn-secondary {
+  width: 80%;
+  padding: 12px 10px;
   font-size: 1rem;
   border: none;
   border-radius: 5px;
@@ -134,21 +150,21 @@
   transition: background-color 0.3s ease;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: white;
+.camiseta-form .btn-primary {
+  background-color: #bbb;
+  color: black;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.camiseta-form .btn-primary:hover {
+  background-color: #ffffff;
 }
 
-.btn-secondary {
+.camiseta-form .btn-secondary {
   background-color: rgba(255, 255, 255, 0.2);
   color: white;
 }
 
-.btn-secondary:hover {
+.camiseta-form .btn-secondary:hover {
   background-color: rgba(255, 255, 255, 0.4);
 }
 
@@ -211,7 +227,7 @@
 }
 
 .selector {
-  border: 2px solid #007bff !important;
+  border: 2px solid #cbcdcf !important;
   background-color: rgba(0, 123, 255, 0.1);
   cursor: move !important;
   z-index: 2;
@@ -227,51 +243,7 @@
   box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.75);
 }
 
-.image-modal-buttons {
-  display: flex;
-  justify-content: center;
-  gap: 20px;
-  margin-top: 20px;
-  width: 100%;
-  max-width: 460px;
-  padding: 0 10px;
-}
-
-.modal-button {
-  width: 200px;
-  padding: 12px 0;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: all 0.3s ease;
-  text-align: center;
-}
-
-.modal-button.primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.modal-button.primary:hover:not(:disabled) {
-  background-color: #0056b3;
-}
-
-.modal-button.primary:disabled {
-  background-color: #cccccc;
-  cursor: not-allowed;
-}
-
-.modal-button.secondary {
-  background-color: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.modal-button.secondary:hover {
-  background-color: rgba(255, 255, 255, 0.3);
-}
-
-/* Estilos de previsualización */
+/* Ajustes para la previsualización */
 .preview-container {
   width: 100%;
   max-width: 300px;
@@ -289,10 +261,23 @@
   object-position: center;
 }
 
-/* Ajustes adicionales */
-.selected-colors + input,
-.selected-colors + textarea {
-  margin-top: 10px;
+.image-modal .btn-primary {
+  width: 80%;
+  padding: 1px 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.image-container .btn-secondary {
+  width: 80%;
+  padding: 12px 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 /* Responsive adjustments */

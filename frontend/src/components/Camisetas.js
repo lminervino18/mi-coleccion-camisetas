@@ -44,7 +44,7 @@ function Camisetas() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button className="btn" onClick={() => setShowForm(true)}>Agregar</button>
+        <button className="btn" onClick={() => setShowForm(true)}>Agregar camiseta</button>
       </div>
 
       {showForm ? (
