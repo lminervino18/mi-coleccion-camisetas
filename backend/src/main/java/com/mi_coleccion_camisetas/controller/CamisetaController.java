@@ -10,6 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/camisetas")
@@ -77,6 +78,21 @@ public class CamisetaController {
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Camiseta no encontrada con ID: " + id);
+        }
+    }
+
+    @GetMapping("/usuario/{usuarioId}/camiseta/{id}")
+    public ResponseEntity<?> getCamisetaDetail(
+            @PathVariable Long usuarioId,
+            @PathVariable Long id) {
+        try {
+            Optional<CamisetaDTO> camiseta = camisetaService.getCamisetaDetail(usuarioId, id);
+            return camiseta
+                    .map(ResponseEntity::ok)
+                    .orElse(ResponseEntity.notFound().build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al obtener el detalle de la camiseta: " + e.getMessage());
         }
     }
 }

@@ -26,6 +26,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
@@ -41,6 +42,24 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     'Rojo', 'Azul', 'Verde', 'Amarillo', 'Negro', 'Blanco', 'Gris',
     'Naranja', 'Violeta', 'Celeste', 'Bordó', 'Rosa', 'Dorado', 'Plateado', 'Marrón'
   ];
+
+  const handlePreviewClick = () => {
+    if (originalImage) {
+      setZoom(1);
+      setShowImageModal(true);
+    }
+  };
+
+  const handleWheel = (e) => {
+    if (e.ctrlKey) {
+      e.preventDefault();
+      const delta = e.deltaY * -0.01;
+      setZoom(prevZoom => {
+        const newZoom = prevZoom * (1 - delta);
+        return Math.min(Math.max(0.5, newZoom), 3);
+      });
+    }
+  };
 
   const calculateImageDimensions = (img, containerRect) => {
     if (!img.naturalWidth || !img.naturalHeight) return;
@@ -61,12 +80,10 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       setImageSize({ width, height });
       setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
       
-      // Calcular el offset de la imagen
       const offsetX = (containerRect.width - width) / 2;
       const offsetY = (containerRect.height - height) / 2;
       setImageOffset({ x: offsetX, y: offsetY });
 
-      // Centrar el selector en la imagen
       setSelectorPosition({
         x: offsetX + (width - SELECTOR_SIZE) / 2,
         y: offsetY + (height - SELECTOR_SIZE) / 2
@@ -103,6 +120,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     if (file) {
       setImageFormat(file.type || 'image/jpeg');
       setImageLoaded(false);
+      setZoom(1);
       
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -115,45 +133,66 @@ function AgregarCamiseta({ onClose, onAgregar }) {
 
   const handleImageSelect = () => {
     if (!imageRef.current || !imageLoaded) return;
-
+  
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
     canvas.width = SELECTOR_SIZE;
     canvas.height = SELECTOR_SIZE;
-
+  
     const img = imageRef.current;
-    const scaleX = img.naturalWidth / imageSize.width;
-    const scaleY = img.naturalHeight / imageSize.height;
-
-    // Calcular las coordenadas relativas a la imagen
-    const relativeX = (selectorPosition.x - imageOffset.x) * scaleX;
-    const relativeY = (selectorPosition.y - imageOffset.y) * scaleY;
-
+    
+    // Calculamos las dimensiones reales de la imagen mostrada
+    const displayedWidth = imageSize.width * zoom;
+    const displayedHeight = imageSize.height * zoom;
+    
+    // Calculamos la relación entre las dimensiones originales y las mostradas
+    const scaleX = img.naturalWidth / displayedWidth;
+    const scaleY = img.naturalHeight / displayedHeight;
+  
+    // Calculamos la posición relativa del selector respecto a la imagen
+    const imageLeft = imageOffset.x;
+    const imageTop = imageOffset.y;
+    
+    // Calculamos las coordenadas del recorte en la imagen original
+    const sourceX = (selectorPosition.x - imageLeft) * scaleX;
+    const sourceY = (selectorPosition.y - imageTop) * scaleY;
+    const sourceWidth = SELECTOR_SIZE * scaleX;
+    const sourceHeight = SELECTOR_SIZE * scaleY;
+  
+    // Aseguramos que las coordenadas estén dentro de los límites de la imagen
+    const clampedSourceX = Math.max(0, Math.min(sourceX, img.naturalWidth - sourceWidth));
+    const clampedSourceY = Math.max(0, Math.min(sourceY, img.naturalHeight - sourceHeight));
+  
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  
     try {
       ctx.drawImage(
         img,
-        relativeX,
-        relativeY,
-        SELECTOR_SIZE * scaleX,
-        SELECTOR_SIZE * scaleY,
+        clampedSourceX,
+        clampedSourceY,
+        sourceWidth,
+        sourceHeight,
         0,
         0,
         SELECTOR_SIZE,
         SELECTOR_SIZE
       );
-
-      canvas.toBlob((blob) => {
-        if (blob) {
-          const croppedImageUrl = URL.createObjectURL(blob);
-          setPreviewImage(croppedImageUrl);
-          setFormData(prev => ({ ...prev, imagen: blob }));
-          setShowImageModal(false);
-        }
-      }, imageFormat, 1);
+  
+      // Mantenemos el formato original de la imagen
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const croppedImageUrl = URL.createObjectURL(blob);
+            setPreviewImage(croppedImageUrl);
+            setFormData(prev => ({ ...prev, imagen: blob }));
+            setShowImageModal(false);
+          }
+        },
+        imageFormat,
+        1
+      );
     } catch (error) {
       console.error('Error al recortar la imagen:', error);
     }
@@ -221,10 +260,12 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         <div className="image-modal-overlay">
           <div className="image-modal">
             <h3>Seleccionar área de la imagen</h3>
-            <p className="image-instructions">
-              Mueve el selector para elegir el área que se mostrará
-            </p>
-            <div className="image-container" ref={containerRef}>
+            <div 
+              className="image-container" 
+              ref={containerRef}
+              onWheel={handleWheel}
+              style={{ touchAction: 'none' }}
+            >
               {originalImage && (
                 <>
                   <img
@@ -233,11 +274,12 @@ function AgregarCamiseta({ onClose, onAgregar }) {
                     alt="Original"
                     className="original-image"
                     style={{
-                      width: imageSize.width,
-                      height: imageSize.height,
+                      width: imageSize.width * zoom,
+                      height: imageSize.height * zoom,
                       left: imageOffset.x,
                       top: imageOffset.y,
-                      transform: 'none'
+                      transform: `scale(${zoom})`,
+                      transformOrigin: 'center',
                     }}
                   />
                   {imageLoaded && (
@@ -312,7 +354,12 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           required 
         />
         {previewImage && (
-          <div className="preview-container">
+          <div 
+            className="preview-container" 
+            onClick={handlePreviewClick}
+            style={{ cursor: 'pointer' }}
+            title="Haz clic para volver a recortar"
+          >
             <img 
               src={previewImage} 
               alt="Previsualización" 

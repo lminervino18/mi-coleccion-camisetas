@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Camisetas.css';
 import AgregarCamiseta from './AgregarCamiseta';
 
@@ -6,6 +7,7 @@ function Camisetas() {
   const [camisetas, setCamisetas] = useState([]);
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchCamisetas = async () => {
@@ -35,6 +37,10 @@ function Camisetas() {
     setShowForm(false);
   };
 
+  const handleCamisetaClick = (camisetaId) => {
+    navigate(`/camiseta/${camisetaId}`);
+  };
+
   return (
     <div className="camisetas-container">
       <div className="top-bar">
@@ -54,7 +60,11 @@ function Camisetas() {
           {camisetas
             .filter((camiseta) => camiseta.club.toLowerCase().includes(search.toLowerCase()))
             .map((camiseta) => (
-              <div key={camiseta.id} className="camiseta-item">
+              <div 
+                key={camiseta.id} 
+                className="camiseta-item"
+                onClick={() => handleCamisetaClick(camiseta.id)}
+              >
                 <div className="camiseta-image-wrapper">
                   {camiseta.imagenBase64 ? (
                     <img

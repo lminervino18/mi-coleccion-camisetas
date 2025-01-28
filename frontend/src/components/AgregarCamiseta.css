@@ -51,6 +51,11 @@
   appearance: auto;
 }
 
+.camiseta-form input:not(:placeholder-shown),
+.camiseta-form textarea:not(:placeholder-shown) {
+  color: rgb(119, 117, 117);
+}
+
 .camiseta-form select {
   width: calc(100% - 20px);
   padding: 12px;
@@ -59,17 +64,28 @@
   border: 1px solid #666;
   border-radius: 5px;
   background-color: rgba(87, 85, 85, 0.2);
-  color: #666060;
+  color: #0c0c0c;
   display: block;
   margin-left: auto;
   margin-right: auto;
   box-sizing: border-box;
-  appearance: auto
-  ; /* Quita el estilo nativo */
+  appearance: auto;
 }
 
+.camiseta-form select:not([value=""]) {
+  color: rgb(110, 106, 106);
+}
 
-/* Estilos para los tags de colores */
+.camiseta-form select option:not([value=""]) {
+  color: white;
+  background-color: rgb(82, 81, 81);
+}
+
+.camiseta-form input::placeholder,
+.camiseta-form textarea::placeholder {
+  color: #666060;
+}
+
 .camiseta-form .selected-colors {
   display: flex;
   flex-wrap: wrap;
@@ -109,13 +125,13 @@
   transform: scale(1.2);
 }
 
-/* Estilos para los botones del formulario */
 .camiseta-form .form-buttons-container {
   width: 100%;
   margin-top: 20px;
   display: flex;
   justify-content: center;
 }
+
 .camiseta-form textarea {
   resize: none;
   height: 80px;
@@ -129,7 +145,6 @@
   max-width: 460px;
   padding: 0 10px;
 }
-
 .camiseta-form .btn {
   width: 80%;
   padding: 12px 10px;
@@ -158,7 +173,6 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Estilos para el modal de imagen */
 .image-modal-overlay {
   position: fixed;
   top: 0;
@@ -207,6 +221,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  touch-action: none;
 }
 
 .original-image {
@@ -216,9 +231,9 @@
   max-height: none;
   user-select: none;
   -webkit-user-drag: none;
+  transition: transform 0.1s ease-out;
 }
 
-/* Estilos para la previsualización */
 .preview-container {
   width: 100%;
   max-width: 300px;
@@ -227,6 +242,12 @@
   border-radius: 8px;
   overflow: hidden;
   background-color: #000;
+  transition: transform 0.2s ease;
+}
+
+.preview-container:hover {
+  transform: scale(1.02);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .preview-image {
@@ -236,8 +257,7 @@
   object-position: center;
 }
 
-/* Estilos para el selector de recorte */
-.camiseta-form .preview-image .selector {
+.selector {
   border: 2px solid #646060 !important;
   background-color: rgba(87, 85, 85, 0.1);
   cursor: move !important;
@@ -275,7 +295,6 @@
   text-align: center;
 }
 
-/* Estilo para el botón principal del modal */
 .image-modal-buttons .modal-button.primary {
   background-color: #bbb;
   color: black;
@@ -285,7 +304,6 @@
   background-color: #ffffff;
 }
 
-/* Estilo para el botón secundario del modal */
 .image-modal-buttons .modal-button.secondary {
   background-color: rgba(255, 255, 255, 0.2);
   color: #e0e0e0;
@@ -295,7 +313,6 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
-/* Responsive adjustments */
 @media (max-width: 900px) {
   .image-container {
     width: 100%;
@@ -322,7 +339,6 @@
   }
 }
 
-/* Ajustes responsive para botones del modal */
 @media (max-width: 500px) {
   .image-modal-buttons {
     flex-direction: column;
@@ -335,7 +351,6 @@
   }
 }
 
-/* Ajustes para el selector */
 .react-draggable {
   cursor: move !important;
 }

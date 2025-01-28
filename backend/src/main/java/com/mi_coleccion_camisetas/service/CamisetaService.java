@@ -73,6 +73,20 @@ public class CamisetaService {
                 .collect(Collectors.toList());
     }
 
+    // Nuevo método para obtener una camiseta específica
+    public Optional<CamisetaDTO> getCamisetaDetail(Long usuarioId, Long camisetaId) {
+        Optional<Camiseta> camisetaOpt = camisetaRepository.findByIdAndUsuarioId(camisetaId, usuarioId);
+
+        return camisetaOpt.map(camiseta -> {
+            CamisetaDTO dto = new CamisetaDTO(camiseta);
+            // Convertir la imagen a Base64 para el frontend
+            if (camiseta.getImagen() != null) {
+                dto.setImagenBase64(Base64.getEncoder().encodeToString(camiseta.getImagen()));
+            }
+            return dto;
+        });
+    }
+
     public void deleteCamiseta(Long id) {
         if (camisetaRepository.existsById(id)) {
             camisetaRepository.deleteById(id);
