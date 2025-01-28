@@ -4,7 +4,8 @@ import './AgregarCamiseta.css';
 
 function AgregarCamiseta({ onClose, onAgregar }) {
   const [formData, setFormData] = useState({
-    imagen: null,
+    imagenRecortada: null,
+    imagenCompleta: null,
     club: '',
     pais: '',
     temporada: '',
@@ -122,6 +123,12 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       setImageLoaded(false);
       setZoom(1);
       
+      // Guardar la imagen completa en el formData
+      setFormData(prev => ({
+        ...prev,
+        imagenCompleta: file
+      }));
+      
       const reader = new FileReader();
       reader.onloadend = () => {
         setOriginalImage(reader.result);
@@ -129,17 +136,16 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       };
       reader.readAsDataURL(file);
     }
-  };
-
+  }
   const handleImageSelect = () => {
     if (!imageRef.current || !imageLoaded) return;
-  
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
     canvas.width = SELECTOR_SIZE;
     canvas.height = SELECTOR_SIZE;
-  
+
     const img = imageRef.current;
     
     // Calculamos las dimensiones reales de la imagen mostrada
@@ -149,7 +155,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     // Calculamos la relación entre las dimensiones originales y las mostradas
     const scaleX = img.naturalWidth / displayedWidth;
     const scaleY = img.naturalHeight / displayedHeight;
-  
+
     // Calculamos la posición relativa del selector respecto a la imagen
     const imageLeft = imageOffset.x;
     const imageTop = imageOffset.y;
@@ -159,14 +165,14 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     const sourceY = (selectorPosition.y - imageTop) * scaleY;
     const sourceWidth = SELECTOR_SIZE * scaleX;
     const sourceHeight = SELECTOR_SIZE * scaleY;
-  
+
     // Aseguramos que las coordenadas estén dentro de los límites de la imagen
     const clampedSourceX = Math.max(0, Math.min(sourceX, img.naturalWidth - sourceWidth));
     const clampedSourceY = Math.max(0, Math.min(sourceY, img.naturalHeight - sourceHeight));
-  
+
     ctx.fillStyle = '#FFFFFF';
     ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
+
     try {
       ctx.drawImage(
         img,
@@ -179,14 +185,16 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         SELECTOR_SIZE,
         SELECTOR_SIZE
       );
-  
-      // Mantenemos el formato original de la imagen
+
       canvas.toBlob(
         (blob) => {
           if (blob) {
             const croppedImageUrl = URL.createObjectURL(blob);
             setPreviewImage(croppedImageUrl);
-            setFormData(prev => ({ ...prev, imagen: blob }));
+            setFormData(prev => ({ 
+              ...prev, 
+              imagenRecortada: blob 
+            }));
             setShowImageModal(false);
           }
         },
@@ -224,14 +232,28 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     }
 
     const submitFormData = new FormData();
+    
+    // Agregar las imágenes con los nombres exactos que espera el backend
     submitFormData.append('usuarioId', usuarioId);
-    Object.keys(formData).forEach(key => {
-      if (key === 'colores') {
-        submitFormData.append(key, selectedColors.join(','));
-      } else {
-        submitFormData.append(key, formData[key]);
-      }
-    });
+    submitFormData.append('imagenCompleta', formData.imagenCompleta);
+    submitFormData.append('imagenRecortada', formData.imagenRecortada);
+    
+    // Agregar el resto de los campos
+    submitFormData.append('club', formData.club);
+    submitFormData.append('pais', formData.pais);
+    submitFormData.append('temporada', formData.temporada);
+    submitFormData.append('nombre', formData.nombre || '');
+    submitFormData.append('dorsal', formData.dorsal || '');
+    submitFormData.append('talle', formData.talle);
+    submitFormData.append('colores', selectedColors.join(','));
+    submitFormData.append('numeroEquipacion', formData.numeroEquipacion);
+    submitFormData.append('comentarios', formData.comentarios || '');
+
+    // Debug para ver qué se está enviando
+    console.log('Enviando datos:');
+    for (let pair of submitFormData.entries()) {
+        console.log(pair[0] + ': ' + pair[1]);
+    }
 
     try {
       const response = await fetch('http://localhost:8080/api/camisetas', {
@@ -242,17 +264,20 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         body: submitFormData,
       });
 
-      if (response.ok) {
-        const addedCamiseta = await response.json();
-        onAgregar(addedCamiseta);
-        onClose();
-      } else {
-        console.error('Error al agregar la camiseta');
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
+
+      const addedCamiseta = await response.json();
+      onAgregar(addedCamiseta);
+      onClose();
     } catch (error) {
-      console.error('Error en la conexión al servidor', error);
+      console.error('Error al agregar la camiseta:', error);
+      alert('Error al agregar la camiseta. Por favor, intente nuevamente.');
     }
-  };
+};
 
   return (
     <div className="form-overlay">
@@ -376,22 +401,28 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           onChange={handleChange} 
         />
         <input 
-          type="text" 
-          name="dorsal" 
-          placeholder="Dorsal" 
-          value={formData.dorsal} 
-          onChange={(e) => setFormData(prev => ({ 
-            ...prev, 
-            dorsal: e.target.value ? parseInt(e.target.value) : '' 
-          }))} 
-        />
+        type="text" 
+        name="dorsal" 
+        placeholder="Dorsal" 
+        value={formData.dorsal || ''} 
+        onChange={(e) => {
+          const value = e.target.value;
+          // Solo permite números y vacío
+          if (value === '' || /^[0-9]+$/.test(value)) {
+            setFormData(prev => ({
+              ...prev,
+              dorsal: value === '' ? '' : parseInt(value)
+            }));
+          }
+        }}
+      />
 
         <select 
           name="talle" 
           value={formData.talle} 
           onChange={handleChange} 
           required 
-          className="select-input"
+          className={`select-input ${formData.talle ? 'has-value' : ''}`}
         >
           <option value="" disabled hidden>Selecciona un talle</option>
           {talles.map((talle) => (
@@ -402,7 +433,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         <select 
           onChange={handleColorChange} 
           value="" 
-          className="select-input"
+          className={`select-input ${selectedColors.length > 0 ? 'has-value' : ''}`}
         >
           <option value="" disabled hidden>Seleccione los colores</option>
           {coloresDisponibles.map((color) => (
@@ -426,7 +457,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           value={formData.numeroEquipacion} 
           onChange={handleChange} 
           required 
-          className="select-input"
+          className={`select-input ${formData.numeroEquipacion ? 'has-value' : ''}`}
         >
           <option value="" disabled hidden>Selecciona número de equipación</option>
           {equipaciones.map((equipacion) => (

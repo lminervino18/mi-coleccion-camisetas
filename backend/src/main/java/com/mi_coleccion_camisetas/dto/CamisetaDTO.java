@@ -16,7 +16,8 @@ public class CamisetaDTO {
     private String numeroEquipacion;
     private String temporada;
     private String comentarios;
-    private String imagenBase64; // Campo para almacenar la imagen en formato Base64 con prefijo
+    private String imagenCompletaBase64;
+    private String imagenRecortadaBase64; // Campo para almacenar la imagen en formato Base64 con prefijo
 
     // Constructor vacío
     public CamisetaDTO() {
@@ -35,8 +36,13 @@ public class CamisetaDTO {
         this.temporada = camiseta.getTemporada();
         this.numeroEquipacion = camiseta.getNumeroEquipacion();
         this.comentarios = camiseta.getComentarios();
-        if (camiseta.getImagen() != null && camiseta.getImagen().length > 0) {
-            this.imagenBase64 = "data:image/jpeg;base64," + Base64.getEncoder().encodeToString(camiseta.getImagen());
+        if (camiseta.getImagenCompleta() != null && camiseta.getImagenCompleta().length > 0) {
+            this.imagenCompletaBase64 = "data:image/jpeg;base64,"
+                    + Base64.getEncoder().encodeToString(camiseta.getImagenCompleta());
+        }
+        if (camiseta.getImagenRecortada() != null && camiseta.getImagenRecortada().length > 0) {
+            this.imagenRecortadaBase64 = "data:image/jpeg;base64,"
+                    + Base64.getEncoder().encodeToString(camiseta.getImagenRecortada());
         }
     }
 
@@ -81,8 +87,12 @@ public class CamisetaDTO {
         return comentarios;
     }
 
-    public String getImagenBase64() {
-        return imagenBase64;
+    public String getImagenCompletaBase64() {
+        return imagenCompletaBase64;
+    }
+
+    public String getImagenRecortadaBase64() {
+        return imagenRecortadaBase64;
     }
 
     // Setters
@@ -134,7 +144,11 @@ public class CamisetaDTO {
         this.comentarios = comentarios;
     }
 
-    public void setImagenBase64(String imagenBase64) {
-        this.imagenBase64 = imagenBase64;
+    public void setImagenCompletaBase64(String imagenBase64) {
+        this.imagenCompletaBase64 = imagenBase64;
+    }
+
+    public void setImagenRecortadaBase64(String imagenBase64) {
+        this.imagenRecortadaBase64 = imagenBase64;
     }
 }

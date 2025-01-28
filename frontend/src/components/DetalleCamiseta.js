@@ -59,13 +59,16 @@ function DetalleCamiseta() {
           <button className="btn-back" onClick={() => navigate('/camisetas')}>
             ← Volver
           </button>
+          <h1 className="detalle-titulo">
+            {camiseta.club} {camiseta.temporada}
+          </h1>
         </div>
-
+  
         <div className="detalle-content">
-          <div className="detalle-imagen">
-            {camiseta.imagenBase64 ? (
+          <div className="detalle-imagen-container">
+            {camiseta.imagenCompletaBase64 ? (
               <img
-                src={`data:image/jpeg;base64,${camiseta.imagenBase64}`}
+                src={`data:image/jpeg;base64,${camiseta.imagenCompletaBase64}`}
                 alt={camiseta.club}
                 className="camiseta-imagen-completa"
               />
@@ -73,18 +76,12 @@ function DetalleCamiseta() {
               <div className="no-image">Sin imagen</div>
             )}
           </div>
-
+  
           <div className="detalle-info">
-            <h1>{camiseta.club}</h1>
-            
             <div className="info-section">
               <div className="info-item">
                 <span className="info-label">País:</span>
                 <span className="info-value">{camiseta.pais}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Temporada:</span>
-                <span className="info-value">{camiseta.temporada}</span>
               </div>
               <div className="info-item">
                 <span className="info-label">Equipación:</span>
@@ -107,7 +104,7 @@ function DetalleCamiseta() {
                 </div>
               )}
             </div>
-
+  
             {camiseta.colores && camiseta.colores.length > 0 && (
               <div className="colores-section">
                 <h3>Colores</h3>
@@ -118,7 +115,7 @@ function DetalleCamiseta() {
                 </div>
               </div>
             )}
-
+  
             {camiseta.comentarios && (
               <div className="comentarios-section">
                 <h3>Comentarios</h3>
@@ -131,5 +128,4 @@ function DetalleCamiseta() {
     </div>
   );
 }
-
 export default DetalleCamiseta;

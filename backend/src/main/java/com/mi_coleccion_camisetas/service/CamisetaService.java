@@ -24,7 +24,8 @@ public class CamisetaService {
         this.usuarioRepository = usuarioRepository;
     }
 
-    public CamisetaDTO saveCamiseta(CamisetaDTO camisetaDTO, MultipartFile file) throws IOException {
+    public CamisetaDTO saveCamiseta(CamisetaDTO camisetaDTO, MultipartFile imagenRecortada,
+            MultipartFile imagenCompleta) throws IOException {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(camisetaDTO.getUsuarioId());
 
         if (usuarioOpt.isEmpty()) {
@@ -43,17 +44,26 @@ public class CamisetaService {
         camiseta.setTemporada(camisetaDTO.getTemporada());
         camiseta.setComentarios(camisetaDTO.getComentarios());
 
-        // Verificar y guardar la imagen
-        if (file != null && !file.isEmpty()) {
-            camiseta.setImagen(file.getBytes());
+        // Guardar imagen recortada
+        if (imagenRecortada != null && !imagenRecortada.isEmpty()) {
+            camiseta.setImagenRecortada(imagenRecortada.getBytes());
+        }
+
+        // Guardar imagen completa
+        if (imagenCompleta != null && !imagenCompleta.isEmpty()) {
+            camiseta.setImagenCompleta(imagenCompleta.getBytes());
         }
 
         Camiseta savedCamiseta = camisetaRepository.save(camiseta);
         CamisetaDTO responseDTO = new CamisetaDTO(savedCamiseta);
 
-        // Convertir la imagen a Base64 para enviarla al frontend
-        if (savedCamiseta.getImagen() != null) {
-            responseDTO.setImagenBase64(Base64.getEncoder().encodeToString(savedCamiseta.getImagen()));
+        // Convertir ambas imágenes a Base64 para el frontend
+        if (savedCamiseta.getImagenRecortada() != null) {
+            responseDTO
+                    .setImagenRecortadaBase64(Base64.getEncoder().encodeToString(savedCamiseta.getImagenRecortada()));
+        }
+        if (savedCamiseta.getImagenCompleta() != null) {
+            responseDTO.setImagenCompletaBase64(Base64.getEncoder().encodeToString(savedCamiseta.getImagenCompleta()));
         }
 
         return responseDTO;
@@ -64,24 +74,26 @@ public class CamisetaService {
         return camisetas.stream()
                 .map(camiseta -> {
                     CamisetaDTO dto = new CamisetaDTO(camiseta);
-                    // Convertir la imagen a Base64 para el frontend
-                    if (camiseta.getImagen() != null) {
-                        dto.setImagenBase64(Base64.getEncoder().encodeToString(camiseta.getImagen()));
+                    // Para la vista en cuadrícula solo necesitamos la imagen recortada
+                    if (camiseta.getImagenRecortada() != null) {
+                        dto.setImagenRecortadaBase64(Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));
                     }
                     return dto;
                 })
                 .collect(Collectors.toList());
     }
 
-    // Nuevo método para obtener una camiseta específica
     public Optional<CamisetaDTO> getCamisetaDetail(Long usuarioId, Long camisetaId) {
         Optional<Camiseta> camisetaOpt = camisetaRepository.findByIdAndUsuarioId(camisetaId, usuarioId);
 
         return camisetaOpt.map(camiseta -> {
             CamisetaDTO dto = new CamisetaDTO(camiseta);
-            // Convertir la imagen a Base64 para el frontend
-            if (camiseta.getImagen() != null) {
-                dto.setImagenBase64(Base64.getEncoder().encodeToString(camiseta.getImagen()));
+            // Para el detalle enviamos ambas imágenes
+            if (camiseta.getImagenRecortada() != null) {
+                dto.setImagenRecortadaBase64(Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));
+            }
+            if (camiseta.getImagenCompleta() != null) {
+                dto.setImagenCompletaBase64(Base64.getEncoder().encodeToString(camiseta.getImagenCompleta()));
             }
             return dto;
         });

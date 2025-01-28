@@ -17,8 +17,12 @@ public class Camiseta {
     private Usuario usuario;
 
     @Lob
-    @Column(name = "imagen", columnDefinition = "LONGBLOB")
-    private byte[] imagen;
+    @Column(name = "imagen_completa", columnDefinition = "LONGBLOB")
+    private byte[] imagenCompleta;
+
+    @Lob
+    @Column(name = "imagen_recortada", columnDefinition = "LONGBLOB")
+    private byte[] imagenRecortada;
 
     @Column(nullable = false, length = 100)
     private String club;
@@ -50,15 +54,19 @@ public class Camiseta {
     @Column(columnDefinition = "TEXT")
     private String comentarios;
 
-    // Constructores
+    // Constructor vacío
     public Camiseta() {
         this.colores = new ArrayList<>();
     }
 
-    public Camiseta(Usuario usuario, byte[] imagen, String club, String pais, Integer dorsal, String nombre,
-            String talle, List<String> colores, String numeroEquipacion, String temporada, String comentarios) {
+    // Constructor completo
+    public Camiseta(Usuario usuario, byte[] imagenCompleta, byte[] imagenRecortada,
+            String club, String pais, Integer dorsal, String nombre,
+            String talle, List<String> colores, String numeroEquipacion,
+            String temporada, String comentarios) {
         this.usuario = usuario;
-        this.imagen = imagen != null ? imagen.clone() : null;
+        this.imagenCompleta = imagenCompleta != null ? imagenCompleta.clone() : null;
+        this.imagenRecortada = imagenRecortada != null ? imagenRecortada.clone() : null;
         this.club = club;
         this.pais = pais;
         this.dorsal = dorsal;
@@ -81,11 +89,6 @@ public class Camiseta {
         this.colores.remove(color);
     }
 
-    // Método para clonar la imagen de manera segura
-    public byte[] getImagenClone() {
-        return imagen != null ? imagen.clone() : null;
-    }
-
     // Getters y setters con validaciones
     public Long getId() {
         return id;
@@ -106,12 +109,20 @@ public class Camiseta {
         this.usuario = usuario;
     }
 
-    public byte[] getImagen() {
-        return imagen != null ? imagen.clone() : null;
+    public byte[] getImagenCompleta() {
+        return imagenCompleta != null ? imagenCompleta.clone() : null;
     }
 
-    public void setImagen(byte[] imagen) {
-        this.imagen = imagen != null ? imagen.clone() : null;
+    public void setImagenCompleta(byte[] imagenCompleta) {
+        this.imagenCompleta = imagenCompleta != null ? imagenCompleta.clone() : null;
+    }
+
+    public byte[] getImagenRecortada() {
+        return imagenRecortada != null ? imagenRecortada.clone() : null;
+    }
+
+    public void setImagenRecortada(byte[] imagenRecortada) {
+        this.imagenRecortada = imagenRecortada != null ? imagenRecortada.clone() : null;
     }
 
     public String getClub() {

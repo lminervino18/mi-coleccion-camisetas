@@ -1,191 +1,241 @@
 .detalle-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.9);
-    background-image: url('../assets/background.jpg');
-    background-size: cover;
-    background-position: center;
-    overflow-y: auto;
-  }
-  
-  .detalle-container {
-    background-color: rgba(0, 0, 0, 0.85);
-    padding: 20px;
-    min-height: 100vh;
-    color: white;
-  }
-  
-  .detalle-header {
-    margin-bottom: 20px;
-  }
-  
-  .btn-back {
-    background-color: transparent;
-    border: none;
-    color: #bbb;
-    font-size: 1.2rem;
-    cursor: pointer;
-    padding: 10px;
-    transition: color 0.3s ease;
-  }
-  
-  .btn-back:hover {
-    color: white;
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.9);
+  background-image: url('../assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  overflow-y: auto;
+}
+
+.detalle-container {
+  background-color: rgba(0, 0, 0, 0.85);
+  padding: 20px;
+  min-height: 100vh;
+  color: white;
+}
+
+.detalle-header {
+  max-width: 1400px;
+  margin: 0 auto 20px;
+  padding: 0 20px;
+}
+
+.detalle-titulo {
+  font-size: 2.5rem;
+  color: white;
+  margin: 20px 0;
+  text-align: center;
+}
+
+.btn-back {
+  background-color: transparent;
+  border: none;
+  color: #bbb;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 10px;
+  transition: color 0.3s ease;
+}
+
+.btn-back:hover {
+  color: white;
+}
+
+.detalle-content {
+  display: flex;
+  gap: 40px;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.detalle-imagen-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 20px;
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 15px;
+  max-width: 600px;
+}
+
+.camiseta-imagen-completa {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
+.detalle-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-section {
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.info-item {
+  margin-bottom: 15px;
+}
+
+.info-label {
+  color: #bbb;
+  margin-right: 10px;
+  font-size: 0.9rem;
+}
+
+.info-value {
+  color: white;
+  font-size: 1.1rem;
+}
+
+.colores-section {
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.colores-section h3 {
+  color: #bbb;
+  margin-bottom: 15px;
+}
+
+.colores-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.color-tag {
+  background: none;
+  border: 1px solid #666;
+  padding: 5px 15px;
+  border-radius: 5px;
+  color: #e0e0e0;
+  font-size: 0.85rem;
+}
+
+.comentarios-section {
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.comentarios-section h3 {
+  color: #bbb;
+  margin-bottom: 15px;
+}
+
+.comentarios-section p {
+  color: white;
+  line-height: 1.6;
+}
+
+.detalle-loading,
+.detalle-error {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  color: white;
+  font-size: 1.2rem;
+  background-color: rgba(0, 0, 0, 0.9);
+  background-image: url('../assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  gap: 20px;
+}
+
+.no-image {
+  width: 100%;
+  height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 10px;
+  color: #bbb;
+  font-size: 1.2rem;
+}
+
+@media (max-width: 1024px) {
   .detalle-content {
-    display: flex;
-    gap: 40px;
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-    border-radius: 10px;
+    flex-direction: column;
+    align-items: center;
   }
-  
-  .detalle-imagen {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-  }
-  
-  .camiseta-imagen-completa {
+
+  .detalle-imagen-container {
     width: 100%;
-    max-height: 80vh;
-    object-fit: contain;
-    border-radius: 10px;
-    background-color: rgba(255, 255, 255, 0.1);
+    max-width: 500px;
+    margin-bottom: 20px;
   }
-  
+
   .detalle-info {
-    flex: 1;
-    padding: 20px;
-  }
-  
-  .detalle-info h1 {
-    font-size: 2.5rem;
-    margin-bottom: 30px;
-    color: white;
-  }
-  
-  .info-section {
-    background-color: rgba(87, 85, 85, 0.2);
-    border: 1px solid #666;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .info-item {
-    margin-bottom: 15px;
-  }
-  
-  .info-label {
-    color: #bbb;
-    margin-right: 10px;
-    font-size: 0.9rem;
-  }
-  
-  .info-value {
-    color: white;
-    font-size: 1.1rem;
-  }
-  
-  .colores-section {
-    background-color: rgba(87, 85, 85, 0.2);
-    border: 1px solid #666;
-    border-radius: 10px;
-    padding: 20px;
-    margin-bottom: 20px;
-  }
-  
-  .colores-section h3 {
-    color: #bbb;
-    margin-bottom: 15px;
-  }
-  
-  .colores-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  
-  .color-tag {
-    background: none;
-    border: 1px solid #666;
-    padding: 5px 15px;
-    border-radius: 5px;
-    color: #e0e0e0;
-    font-size: 0.85rem;
-  }
-  
-  .comentarios-section {
-    background-color: rgba(87, 85, 85, 0.2);
-    border: 1px solid #666;
-    border-radius: 10px;
-    padding: 20px;
-  }
-  
-  .comentarios-section h3 {
-    color: #bbb;
-    margin-bottom: 15px;
-  }
-  
-  .comentarios-section p {
-    color: white;
-    line-height: 1.6;
-  }
-  
-  .detalle-loading,
-  .detalle-error {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    color: white;
-    font-size: 1.2rem;
-    background-color: rgba(0, 0, 0, 0.9);
-    background-image: url('../assets/background.jpg');
-    background-size: cover;
-    background-position: center;
-  }
-  
-  .no-image {
     width: 100%;
-    height: 400px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background-color: rgba(87, 85, 85, 0.2);
-    border: 1px solid #666;
-    border-radius: 10px;
-    color: #bbb;
-    font-size: 1.2rem;
   }
-  
-  @media (max-width: 1024px) {
-    .detalle-content {
-      flex-direction: column;
-    }
-  
-    .detalle-imagen {
-      margin-bottom: 20px;
-    }
-  
-    .camiseta-imagen-completa {
-      max-height: 50vh;
-    }
+
+  .camiseta-imagen-completa {
+    max-height: 50vh;
   }
-  
-  @media (max-width: 768px) {
-    .detalle-container {
-      padding: 10px;
-    }
-  
-    .detalle-info h1 {
-      font-size: 2rem;
-    }
+}
+
+@media (max-width: 768px) {
+  .detalle-container {
+    padding: 10px;
   }
+
+  .detalle-titulo {
+    font-size: 2rem;
+  }
+
+  .detalle-header {
+    padding: 0 10px;
+  }
+
+  .detalle-content {
+    padding: 10px;
+  }
+
+  .info-section,
+  .colores-section,
+  .comentarios-section {
+    padding: 15px;
+  }
+
+  .info-value {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .detalle-titulo {
+    font-size: 1.8rem;
+  }
+
+  .detalle-imagen-container {
+    padding: 10px;
+  }
+
+  .color-tag {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+}

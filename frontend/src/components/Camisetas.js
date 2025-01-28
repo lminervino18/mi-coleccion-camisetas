@@ -66,9 +66,9 @@ function Camisetas() {
                 onClick={() => handleCamisetaClick(camiseta.id)}
               >
                 <div className="camiseta-image-wrapper">
-                  {camiseta.imagenBase64 ? (
+                  {camiseta.imagenRecortadaBase64 ? (
                     <img
-                      src={`data:image/jpeg;base64,${camiseta.imagenBase64}`}
+                      src={`data:image/jpeg;base64,${camiseta.imagenRecortadaBase64}`}
                       alt={camiseta.club}
                       className="camiseta-image"
                     />

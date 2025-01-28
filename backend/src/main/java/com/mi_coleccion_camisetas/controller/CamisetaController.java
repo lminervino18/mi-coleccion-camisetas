@@ -27,7 +27,8 @@ public class CamisetaController {
     @PostMapping
     public ResponseEntity<?> uploadCamiseta(
             @RequestParam("usuarioId") Long usuarioId,
-            @RequestParam("imagen") MultipartFile imagen,
+            @RequestParam("imagenCompleta") MultipartFile imagenCompleta,
+            @RequestParam("imagenRecortada") MultipartFile imagenRecortada,
             @RequestParam("club") String club,
             @RequestParam("pais") String pais,
             @RequestParam(required = false) Integer dorsal,
@@ -57,7 +58,7 @@ public class CamisetaController {
             camisetaDTO.setComentarios(comentarios);
 
             // Guardar camiseta
-            CamisetaDTO nuevaCamiseta = camisetaService.saveCamiseta(camisetaDTO, imagen);
+            CamisetaDTO nuevaCamiseta = camisetaService.saveCamiseta(camisetaDTO, imagenRecortada, imagenCompleta);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCamiseta);
 
         } catch (IOException e) {
