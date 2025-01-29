@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@CrossOrigin(origins = "http://localhost:3000")
 public class UsuarioController {
 
     private final UsuarioService usuarioService;
@@ -45,14 +46,12 @@ public class UsuarioController {
         }
     }
 
-    // Obtener todos los usuarios como DTOs
     @GetMapping
     public ResponseEntity<List<UsuarioDTO>> getAllUsuarios() {
         List<UsuarioDTO> usuarios = usuarioService.getAllUsuarios();
         return new ResponseEntity<>(usuarios, HttpStatus.OK);
     }
 
-    // Obtener un usuario por ID como DTO
     @GetMapping("/{id}")
     public ResponseEntity<UsuarioDTO> getUsuarioById(@PathVariable Long id) {
         Optional<UsuarioDTO> usuario = usuarioService.getUsuarioById(id);
@@ -60,27 +59,45 @@ public class UsuarioController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-    // Actualizar un usuario con DTO
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> updateUsuario(
+    public ResponseEntity<?> updateUsuario(
             @PathVariable Long id,
             @Validated @RequestBody UsuarioDTO usuarioDTO) {
         try {
+            // Verificar si el email actualizado ya existe en otro usuario
+            if (!usuarioService.getUsuarioById(id).get().getEmail().equals(usuarioDTO.getEmail()) 
+                && usuarioService.existsByEmail(usuarioDTO.getEmail())) {
+                return new ResponseEntity<>("El correo ya está registrado por otro usuario", HttpStatus.CONFLICT);
+            }
+
+            // Verificar si el username actualizado ya existe en otro usuario
+            if (!usuarioService.getUsuarioById(id).get().getUsername().equals(usuarioDTO.getUsername()) 
+                && usuarioService.existsByUsername(usuarioDTO.getUsername())) {
+                return new ResponseEntity<>("El nombre de usuario ya está en uso por otro usuario", HttpStatus.CONFLICT);
+            }
+
             UsuarioDTO usuarioActualizado = usuarioService.updateUsuario(id, usuarioDTO);
             return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al actualizar el usuario", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
-    // Eliminar un usuario
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUsuario(@PathVariable Long id) {
         try {
+            // Verificar si el usuario existe
+            if (usuarioService.getUsuarioById(id).isEmpty()) {
+                return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+            }
+            
             usuarioService.deleteUsuario(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No se puede eliminar el usuario: " + e.getMessage(), 
+                                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

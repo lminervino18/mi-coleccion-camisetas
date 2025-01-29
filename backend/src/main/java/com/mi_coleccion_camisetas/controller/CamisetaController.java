@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/camisetas")
+@CrossOrigin(origins = "http://localhost:3000")
 public class CamisetaController {
 
     private final CamisetaService camisetaService;
@@ -72,13 +73,59 @@ public class CamisetaController {
         return ResponseEntity.ok(camisetas);
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteCamiseta(@PathVariable Long id) {
+    @DeleteMapping("/usuario/{usuarioId}/camiseta/{id}")
+    public ResponseEntity<?> deleteCamiseta(
+            @PathVariable Long usuarioId,
+            @PathVariable Long id) {
         try {
-            camisetaService.deleteCamiseta(id);
+            camisetaService.deleteCamiseta(id, usuarioId);
             return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Camiseta no encontrada con ID: " + id);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Camiseta no encontrada o no pertenece al usuario");
+        }
+    }
+
+    @PutMapping("/usuario/{usuarioId}/camiseta/{id}")
+    public ResponseEntity<?> updateCamiseta(
+            @PathVariable Long usuarioId,
+            @PathVariable Long id,
+            @RequestParam(value = "imagenCompleta", required = false) MultipartFile imagenCompleta,
+            @RequestParam(value = "imagenRecortada", required = false) MultipartFile imagenRecortada,
+            @RequestParam("club") String club,
+            @RequestParam("pais") String pais,
+            @RequestParam(required = false) Integer dorsal,
+            @RequestParam("nombre") String nombre,
+            @RequestParam("talle") String talle,
+            @RequestParam("colores") String colores,
+            @RequestParam("numeroEquipacion") String numeroEquipacion,
+            @RequestParam("temporada") String temporada,
+            @RequestParam("comentarios") String comentarios) {
+        try {
+            CamisetaDTO camisetaDTO = new CamisetaDTO();
+            camisetaDTO.setId(id);
+            camisetaDTO.setUsuarioId(usuarioId);
+            camisetaDTO.setClub(club);
+            camisetaDTO.setPais(pais);
+            camisetaDTO.setDorsal(dorsal);
+            camisetaDTO.setNombre(nombre);
+            camisetaDTO.setTalle(talle);
+            camisetaDTO.setColores(List.of(colores.split(",")));
+            camisetaDTO.setNumeroEquipacion(numeroEquipacion);
+            camisetaDTO.setTemporada(temporada);
+            camisetaDTO.setComentarios(comentarios);
+
+            CamisetaDTO updatedCamiseta = camisetaService.updateCamiseta(
+                    camisetaDTO,
+                    imagenRecortada,
+                    imagenCompleta);
+            return ResponseEntity.ok(updatedCamiseta);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Camiseta no encontrada o no pertenece al usuario");
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar la imagen");
         }
     }
 

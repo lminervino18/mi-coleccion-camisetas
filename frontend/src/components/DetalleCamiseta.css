@@ -1,3 +1,4 @@
+/* Layout Principal */
 .detalle-overlay {
   position: fixed;
   top: 0;
@@ -5,7 +6,7 @@
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.9);
-  background-image: url('../assets/background.jpg');
+  background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
   overflow-y: auto;
@@ -18,6 +19,7 @@
   color: white;
 }
 
+/* Header y Título */
 .detalle-header {
   max-width: 1400px;
   margin: 0 auto 20px;
@@ -31,30 +33,75 @@
   text-align: center;
 }
 
-.btn-back {
-  background-color: transparent;
-  border: none;
-  color: #bbb;
-  font-size: 1.2rem;
-  cursor: pointer;
-  padding: 10px;
-  transition: color 0.3s ease;
+/* Botones de Acción */
+.header-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
 }
 
-.btn-back:hover {
+.action-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+/* Estilos Base para Botones */
+.btn-back,
+.btn-edit,
+.btn-delete {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  min-width: 100px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-back {
+  background-color: #444;
   color: white;
 }
 
+.btn-edit {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #ff6347;
+  color: white;
+}
+
+.btn-back:hover {
+  background-color: #555;
+}
+
+.btn-edit:hover {
+  background-color: #357abd;
+}
+
+.btn-delete:hover {
+  background-color: #ff4125;
+}
+
+/* Contenido Principal */
 .detalle-content {
   display: flex;
-  gap: 40px;
+  gap: 30px;
   max-width: 1400px;
   margin: 0 auto;
   padding: 20px;
 }
 
+/* Contenedor de Imagen */
 .detalle-imagen-container {
-  flex: 1;
+  flex: 1.5;
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -62,7 +109,7 @@
   background-color: rgba(87, 85, 85, 0.2);
   border: 1px solid #666;
   border-radius: 15px;
-  max-width: 600px;
+  max-width: 800px;
 }
 
 .camiseta-imagen-completa {
@@ -72,23 +119,27 @@
   border-radius: 10px;
 }
 
+/* Información del Producto */
 .detalle-info {
-  flex: 1;
+  flex: 0.8;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
 }
 
-.info-section {
+/* Secciones de Información */
+.info-section,
+.colores-section,
+.comentarios-section {
   background-color: rgba(87, 85, 85, 0.2);
   border: 1px solid #666;
   border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
+  padding: 15px;
+  margin-bottom: 15px;
 }
 
 .info-item {
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .info-label {
@@ -102,15 +153,9 @@
   font-size: 1.1rem;
 }
 
-.colores-section {
-  background-color: rgba(87, 85, 85, 0.2);
-  border: 1px solid #666;
-  border-radius: 10px;
-  padding: 20px;
-  margin-bottom: 20px;
-}
-
-.colores-section h3 {
+/* Sección de Colores */
+.colores-section h3,
+.comentarios-section h3 {
   color: #bbb;
   margin-bottom: 15px;
 }
@@ -118,35 +163,110 @@
 .colores-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
 }
 
 .color-tag {
   background: none;
-  border: 1px solid #666;
   padding: 5px 15px;
   border-radius: 5px;
-  color: #e0e0e0;
   font-size: 0.85rem;
+  border-width: 2px;
+  border-style: solid;
 }
 
-.comentarios-section {
-  background-color: rgba(87, 85, 85, 0.2);
-  border: 1px solid #666;
+/* Colores específicos para cada tag */
+.color-tag[data-color="rojo"] {
+  border-color: #ff0000;
+  color: #ff0000;
+}
+
+.color-tag[data-color="azul"] {
+  border-color: #0000ff;
+  color: #0000ff;
+}
+
+.color-tag[data-color="verde"] {
+  border-color: #00ff00;
+  color: #00ff00;
+}
+
+.color-tag[data-color="amarillo"] {
+  border-color: #ffff00;
+  color: #ffff00;
+}
+
+.color-tag[data-color="negro"] {
+  border-color: #080808;
+  color: #c2baba;
+}
+
+.color-tag[data-color="blanco"] {
+  border-color: #ffffff;
+  color: #ffffff;
+}
+
+.color-tag[data-color="gris"] {
+  border-color: #808080;
+  color: #808080;
+}
+
+.color-tag[data-color="marron"] {
+  border-color: #8b4513;
+  color: #8b4513;
+}
+
+.color-tag[data-color="violeta"] {
+  border-color: #800080;
+  color: #800080;
+}
+
+.color-tag[data-color="rosa"] {
+  border-color: #ff69b4;
+  color: #ff69b4;
+}
+
+.color-tag[data-color="naranja"] {
+  border-color: #ffa500;
+  color: #ffa500;
+}
+
+.color-tag[data-color="celeste"] {
+  border-color: #00c3ff;
+  color: #00c3ff;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: rgba(0, 0, 0, 0.95);
+  padding: 30px;
   border-radius: 10px;
-  padding: 20px;
+  border: 1px solid #666;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
 }
 
-.comentarios-section h3 {
-  color: #bbb;
-  margin-bottom: 15px;
+.modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
 }
 
-.comentarios-section p {
-  color: white;
-  line-height: 1.6;
-}
-
+/* Estados de Carga y Error */
 .detalle-loading,
 .detalle-error {
   display: flex;
@@ -157,25 +277,13 @@
   color: white;
   font-size: 1.2rem;
   background-color: rgba(0, 0, 0, 0.9);
-  background-image: url('../assets/background.jpg');
+  background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
   gap: 20px;
 }
 
-.no-image {
-  width: 100%;
-  height: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: rgba(87, 85, 85, 0.2);
-  border: 1px solid #666;
-  border-radius: 10px;
-  color: #bbb;
-  font-size: 1.2rem;
-}
-
+/* Media Queries */
 @media (max-width: 1024px) {
   .detalle-content {
     flex-direction: column;
@@ -184,16 +292,17 @@
 
   .detalle-imagen-container {
     width: 100%;
-    max-width: 500px;
+    max-width: 700px;
     margin-bottom: 20px;
   }
 
   .detalle-info {
     width: 100%;
+    max-width: 700px;
   }
 
   .camiseta-imagen-completa {
-    max-height: 50vh;
+    max-height: 60vh;
   }
 }
 
@@ -206,22 +315,20 @@
     font-size: 2rem;
   }
 
-  .detalle-header {
-    padding: 0 10px;
+  .header-buttons {
+    flex-direction: column;
+    gap: 10px;
   }
 
-  .detalle-content {
-    padding: 10px;
+  .action-buttons {
+    width: 100%;
+    justify-content: center;
   }
 
-  .info-section,
-  .colores-section,
-  .comentarios-section {
-    padding: 15px;
-  }
-
-  .info-value {
-    font-size: 1rem;
+  .btn-back,
+  .btn-edit,
+  .btn-delete {
+    width: 33%;
   }
 }
 

@@ -6,6 +6,7 @@ import com.mi_coleccion_camisetas.model.Usuario;
 import com.mi_coleccion_camisetas.repository.CamisetaRepository;
 import com.mi_coleccion_camisetas.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Base64;
@@ -24,6 +25,7 @@ public class CamisetaService {
         this.usuarioRepository = usuarioRepository;
     }
 
+    @Transactional
     public CamisetaDTO saveCamiseta(CamisetaDTO camisetaDTO, MultipartFile imagenRecortada,
             MultipartFile imagenCompleta) throws IOException {
         Optional<Usuario> usuarioOpt = usuarioRepository.findById(camisetaDTO.getUsuarioId());
@@ -59,11 +61,58 @@ public class CamisetaService {
 
         // Convertir ambas imágenes a Base64 para el frontend
         if (savedCamiseta.getImagenRecortada() != null) {
-            responseDTO
-                    .setImagenRecortadaBase64(Base64.getEncoder().encodeToString(savedCamiseta.getImagenRecortada()));
+            responseDTO.setImagenRecortadaBase64(
+                    Base64.getEncoder().encodeToString(savedCamiseta.getImagenRecortada()));
         }
         if (savedCamiseta.getImagenCompleta() != null) {
-            responseDTO.setImagenCompletaBase64(Base64.getEncoder().encodeToString(savedCamiseta.getImagenCompleta()));
+            responseDTO.setImagenCompletaBase64(
+                    Base64.getEncoder().encodeToString(savedCamiseta.getImagenCompleta()));
+        }
+
+        return responseDTO;
+    }
+
+    @Transactional
+    public CamisetaDTO updateCamiseta(CamisetaDTO camisetaDTO, MultipartFile imagenRecortada,
+            MultipartFile imagenCompleta) throws IOException {
+        Optional<Camiseta> camisetaOpt = camisetaRepository.findByIdAndUsuarioId(
+                camisetaDTO.getId(),
+                camisetaDTO.getUsuarioId());
+
+        if (camisetaOpt.isEmpty()) {
+            throw new RuntimeException("Camiseta no encontrada o no pertenece al usuario");
+        }
+
+        Camiseta camiseta = camisetaOpt.get();
+        camiseta.setClub(camisetaDTO.getClub());
+        camiseta.setPais(camisetaDTO.getPais());
+        camiseta.setDorsal(camisetaDTO.getDorsal());
+        camiseta.setNombre(camisetaDTO.getNombre());
+        camiseta.setTalle(camisetaDTO.getTalle());
+        camiseta.setColores(camisetaDTO.getColores());
+        camiseta.setNumeroEquipacion(camisetaDTO.getNumeroEquipacion());
+        camiseta.setTemporada(camisetaDTO.getTemporada());
+        camiseta.setComentarios(camisetaDTO.getComentarios());
+
+        // Actualizar imágenes solo si se proporcionan nuevas
+        if (imagenRecortada != null && !imagenRecortada.isEmpty()) {
+            camiseta.setImagenRecortada(imagenRecortada.getBytes());
+        }
+        if (imagenCompleta != null && !imagenCompleta.isEmpty()) {
+            camiseta.setImagenCompleta(imagenCompleta.getBytes());
+        }
+
+        Camiseta updatedCamiseta = camisetaRepository.save(camiseta);
+        CamisetaDTO responseDTO = new CamisetaDTO(updatedCamiseta);
+
+        // Convertir imágenes a Base64
+        if (updatedCamiseta.getImagenRecortada() != null) {
+            responseDTO.setImagenRecortadaBase64(
+                    Base64.getEncoder().encodeToString(updatedCamiseta.getImagenRecortada()));
+        }
+        if (updatedCamiseta.getImagenCompleta() != null) {
+            responseDTO.setImagenCompletaBase64(
+                    Base64.getEncoder().encodeToString(updatedCamiseta.getImagenCompleta()));
         }
 
         return responseDTO;
@@ -76,7 +125,8 @@ public class CamisetaService {
                     CamisetaDTO dto = new CamisetaDTO(camiseta);
                     // Para la vista en cuadrícula solo necesitamos la imagen recortada
                     if (camiseta.getImagenRecortada() != null) {
-                        dto.setImagenRecortadaBase64(Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));
+                        dto.setImagenRecortadaBase64(
+                                Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));
                     }
                     return dto;
                 })
@@ -90,20 +140,40 @@ public class CamisetaService {
             CamisetaDTO dto = new CamisetaDTO(camiseta);
             // Para el detalle enviamos ambas imágenes
             if (camiseta.getImagenRecortada() != null) {
-                dto.setImagenRecortadaBase64(Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));
+                dto.setImagenRecortadaBase64(
+                        Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));
             }
             if (camiseta.getImagenCompleta() != null) {
-                dto.setImagenCompletaBase64(Base64.getEncoder().encodeToString(camiseta.getImagenCompleta()));
+                dto.setImagenCompletaBase64(
+                        Base64.getEncoder().encodeToString(camiseta.getImagenCompleta()));
             }
             return dto;
         });
     }
 
-    public void deleteCamiseta(Long id) {
-        if (camisetaRepository.existsById(id)) {
+    @Transactional
+    public void deleteCamisetaByUsuario(Long usuarioId, Long camisetaId) {
+        if (!camisetaRepository.existsByIdAndUsuarioId(camisetaId, usuarioId)) {
+            throw new RuntimeException("Camiseta no encontrada o no pertenece al usuario");
+        }
+        camisetaRepository.deleteByIdAndUsuarioId(camisetaId, usuarioId);
+    }
+
+    @Transactional
+    public void deleteAllCamisetasByUsuario(Long usuarioId) {
+        if (!usuarioRepository.existsById(usuarioId)) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        camisetaRepository.deleteAllByUsuarioId(usuarioId);
+    }
+
+    @Transactional
+    public void deleteCamiseta(Long id, Long usuarioId) {
+        Optional<Camiseta> camiseta = camisetaRepository.findByIdAndUsuarioId(id, usuarioId);
+        if (camiseta.isPresent()) {
             camisetaRepository.deleteById(id);
         } else {
-            throw new RuntimeException("Camiseta no encontrada con el ID: " + id);
+            throw new RuntimeException("Camiseta no encontrada o no pertenece al usuario");
         }
     }
 }
