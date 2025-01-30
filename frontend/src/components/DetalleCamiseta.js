@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './DetalleCamiseta.css';
-import AgregarCamiseta from './AgregarCamiseta';
+import EditarCamiseta from './EditarCamiseta'; // Importa el nuevo componente
 
 function DetalleCamiseta() {
   const [camiseta, setCamiseta] = useState(null);
@@ -99,6 +99,17 @@ function DetalleCamiseta() {
           Volver
         </button>
       </div>
+    );
+  }
+
+  // Si está en modo edición, muestra el componente EditarCamiseta
+  if (showEditForm) {
+    return (
+      <EditarCamiseta
+        camisetaSeleccionada={camiseta}
+        onClose={() => setShowEditForm(false)}
+        onActualizar={handleUpdate}
+      />
     );
   }
 
@@ -219,15 +230,6 @@ function DetalleCamiseta() {
             </div>
           </div>
         </div>
-      )}
-
-      {showEditForm && (
-        <AgregarCamiseta 
-          onClose={() => setShowEditForm(false)}
-          onAgregar={handleUpdate}
-          initialData={camiseta}
-          isEditing={true}
-        />
       )}
     </div>
   );
