@@ -41,6 +41,9 @@ public class Usuario {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
+    @Column(name = "foto_perfil", columnDefinition = "TEXT")
+    private String fotoDePerfil;
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Camiseta> camisetas = new ArrayList<>();
 
@@ -88,6 +91,10 @@ public class Usuario {
         return new ArrayList<>(camisetas);
     }
 
+    public String getFotoDePerfil() {
+        return fotoDePerfil;
+    }
+
     // Setters con validaciones
     public void setUsername(String username) {
         if (username == null || username.trim().isEmpty()) {
@@ -123,6 +130,21 @@ public class Usuario {
         this.role = role;
     }
 
+    public void setFotoDePerfil(String fotoDePerfil) {
+        // Validar que la cadena base64 sea válida
+        if (fotoDePerfil != null && !fotoDePerfil.isEmpty()) {
+            try {
+                // Verificar si la cadena comienza con el formato data:image
+                if (!fotoDePerfil.startsWith("data:image")) {
+                    throw new IllegalArgumentException("Formato de imagen no válido");
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("La imagen proporcionada no es válida");
+            }
+        }
+        this.fotoDePerfil = fotoDePerfil;
+    }
+
     // Métodos para manejar la relación con camisetas
     public void addCamiseta(Camiseta camiseta) {
         camisetas.add(camiseta);
@@ -142,6 +164,7 @@ public class Usuario {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", role=" + role +
+                ", hasFotoDePerfil=" + (fotoDePerfil != null) +
                 '}';
     }
 

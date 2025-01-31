@@ -4,6 +4,7 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-draggable": "^4.4.6",
+    "react-icons": "^5.4.0",
     "react-image-crop": "^9.1.1",
     "react-rnd": "^10.4.1",
     "react-router-dom": "^6.28.2"

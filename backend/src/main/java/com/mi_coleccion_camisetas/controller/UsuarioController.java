@@ -65,15 +65,16 @@ public class UsuarioController {
             @Validated @RequestBody UsuarioDTO usuarioDTO) {
         try {
             // Verificar si el email actualizado ya existe en otro usuario
-            if (!usuarioService.getUsuarioById(id).get().getEmail().equals(usuarioDTO.getEmail()) 
-                && usuarioService.existsByEmail(usuarioDTO.getEmail())) {
+            if (!usuarioService.getUsuarioById(id).get().getEmail().equals(usuarioDTO.getEmail())
+                    && usuarioService.existsByEmail(usuarioDTO.getEmail())) {
                 return new ResponseEntity<>("El correo ya está registrado por otro usuario", HttpStatus.CONFLICT);
             }
 
             // Verificar si el username actualizado ya existe en otro usuario
-            if (!usuarioService.getUsuarioById(id).get().getUsername().equals(usuarioDTO.getUsername()) 
-                && usuarioService.existsByUsername(usuarioDTO.getUsername())) {
-                return new ResponseEntity<>("El nombre de usuario ya está en uso por otro usuario", HttpStatus.CONFLICT);
+            if (!usuarioService.getUsuarioById(id).get().getUsername().equals(usuarioDTO.getUsername())
+                    && usuarioService.existsByUsername(usuarioDTO.getUsername())) {
+                return new ResponseEntity<>("El nombre de usuario ya está en uso por otro usuario",
+                        HttpStatus.CONFLICT);
             }
 
             UsuarioDTO usuarioActualizado = usuarioService.updateUsuario(id, usuarioDTO);
@@ -92,12 +93,59 @@ public class UsuarioController {
             if (usuarioService.getUsuarioById(id).isEmpty()) {
                 return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
             }
-            
+
             usuarioService.deleteUsuario(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         } catch (RuntimeException e) {
-            return new ResponseEntity<>("No se puede eliminar el usuario: " + e.getMessage(), 
-                                     HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("No se puede eliminar el usuario: " + e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // Nuevos endpoints para manejar la foto de perfil
+
+    @PutMapping("/{id}/foto-perfil")
+    public ResponseEntity<?> updateFotoPerfil(
+            @PathVariable Long id,
+            @RequestBody String fotoPerfil) {
+        try {
+            if (fotoPerfil == null || fotoPerfil.isEmpty()) {
+                return new ResponseEntity<>("La foto de perfil no puede estar vacía", HttpStatus.BAD_REQUEST);
+            }
+
+            UsuarioDTO usuarioActualizado = usuarioService.updateFotoDePerfil(id, fotoPerfil);
+            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al actualizar la foto de perfil", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @DeleteMapping("/{id}/foto-perfil")
+    public ResponseEntity<?> deleteFotoPerfil(@PathVariable Long id) {
+        try {
+            UsuarioDTO usuarioActualizado = usuarioService.deleteFotoDePerfil(id);
+            return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al eliminar la foto de perfil", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @GetMapping("/{id}/foto-perfil")
+    public ResponseEntity<?> getFotoPerfil(@PathVariable Long id) {
+        try {
+            if (!usuarioService.hasFotoDePerfil(id)) {
+                return new ResponseEntity<>("El usuario no tiene foto de perfil", HttpStatus.NOT_FOUND);
+            }
+
+            Optional<UsuarioDTO> usuario = usuarioService.getUsuarioById(id);
+            return usuario.map(u -> new ResponseEntity<>(u.getFotoDePerfil(), HttpStatus.OK))
+                    .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+        } catch (Exception e) {
+            return new ResponseEntity<>("Error al obtener la foto de perfil", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

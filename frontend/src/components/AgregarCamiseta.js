@@ -56,8 +56,8 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       e.preventDefault();
       const delta = e.deltaY * -0.01;
       setZoom(prevZoom => {
-        const newZoom = prevZoom * (1 - delta);
-        return Math.min(Math.max(0.5, newZoom), 3);
+        const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
+        return Number(newZoom.toFixed(2)); // Redondear a 2 decimales para mayor precisión
       });
     }
   };
@@ -97,12 +97,43 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       const img = imageRef.current;
       const container = containerRef.current;
       const containerRect = container.getBoundingClientRect();
-
+  
       const handleImageLoad = () => {
-        calculateImageDimensions(img, containerRect);
+        const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+        const containerAspectRatio = containerRect.width / containerRect.height;
+        
+        let width, height;
+  
+        // Calcular dimensiones manteniendo el aspect ratio
+        if (imgAspectRatio > containerAspectRatio) {
+          width = containerRect.width;
+          height = width / imgAspectRatio;
+        } else {
+          height = containerRect.height;
+          width = height * imgAspectRatio;
+        }
+  
+        // Establecer dimensiones y offset
+        setImageSize({ width, height });
+        setImageDimensions({ 
+          width: img.naturalWidth, 
+          height: img.naturalHeight 
+        });
+        
+        // Centrar la imagen
+        const offsetX = Math.max(0, (containerRect.width - width) / 2);
+        const offsetY = Math.max(0, (containerRect.height - height) / 2);
+        setImageOffset({ x: offsetX, y: offsetY });
+  
+        // Centrar el selector
+        setSelectorPosition({
+          x: offsetX + (width - SELECTOR_SIZE) / 2,
+          y: offsetY + (height - SELECTOR_SIZE) / 2
+        });
+  
         setImageLoaded(true);
       };
-
+  
       if (img.complete) {
         handleImageLoad();
       } else {
@@ -115,6 +146,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -137,43 +169,53 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       reader.readAsDataURL(file);
     }
   }
+
   const handleImageSelect = () => {
     if (!imageRef.current || !imageLoaded) return;
-
+  
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
     canvas.width = SELECTOR_SIZE;
     canvas.height = SELECTOR_SIZE;
-
+  
     const img = imageRef.current;
+    const container = containerRef.current;
     
-    // Calculamos las dimensiones reales de la imagen mostrada
-    const displayedWidth = imageSize.width * zoom;
-    const displayedHeight = imageSize.height * zoom;
+    // Obtener las dimensiones reales del contenedor y la imagen
+    const containerRect = container.getBoundingClientRect();
+    const imgRect = img.getBoundingClientRect();
+  
+    // Calcular la relación entre las dimensiones naturales y las mostradas
+    const scaleX = img.naturalWidth / imgRect.width;
+    const scaleY = img.naturalHeight / imgRect.height;
+  
+    // Calcular la posición del selector relativa a la imagen
+    const imageLeft = imgRect.left - containerRect.left;
+    const imageTop = imgRect.top - containerRect.top;
     
-    // Calculamos la relación entre las dimensiones originales y las mostradas
-    const scaleX = img.naturalWidth / displayedWidth;
-    const scaleY = img.naturalHeight / displayedHeight;
-
-    // Calculamos la posición relativa del selector respecto a la imagen
-    const imageLeft = imageOffset.x;
-    const imageTop = imageOffset.y;
-    
-    // Calculamos las coordenadas del recorte en la imagen original
-    const sourceX = (selectorPosition.x - imageLeft) * scaleX;
-    const sourceY = (selectorPosition.y - imageTop) * scaleY;
+    const relativeX = (selectorPosition.x - imageLeft);
+    const relativeY = (selectorPosition.y - imageTop);
+  
+    // Calcular las coordenadas de recorte en la imagen original
+    const sourceX = relativeX * scaleX;
+    const sourceY = relativeY * scaleY;
     const sourceWidth = SELECTOR_SIZE * scaleX;
     const sourceHeight = SELECTOR_SIZE * scaleY;
-
-    // Aseguramos que las coordenadas estén dentro de los límites de la imagen
-    const clampedSourceX = Math.max(0, Math.min(sourceX, img.naturalWidth - sourceWidth));
-    const clampedSourceY = Math.max(0, Math.min(sourceY, img.naturalHeight - sourceHeight));
-
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
+  
+    // Asegurar que las coordenadas estén dentro de los límites
+    const maxX = img.naturalWidth - sourceWidth;
+    const maxY = img.naturalHeight - sourceHeight;
+    
+    const clampedSourceX = Math.max(0, Math.min(sourceX, maxX));
+    const clampedSourceY = Math.max(0, Math.min(sourceY, maxY));
+  
     try {
+      // Limpiar el canvas
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, SELECTOR_SIZE, SELECTOR_SIZE);
+  
+      // Dibujar la imagen recortada
       ctx.drawImage(
         img,
         clampedSourceX,
@@ -185,7 +227,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         SELECTOR_SIZE,
         SELECTOR_SIZE
       );
-
+  
       canvas.toBlob(
         (blob) => {
           if (blob) {
@@ -285,45 +327,50 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         <div className="image-modal-overlay">
           <div className="image-modal">
             <h3>Elige el área que se mostrará como miniatura</h3>
+            // En el JSX, modifica el estilo del contenedor de la imagen
             <div 
               className="image-container" 
               ref={containerRef}
               onWheel={handleWheel}
-              style={{ touchAction: 'none' }}
+              style={{ 
+                position: 'relative',
+                width: '100%',
+                height: '500px', // O el alto que necesites
+                overflow: 'hidden'
+              }}
             >
-              {originalImage && (
-                <>
-                  <img
-                    ref={imageRef}
-                    src={originalImage}
-                    alt="Original"
-                    className="original-image"
-                    style={{
-                      width: imageSize.width * zoom,
-                      height: imageSize.height * zoom,
-                      left: imageOffset.x,
-                      top: imageOffset.y,
-                      transform: `scale(${zoom})`,
-                      transformOrigin: 'center',
-                    }}
-                  />
-                  {imageLoaded && (
-                    <Rnd
-                      size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
-                      position={selectorPosition}
-                      onDragStop={(e, d) => {
-                        setSelectorPosition({ x: d.x, y: d.y });
-                      }}
-                      bounds="parent"
-                      enableResizing={false}
-                      className="selector"
-                    >
-                      <div className="selector-overlay" />
-                    </Rnd>
-                  )}
-                </>
+              <img
+                ref={imageRef}
+                src={originalImage}
+                alt="Original"
+                style={{
+                  position: 'absolute',
+                  left: `${imageOffset.x}px`,
+                  top: `${imageOffset.y}px`,
+                  width: `${imageSize.width * zoom}px`,
+                  height: `${imageSize.height * zoom}px`,
+                  transformOrigin: 'top left'
+                }}
+              />
+              {imageLoaded && (
+                <Rnd
+                  size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
+                  position={selectorPosition}
+                  onDragStop={(e, d) => {
+                    setSelectorPosition({ x: d.x, y: d.y });
+                  }}
+                  bounds="parent"
+                  enableResizing={false}
+                  style={{
+                    position: 'absolute',
+                    zIndex: 1000
+                  }}
+                >
+                  <div className="selector-overlay" />
+                </Rnd>
               )}
             </div>
+
             <div className="image-modal-buttons">
               <button 
                 type="button" 

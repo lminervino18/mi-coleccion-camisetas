@@ -8,7 +8,8 @@ public class UsuarioDTO {
     private String username;
     private String email;
     private Usuario.Role role;
-    
+    private String fotoDePerfil;
+
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
@@ -22,7 +23,7 @@ public class UsuarioDTO {
         this.username = usuario.getUsername();
         this.email = usuario.getEmail();
         this.role = usuario.getRole();
-        // No incluimos la contraseña por seguridad
+        this.fotoDePerfil = usuario.getFotoDePerfil();
     }
 
     // Método para actualizar una entidad existente
@@ -40,6 +41,10 @@ public class UsuarioDTO {
         if (this.password != null && !this.password.trim().isEmpty()) {
             usuario.setPassword(this.password);
         }
+        // Actualizar foto de perfil
+        if (this.fotoDePerfil != null) {
+            usuario.setFotoDePerfil(this.fotoDePerfil);
+        }
     }
 
     // Método para validar los datos
@@ -56,9 +61,13 @@ public class UsuarioDTO {
         if (password != null && password.length() < 6) {
             throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
         }
+        // Validar formato de la foto de perfil si existe
+        if (fotoDePerfil != null && !fotoDePerfil.isEmpty() && !fotoDePerfil.startsWith("data:image")) {
+            throw new IllegalArgumentException("Formato de imagen no válido");
+        }
     }
 
-    // Getters y setters con validaciones
+    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -99,6 +108,14 @@ public class UsuarioDTO {
         this.password = password;
     }
 
+    public String getFotoDePerfil() {
+        return fotoDePerfil;
+    }
+
+    public void setFotoDePerfil(String fotoDePerfil) {
+        this.fotoDePerfil = fotoDePerfil;
+    }
+
     @Override
     public String toString() {
         return "UsuarioDTO{" +
@@ -106,6 +123,7 @@ public class UsuarioDTO {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", role=" + role +
+                ", hasFotoDePerfil=" + (fotoDePerfil != null && !fotoDePerfil.isEmpty()) +
                 // No incluimos la contraseña en el toString por seguridad
                 '}';
     }

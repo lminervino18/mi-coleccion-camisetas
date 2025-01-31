@@ -54,6 +54,11 @@ public class UsuarioService {
         usuario.setRole(usuarioDTO.getRole() != null ? usuarioDTO.getRole() : Usuario.Role.USER);
         usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
 
+        // Agregar foto de perfil si existe
+        if (usuarioDTO.getFotoDePerfil() != null && !usuarioDTO.getFotoDePerfil().isEmpty()) {
+            usuario.setFotoDePerfil(usuarioDTO.getFotoDePerfil());
+        }
+
         Usuario savedUsuario = usuarioRepository.save(usuario);
         return new UsuarioDTO(savedUsuario);
     }
@@ -107,6 +112,11 @@ public class UsuarioService {
             usuario.setUsername(usuarioDTO.getUsername().trim());
             usuario.setEmail(usuarioDTO.getEmail().trim().toLowerCase());
 
+            // Actualizar foto de perfil si se proporciona una nueva
+            if (usuarioDTO.getFotoDePerfil() != null && !usuarioDTO.getFotoDePerfil().isEmpty()) {
+                usuario.setFotoDePerfil(usuarioDTO.getFotoDePerfil());
+            }
+
             // Actualizar contraseña solo si se proporciona una nueva
             if (usuarioDTO.getPassword() != null && !usuarioDTO.getPassword().trim().isEmpty()) {
                 usuario.setPassword(passwordEncoder.encode(usuarioDTO.getPassword()));
@@ -119,6 +129,18 @@ public class UsuarioService {
 
             Usuario updatedUsuario = usuarioRepository.save(usuario);
             return new UsuarioDTO(updatedUsuario);
+        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+    }
+
+    @Transactional
+    public UsuarioDTO updateFotoDePerfil(Long id, String fotoDePerfil) {
+        return usuarioRepository.findById(id).map(usuario -> {
+            if (fotoDePerfil != null && !fotoDePerfil.isEmpty()) {
+                usuario.setFotoDePerfil(fotoDePerfil);
+                Usuario updatedUsuario = usuarioRepository.save(usuario);
+                return new UsuarioDTO(updatedUsuario);
+            }
+            throw new IllegalArgumentException("La foto de perfil no puede estar vacía");
         }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
     }
 
@@ -144,5 +166,23 @@ public class UsuarioService {
         return password != null &&
                 password.trim().length() >= 6 &&
                 !password.trim().equals(password); // Verifica que no haya espacios
+    }
+
+    // Método para eliminar la foto de perfil
+    @Transactional
+    public UsuarioDTO deleteFotoDePerfil(Long id) {
+        return usuarioRepository.findById(id).map(usuario -> {
+            usuario.setFotoDePerfil(null);
+            Usuario updatedUsuario = usuarioRepository.save(usuario);
+            return new UsuarioDTO(updatedUsuario);
+        }).orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+    }
+
+    // Método para verificar si un usuario tiene foto de perfil
+    @Transactional(readOnly = true)
+    public boolean hasFotoDePerfil(Long id) {
+        return usuarioRepository.findById(id)
+                .map(usuario -> usuario.getFotoDePerfil() != null && !usuario.getFotoDePerfil().isEmpty())
+                .orElse(false);
     }
 }

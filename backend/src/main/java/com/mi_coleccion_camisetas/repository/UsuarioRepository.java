@@ -37,4 +37,19 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Modifying
     @Query("DELETE FROM Usuario u WHERE u.id = :id")
     void deleteByIdWithCheck(@Param("id") Long id);
+
+    // Nuevos métodos para manejo de foto de perfil
+    @Query("SELECT u.fotoDePerfil FROM Usuario u WHERE u.id = :id")
+    Optional<String> findFotoDePerfilById(@Param("id") Long id);
+
+    @Modifying
+    @Query("UPDATE Usuario u SET u.fotoDePerfil = :fotoDePerfil WHERE u.id = :id")
+    int updateFotoDePerfil(@Param("id") Long id, @Param("fotoDePerfil") String fotoDePerfil);
+
+    @Modifying
+    @Query("UPDATE Usuario u SET u.fotoDePerfil = NULL WHERE u.id = :id")
+    int deleteFotoDePerfil(@Param("id") Long id);
+
+    @Query("SELECT COUNT(u) > 0 FROM Usuario u WHERE u.id = :id AND u.fotoDePerfil IS NOT NULL")
+    boolean hasFotoDePerfil(@Param("id") Long id);
 }
