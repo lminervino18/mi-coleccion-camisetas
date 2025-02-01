@@ -3,22 +3,24 @@ import { useNavigate } from 'react-router-dom';
 import { Rnd } from 'react-rnd';
 import './Camisetas.css';
 import AgregarCamiseta from './AgregarCamiseta';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
 
 function Camisetas() {
   const [camisetas, setCamisetas] = useState([]);
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [userData, setUserData] = useState(null);
   const [originalImage, setOriginalImage] = useState(null);
-  const [previewImage, setPreviewImage] = useState(null);
   const [imageSize, setImageSize] = useState({ width: 'auto', height: 'auto' });
   const [selectorPosition, setSelectorPosition] = useState({ x: 0, y: 0 });
-  const [imageFormat, setImageFormat] = useState('image/jpeg');
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
@@ -107,6 +109,51 @@ function Camisetas() {
     }
   }, [showProfileModal, originalImage]);
 
+  const handleMouseDown = (e) => {
+    if (e.button === 0) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - imageOffset.x,
+        y: e.clientY - imageOffset.y
+      });
+    }
+  };
+
+
+  useEffect(() => {
+    if (isDragging) {
+      const handleMouseMoveEffect = (e) => {
+        if (imageRef.current && containerRef.current) {
+          const container = containerRef.current;
+          const containerRect = container.getBoundingClientRect();
+          
+          const newX = e.clientX - dragStart.x;
+          const newY = e.clientY - dragStart.y;
+          
+          const maxX = containerRect.width - (imageSize.width * zoom);
+          const maxY = containerRect.height - (imageSize.height * zoom);
+          
+          setImageOffset({
+            x: Math.min(Math.max(newX, maxX), 0),
+            y: Math.min(Math.max(newY, maxY), 0)
+          });
+        }
+      };
+  
+      const handleMouseUpEffect = () => {
+        setIsDragging(false);
+      };
+  
+      window.addEventListener('mousemove', handleMouseMoveEffect);
+      window.addEventListener('mouseup', handleMouseUpEffect);
+  
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMoveEffect);
+        window.removeEventListener('mouseup', handleMouseUpEffect);
+      };
+    }
+  }, [isDragging, dragStart, imageSize.width, imageSize.height, zoom]);
+
   const handleWheel = (e) => {
     if (e.ctrlKey) {
       e.preventDefault();
@@ -121,9 +168,9 @@ function Camisetas() {
   const handleProfilePhotoChange = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setImageFormat(file.type || 'image/jpeg');
       setImageLoaded(false);
       setZoom(1);
+      setImageOffset({ x: 0, y: 0 });
       
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -133,15 +180,16 @@ function Camisetas() {
     }
   };
 
-  const handleImageSelect = () => {
-    if (!imageRef.current || !imageLoaded) return;
 
+  const handleImageSelect = async () => {
+    if (!imageRef.current || !imageLoaded) return;
+  
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
     canvas.width = SELECTOR_SIZE;
     canvas.height = SELECTOR_SIZE;
-
+  
     const img = imageRef.current;
     
     const displayedWidth = imageSize.width * zoom;
@@ -149,18 +197,18 @@ function Camisetas() {
     
     const scaleX = img.naturalWidth / displayedWidth;
     const scaleY = img.naturalHeight / displayedHeight;
-
+  
     const sourceX = (selectorPosition.x - imageOffset.x) * scaleX;
     const sourceY = (selectorPosition.y - imageOffset.y) * scaleY;
     const sourceWidth = SELECTOR_SIZE * scaleX;
     const sourceHeight = SELECTOR_SIZE * scaleY;
-
+  
     try {
       ctx.beginPath();
       ctx.arc(SELECTOR_SIZE/2, SELECTOR_SIZE/2, SELECTOR_SIZE/2, 0, Math.PI * 2);
       ctx.closePath();
       ctx.clip();
-
+  
       ctx.drawImage(
         img,
         sourceX,
@@ -172,43 +220,43 @@ function Camisetas() {
         SELECTOR_SIZE,
         SELECTOR_SIZE
       );
-
-      canvas.toBlob(
-        async (blob) => {
-          if (blob) {
-            try {
-              const reader = new FileReader();
-              reader.onloadend = async () => {
-                const base64data = reader.result;
-                
-                const response = await fetch(`http://localhost:8080/api/usuarios/${localStorage.getItem('usuarioId')}/foto-perfil`, {
-                  method: 'PUT',
-                  headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                  },
-                  body: JSON.stringify({ fotoDePerfil: base64data }),
-                });
-
-                if (response.ok) {
-                  const updatedUser = await response.json();
-                  setUserData(updatedUser);
-                  setShowProfileModal(false);
-                  setOriginalImage(null);
-                }
-              };
-              reader.readAsDataURL(blob);
-            } catch (error) {
-              console.error('Error al actualizar la foto de perfil:', error);
-            }
-          }
+  
+      const base64Image = canvas.toDataURL('image/jpeg', 0.8);
+      
+      const response = await fetch(`http://localhost:8080/api/usuarios/${localStorage.getItem('usuarioId')}/foto-perfil`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
-        imageFormat,
-        1
-      );
+        body: JSON.stringify({ fotoDePerfil: base64Image }),
+      });
+  
+      if (response.ok) {
+        const updatedUser = await response.json();
+        setUserData(updatedUser);
+        setShowProfileModal(false);
+        setOriginalImage(null);
+        setZoom(1);
+        setImageOffset({ x: 0, y: 0 });
+      } else {
+        const errorData = await response.text();
+        throw new Error(errorData || 'Error al actualizar la foto de perfil');
+      }
     } catch (error) {
-      console.error('Error al recortar la imagen:', error);
+      console.error('Error:', error);
+      alert('Error al actualizar la foto de perfil. Por favor, intenta nuevamente.');
     }
+  };
+
+  const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuarioId');
+    navigate('/login');
   };
 
   const handleAgregarCamiseta = (nuevaCamiseta) => {
@@ -226,6 +274,14 @@ function Camisetas() {
       .map(word => word[0])
       .join('')
       .toUpperCase();
+  };
+
+  const handleCloseModal = () => {
+    setShowProfileModal(false);
+    setOriginalImage(null);
+    setImageLoaded(false);
+    setZoom(1);
+    setImageOffset({ x: 0, y: 0 });
   };
 
   return (
@@ -256,17 +312,53 @@ function Camisetas() {
               </div>
             )}
           </div>
+          <FontAwesomeIcon 
+            icon={faSignOutAlt} 
+            className="logout-icon"
+            onClick={handleLogout}
+            title="Cerrar sesión"
+          />
         </div>
       </div>
+
+      {showLogoutConfirm && (
+        <div className="confirm-modal-overlay">
+          <div className="confirm-modal">
+            <h3>¿Estás seguro que deseas cerrar sesión?</h3>
+            <div className="confirm-modal-buttons">
+              <button className="confirm-btn" onClick={confirmLogout}>
+                Sí, cerrar sesión
+              </button>
+              <button className="cancel-btn" onClick={() => setShowLogoutConfirm(false)}>
+                Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {showProfileModal && (
         <div className="modal-overlay">
           <div className="profile-modal">
-            <h3>Elige el área para tu foto de perfil</h3>
+            <div className="profile-modal-header">
+              <h3>Foto de perfil</h3>
+              <button className="close-button" onClick={handleCloseModal}>×</button>
+            </div>
+
+            {userData?.fotoDePerfil && !originalImage && (
+              <img 
+                src={userData.fotoDePerfil} 
+                alt="Foto actual" 
+                className="profile-current-image"
+              />
+            )}
+
             <div 
               className="profile-image-container" 
               ref={containerRef}
               onWheel={handleWheel}
+              onMouseDown={handleMouseDown}
+              style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
             >
               {originalImage ? (
                 <>
@@ -281,7 +373,8 @@ function Camisetas() {
                       top: `${imageOffset.y}px`,
                       width: `${imageSize.width * zoom}px`,
                       height: `${imageSize.height * zoom}px`,
-                      transformOrigin: 'top left'
+                      transformOrigin: 'top left',
+                      pointerEvents: 'none'
                     }}
                   />
                   {imageLoaded && (
@@ -300,21 +393,26 @@ function Camisetas() {
                   )}
                 </>
               ) : (
-                <div className="upload-prompt">
+                <div className="profile-controls-container">
                   <p>Selecciona una imagen para tu foto de perfil</p>
+                  <div className="file-input-wrapper">
+                    <button className="file-input-button">
+                      Seleccionar imagen
+                    </button>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleProfilePhotoChange}
+                      className="profile-file-input"
+                    />
+                  </div>
                 </div>
               )}
             </div>
-            <div className="profile-modal-controls">
-              {!originalImage ? (
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleProfilePhotoChange}
-                  className="profile-file-input"
-                />
-              ) : (
-                <div className="profile-modal-buttons">
+
+            <div className="profile-modal-footer">
+              {originalImage ? (
+                <div className="btn-group">
                   <button 
                     className="btn primary"
                     onClick={handleImageSelect}
@@ -325,13 +423,22 @@ function Camisetas() {
                   <button 
                     className="btn secondary"
                     onClick={() => {
-                      setShowProfileModal(false);
                       setOriginalImage(null);
+                      setImageLoaded(false);
+                      setZoom(1);
+                      setImageOffset({ x: 0, y: 0 });
                     }}
                   >
                     Cancelar
                   </button>
                 </div>
+              ) : (
+                <button 
+                  className="btn secondary"
+                  onClick={handleCloseModal}
+                >
+                  Cerrar
+                </button>
               )}
             </div>
           </div>

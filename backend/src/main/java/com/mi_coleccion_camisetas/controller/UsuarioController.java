@@ -107,18 +107,34 @@ public class UsuarioController {
     @PutMapping("/{id}/foto-perfil")
     public ResponseEntity<?> updateFotoPerfil(
             @PathVariable Long id,
-            @RequestBody String fotoPerfil) {
+            @RequestBody UsuarioDTO usuarioDTO) {
         try {
-            if (fotoPerfil == null || fotoPerfil.isEmpty()) {
-                return new ResponseEntity<>("La foto de perfil no puede estar vacía", HttpStatus.BAD_REQUEST);
+            // Validar que la foto de perfil no esté vacía
+            if (usuarioDTO.getFotoDePerfil() == null || usuarioDTO.getFotoDePerfil().isEmpty()) {
+                return new ResponseEntity<>("La foto de perfil no puede estar vacía",
+                        HttpStatus.BAD_REQUEST);
             }
 
-            UsuarioDTO usuarioActualizado = usuarioService.updateFotoDePerfil(id, fotoPerfil);
+            // Validar el formato de la imagen
+            if (!usuarioDTO.getFotoDePerfil().startsWith("data:image")) {
+                return new ResponseEntity<>("Formato de imagen no válido",
+                        HttpStatus.BAD_REQUEST);
+            }
+
+            // Obtener el usuario actual
+            Optional<UsuarioDTO> usuarioExistente = usuarioService.getUsuarioById(id);
+            if (usuarioExistente.isEmpty()) {
+                return new ResponseEntity<>("Usuario no encontrado", HttpStatus.NOT_FOUND);
+            }
+
+            // Actualizar solo la foto de perfil
+            UsuarioDTO usuarioActualizado = usuarioService.updateFotoDePerfil(id,
+                    usuarioDTO.getFotoDePerfil());
+
             return new ResponseEntity<>(usuarioActualizado, HttpStatus.OK);
-        } catch (RuntimeException e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
-            return new ResponseEntity<>("Error al actualizar la foto de perfil", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error al actualizar la foto de perfil: " +
+                    e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

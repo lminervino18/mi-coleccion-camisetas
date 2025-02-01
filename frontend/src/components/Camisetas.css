@@ -1,6 +1,6 @@
+/* Layout Principal */
 .camisetas-container {
   padding: 20px;
-  background-color: rgba(0, 0, 0, 0.9);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -9,19 +9,23 @@
   background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
+  background-color: rgba(0, 0, 0, 0.9);
 }
 
+/* Barra Superior */
 .top-bar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   width: 80%;
   margin-bottom: 20px;
-  background-color: rgba(0, 0, 0, 0.8);
-  padding: 10px 20px;
+  padding: 15px 25px;
   border-radius: 8px;
+  height: 70px;
+  background-color: rgba(0, 0, 0, 0.8);
 }
 
+/* Búsqueda y Botón Agregar */
 .search-container {
   display: flex;
   align-items: center;
@@ -29,9 +33,9 @@
 }
 
 .search-container input {
-  padding: 10px;
-  font-size: 1rem;
-  width: 200px;
+  padding: 12px;
+  font-size: 1.1rem;
+  width: 250px;
   border: 1px solid #ccc;
   border-radius: 5px;
   background-color: rgba(255, 255, 255, 0.2);
@@ -39,18 +43,18 @@
 }
 
 .add-button {
+  width: 40px;
+  height: 40px;
+  font-size: 28px;
   background-color: #007bff;
   color: white;
   border: none;
   border-radius: 50%;
-  width: 35px;
-  height: 35px;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  font-size: 24px;
   font-weight: bold;
   line-height: 1;
   padding: 0;
@@ -61,15 +65,16 @@
   background-color: #0056b3;
 }
 
+/* Perfil de Usuario */
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 20px;
 }
 
 .profile-photo {
-  width: 40px;
-  height: 40px;
+  width: 50px;
+  height: 50px;
   border-radius: 50%;
   overflow: hidden;
   cursor: pointer;
@@ -92,15 +97,30 @@
 
 .profile-photo .initials {
   color: white;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   font-weight: bold;
 }
 
 .username {
   color: white;
-  font-size: 1rem;
+  font-size: 1.2rem;
 }
 
+/* Icono de Logout */
+.logout-icon {
+  cursor: pointer;
+  color: #dc3545;
+  font-size: 1.5rem;
+  margin-left: 15px;
+  transition: all 0.3s ease;
+}
+
+.logout-icon:hover {
+  transform: scale(1.1);
+  color: #c82333;
+}
+
+/* Modal Base */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -114,37 +134,71 @@
   z-index: 1000;
 }
 
+/* Modal de Perfil */
 .profile-modal {
-  background-color: white;
-  padding: 20px;
-  border-radius: 12px;
   width: 500px;
   max-width: 90vw;
+  padding: 20px;
+  border-radius: 12px;
   display: flex;
   flex-direction: column;
   gap: 20px;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
 }
 
-.profile-modal h3 {
+.profile-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.profile-modal-header h3 {
   margin: 0;
   text-align: center;
-  color: #333;
+  color: white;
   font-size: 1.5rem;
 }
 
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  color: white;
+  padding: 5px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.close-button:hover {
+  color: #ccc;
+}
+
+/* Contenedor de Imagen de Perfil */
 .profile-image-container {
   position: relative;
   width: 100%;
   height: 400px;
-  background-color: #f0f0f0;
   overflow: hidden;
   border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: move;
+  background-color: rgba(0, 0, 0, 0.6);
 }
 
 .profile-original-image {
   position: absolute;
   pointer-events: none;
   user-select: none;
+  cursor: move;
 }
 
 .profile-selector {
@@ -160,23 +214,65 @@
   box-sizing: border-box;
 }
 
-.profile-modal-controls {
+.profile-current-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  margin: 0 auto 20px;
+  display: block;
+  object-fit: cover;
+  border: 3px solid #007bff;
+}
+
+/* Controles del Modal de Perfil */
+.profile-controls-container {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 15px;
+  align-items: center;
+  color: white;
 }
 
-.profile-file-input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
+.file-input-wrapper {
+  position: relative;
+  overflow: hidden;
+  display: inline-block;
+}
+
+.file-input-wrapper input[type="file"] {
+  position: absolute;
+  left: 0;
+  top: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.file-input-button {
+  display: inline-block;
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
   border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.profile-modal-buttons {
+.file-input-button:hover {
+  background-color: #0056b3;
+}
+
+.profile-modal-footer {
   display: flex;
   justify-content: flex-end;
   gap: 10px;
+  margin-top: 15px;
+}
+
+.btn-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  width: 100%;
 }
 
 .upload-prompt {
@@ -185,10 +281,104 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #666;
+  color: white;
   font-size: 1.2rem;
 }
 
+/* Modal de Confirmación de Logout */
+.confirm-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1100;
+}
+
+.confirm-modal {
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  text-align: center;
+}
+
+.confirm-modal h3 {
+  margin: 0 0 20px 0;
+  color: white;
+  font-size: 1.5rem;
+}
+
+.confirm-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+/* Estilos de Botones */
+.btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.btn.primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.btn.secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.confirm-modal-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s ease;
+}
+
+.confirm-modal-buttons .confirm-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.confirm-modal-buttons .confirm-btn:hover {
+  background-color: #c82333;
+}
+
+.confirm-modal-buttons .cancel-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.confirm-modal-buttons .cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+/* Grid de Camisetas */
 .grid-container {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
@@ -261,33 +451,11 @@
   font-size: 1.2rem;
 }
 
-.btn {
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn.primary {
-  background-color: #007bff;
-  color: white;
-}
-
-.btn.secondary {
-  background-color: #6c757d;
-  color: white;
-}
-
-.btn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+/* Utilidades */
+.draggable-container {
+  position: absolute;
+  cursor: move;
+  touch-action: none;
 }
 
 /* Media Queries */
@@ -355,5 +523,9 @@
 
   .profile-image-container {
     height: 250px;
+  }
+
+  .logout-icon {
+    font-size: 1.2rem;
   }
 }
