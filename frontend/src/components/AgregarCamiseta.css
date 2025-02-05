@@ -8,9 +8,10 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  overflow-y: auto;color: rgb(22, 21, 21);
+  overflow-y: auto;
+  color: rgb(22, 21, 21);
   padding: 20px;
-  background-image: url('../assets/background.jpg');
+  background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
 }
@@ -50,18 +51,15 @@
   appearance: auto;
 }
 
-/* Estilo base para el input file */
 .camiseta-form input[type="file"] {
   color: #666060;
 }
 
-/* Cuando se ha seleccionado un archivo */
 .camiseta-form input[type="file"]:not(:placeholder-shown),
 .camiseta-form input[type="file"]::-webkit-file-upload-button {
   color: white;
 }
 
-/* Estilo para el botón de selección de archivo */
 .camiseta-form input[type="file"]::-webkit-file-upload-button {
   background-color: rgba(87, 85, 85, 0.2);
   color: #666060;
@@ -73,12 +71,10 @@
   transition: all 0.3s ease;
 }
 
-/* Hover del botón */
 .camiseta-form input[type="file"]::-webkit-file-upload-button:hover {
   background-color: rgba(87, 85, 85, 0.3);
 }
 
-/* Para Firefox */
 .camiseta-form input[type="file"]::file-selector-button {
   background-color: rgba(87, 85, 85, 0.2);
   color: #666060;
@@ -90,26 +86,23 @@
   transition: all 0.3s ease;
 }
 
-/* Hover del botón en Firefox */
 .camiseta-form input[type="file"]::file-selector-button:hover {
   background-color: rgba(87, 85, 85, 0.3);
 }
 
-/* Cuando se ha seleccionado un archivo - Firefox */
-.camiseta-form input[type="file"]:not(:placeholder-shown){
+.camiseta-form input[type="file"]:not(:placeholder-shown) {
   color: gray;
 }
+
 .camiseta-form input[type="file"]::file-selector-button {
   color: rgb(160, 155, 155);
 }
 
-/* Color blanco cuando hay contenido */
 .camiseta-form input:not(:placeholder-shown),
 .camiseta-form textarea:not(:placeholder-shown) {
   color: white;
 }
 
-/* Estilo base para los select */
 .camiseta-form select {
   width: calc(100% - 20px);
   padding: 12px;
@@ -126,24 +119,20 @@
   appearance: auto;
 }
 
-/* Color blanco cuando hay una opción seleccionada */
 .camiseta-form select.has-value {
   color: white;
 }
 
-/* Estilo para las opciones del select */
 .camiseta-form select option {
   color: white;
   background-color: rgb(82, 81, 81);
 }
 
-/* Mantener el color gris para los placeholders */
 .camiseta-form input::placeholder,
 .camiseta-form textarea::placeholder {
   color: #666060;
 }
 
-/* Estilo para la opción placeholder del select */
 .camiseta-form select option[value=""][disabled] {
   color: #666060;
 }
@@ -159,7 +148,6 @@
   width: 100%;
   max-width: 100%;
 }
-
 
 .color-tag {
   background: none;
@@ -187,6 +175,7 @@
   color: #a8a8a8;
   transform: scale(1.2);
 }
+
 .camiseta-form .form-buttons-container {
   width: 100%;
   margin-top: 20px;
@@ -285,6 +274,12 @@
   justify-content: center;
   align-items: center;
   touch-action: none;
+  user-select: none;
+  cursor: grab;
+}
+
+.image-container:active {
+  cursor: grabbing;
 }
 
 .original-image {
@@ -376,6 +371,14 @@
   background-color: rgba(255, 255, 255, 0.3);
 }
 
+.react-draggable {
+  cursor: move !important;
+}
+
+.react-draggable:active {
+  cursor: grabbing !important;
+}
+
 @media (max-width: 900px) {
   .image-container {
     width: 100%;
@@ -385,6 +388,22 @@
   .image-modal {
     width: 95%;
     padding: 15px;
+  }
+
+  .selector {
+    width: 300px !important;
+    height: 300px !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .image-container {
+    height: 300px;
+  }
+
+  .selector {
+    width: 250px !important;
+    height: 250px !important;
   }
 }
 
@@ -400,9 +419,7 @@
     width: 100%;
     max-width: 200px;
   }
-}
 
-@media (max-width: 500px) {
   .image-modal-buttons {
     flex-direction: column;
     align-items: center;
@@ -414,10 +431,12 @@
   }
 }
 
-.react-draggable {
-  cursor: move !important;
+.image-container * {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
-.react-draggable:active {
-  cursor: grabbing !important;
+.image-container:focus-visible {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
 }

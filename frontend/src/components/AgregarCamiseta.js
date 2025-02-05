@@ -28,6 +28,9 @@ function AgregarCamiseta({ onClose, onAgregar }) {
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
@@ -44,6 +47,32 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     'Naranja', 'Violeta', 'Celeste', 'Bordó', 'Rosa', 'Dorado', 'Plateado', 'Marrón'
   ];
 
+  useEffect(() => {
+    setImagePosition({ x: 0, y: 0 });
+  }, [zoom]);
+
+  const handleImageMouseDown = (e) => {
+    if (e.button === 0) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - imagePosition.x,
+        y: e.clientY - imagePosition.y
+      });
+    }
+  };
+
+  const handleImageMouseMove = (e) => {
+    if (isDragging) {
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+      setImagePosition({ x: newX, y: newY });
+    }
+  };
+
+  const handleImageMouseUp = () => {
+    setIsDragging(false);
+  };
+
   const handlePreviewClick = () => {
     if (originalImage) {
       setZoom(1);
@@ -57,37 +86,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       const delta = e.deltaY * -0.01;
       setZoom(prevZoom => {
         const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
-        return Number(newZoom.toFixed(2)); // Redondear a 2 decimales para mayor precisión
-      });
-    }
-  };
-
-  const calculateImageDimensions = (img, containerRect) => {
-    if (!img.naturalWidth || !img.naturalHeight) return;
-
-    const imgAspectRatio = img.naturalWidth / img.naturalHeight;
-    const containerAspectRatio = containerRect.width / containerRect.height;
-    let width, height;
-
-    if (imgAspectRatio > containerAspectRatio) {
-      width = containerRect.width;
-      height = width / imgAspectRatio;
-    } else {
-      height = containerRect.height;
-      width = height * imgAspectRatio;
-    }
-
-    if (isFinite(width) && isFinite(height)) {
-      setImageSize({ width, height });
-      setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
-      
-      const offsetX = (containerRect.width - width) / 2;
-      const offsetY = (containerRect.height - height) / 2;
-      setImageOffset({ x: offsetX, y: offsetY });
-
-      setSelectorPosition({
-        x: offsetX + (width - SELECTOR_SIZE) / 2,
-        y: offsetY + (height - SELECTOR_SIZE) / 2
+        return Number(newZoom.toFixed(2));
       });
     }
   };
@@ -97,14 +96,13 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       const img = imageRef.current;
       const container = containerRef.current;
       const containerRect = container.getBoundingClientRect();
-  
+
       const handleImageLoad = () => {
         const imgAspectRatio = img.naturalWidth / img.naturalHeight;
         const containerAspectRatio = containerRect.width / containerRect.height;
         
         let width, height;
-  
-        // Calcular dimensiones manteniendo el aspect ratio
+
         if (imgAspectRatio > containerAspectRatio) {
           width = containerRect.width;
           height = width / imgAspectRatio;
@@ -112,41 +110,37 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           height = containerRect.height;
           width = height * imgAspectRatio;
         }
-  
-        // Establecer dimensiones y offset
+
         setImageSize({ width, height });
         setImageDimensions({ 
           width: img.naturalWidth, 
           height: img.naturalHeight 
         });
         
-        // Centrar la imagen
         const offsetX = Math.max(0, (containerRect.width - width) / 2);
         const offsetY = Math.max(0, (containerRect.height - height) / 2);
         setImageOffset({ x: offsetX, y: offsetY });
-  
-        // Centrar el selector
+
         setSelectorPosition({
           x: offsetX + (width - SELECTOR_SIZE) / 2,
           y: offsetY + (height - SELECTOR_SIZE) / 2
         });
-  
+
         setImageLoaded(true);
       };
-  
+
       if (img.complete) {
         handleImageLoad();
       } else {
         img.onload = handleImageLoad;
       }
     }
-  }, [showImageModal]);
+  }, [showImageModal, originalImage]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -154,8 +148,8 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       setImageFormat(file.type || 'image/jpeg');
       setImageLoaded(false);
       setZoom(1);
+      setImagePosition({ x: 0, y: 0 });
       
-      // Guardar la imagen completa en el formData
       setFormData(prev => ({
         ...prev,
         imagenCompleta: file
@@ -168,58 +162,38 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       };
       reader.readAsDataURL(file);
     }
-  }
+  };
 
   const handleImageSelect = () => {
     if (!imageRef.current || !imageLoaded) return;
-  
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
     canvas.width = SELECTOR_SIZE;
     canvas.height = SELECTOR_SIZE;
-  
+
     const img = imageRef.current;
-    const container = containerRef.current;
     
-    // Obtener las dimensiones reales del contenedor y la imagen
-    const containerRect = container.getBoundingClientRect();
-    const imgRect = img.getBoundingClientRect();
-  
-    // Calcular la relación entre las dimensiones naturales y las mostradas
-    const scaleX = img.naturalWidth / imgRect.width;
-    const scaleY = img.naturalHeight / imgRect.height;
-  
-    // Calcular la posición del selector relativa a la imagen
-    const imageLeft = imgRect.left - containerRect.left;
-    const imageTop = imgRect.top - containerRect.top;
+    const displayedWidth = imageSize.width * zoom;
+    const displayedHeight = imageSize.height * zoom;
     
-    const relativeX = (selectorPosition.x - imageLeft);
-    const relativeY = (selectorPosition.y - imageTop);
-  
-    // Calcular las coordenadas de recorte en la imagen original
-    const sourceX = relativeX * scaleX;
-    const sourceY = relativeY * scaleY;
+    const scaleX = img.naturalWidth / displayedWidth;
+    const scaleY = img.naturalHeight / displayedHeight;
+
+    const sourceX = ((selectorPosition.x - imageOffset.x - imagePosition.x) * scaleX);
+    const sourceY = ((selectorPosition.y - imageOffset.y - imagePosition.y) * scaleY);
     const sourceWidth = SELECTOR_SIZE * scaleX;
     const sourceHeight = SELECTOR_SIZE * scaleY;
-  
-    // Asegurar que las coordenadas estén dentro de los límites
-    const maxX = img.naturalWidth - sourceWidth;
-    const maxY = img.naturalHeight - sourceHeight;
-    
-    const clampedSourceX = Math.max(0, Math.min(sourceX, maxX));
-    const clampedSourceY = Math.max(0, Math.min(sourceY, maxY));
-  
+
     try {
-      // Limpiar el canvas
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, SELECTOR_SIZE, SELECTOR_SIZE);
-  
-      // Dibujar la imagen recortada
+
       ctx.drawImage(
         img,
-        clampedSourceX,
-        clampedSourceY,
+        sourceX,
+        sourceY,
         sourceWidth,
         sourceHeight,
         0,
@@ -227,7 +201,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         SELECTOR_SIZE,
         SELECTOR_SIZE
       );
-  
+
       canvas.toBlob(
         (blob) => {
           if (blob) {
@@ -246,8 +220,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     } catch (error) {
       console.error('Error al recortar la imagen:', error);
     }
-  };
-
+  }
   const handleColorChange = (e) => {
     const color = e.target.value;
     if (color && !selectedColors.includes(color)) {
@@ -275,12 +248,9 @@ function AgregarCamiseta({ onClose, onAgregar }) {
 
     const submitFormData = new FormData();
     
-    // Agregar las imágenes con los nombres exactos que espera el backend
     submitFormData.append('usuarioId', usuarioId);
     submitFormData.append('imagenCompleta', formData.imagenCompleta);
     submitFormData.append('imagenRecortada', formData.imagenRecortada);
-    
-    // Agregar el resto de los campos
     submitFormData.append('club', formData.club);
     submitFormData.append('pais', formData.pais);
     submitFormData.append('temporada', formData.temporada);
@@ -290,12 +260,6 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     submitFormData.append('colores', selectedColors.join(','));
     submitFormData.append('numeroEquipacion', formData.numeroEquipacion);
     submitFormData.append('comentarios', formData.comentarios || '');
-
-    // Debug para ver qué se está enviando
-    console.log('Enviando datos:');
-    for (let pair of submitFormData.entries()) {
-        console.log(pair[0] + ': ' + pair[1]);
-    }
 
     try {
       const response = await fetch('http://localhost:8080/api/camisetas', {
@@ -319,7 +283,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       console.error('Error al agregar la camiseta:', error);
       alert('Error al agregar la camiseta. Por favor, intente nuevamente.');
     }
-};
+  };
 
   return (
     <div className="form-overlay">
@@ -327,31 +291,47 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         <div className="image-modal-overlay">
           <div className="image-modal">
             <h3>Elige el área que se mostrará como miniatura</h3>
-            // En el JSX, modifica el estilo del contenedor de la imagen
             <div 
               className="image-container" 
               ref={containerRef}
               onWheel={handleWheel}
+              onMouseMove={handleImageMouseMove}
+              onMouseUp={handleImageMouseUp}
+              onMouseLeave={handleImageMouseUp}
               style={{ 
                 position: 'relative',
                 width: '100%',
-                height: '500px', // O el alto que necesites
-                overflow: 'hidden'
+                height: '500px',
+                overflow: 'hidden',
+                cursor: isDragging ? 'grabbing' : 'grab'
               }}
             >
-              <img
-                ref={imageRef}
-                src={originalImage}
-                alt="Original"
+              <div
                 style={{
                   position: 'absolute',
-                  left: `${imageOffset.x}px`,
-                  top: `${imageOffset.y}px`,
-                  width: `${imageSize.width * zoom}px`,
-                  height: `${imageSize.height * zoom}px`,
-                  transformOrigin: 'top left'
+                  left: `${imagePosition.x}px`,
+                  top: `${imagePosition.y}px`,
+                  width: '100%',
+                  height: '100%',
+                  cursor: isDragging ? 'grabbing' : 'grab'
                 }}
-              />
+                onMouseDown={handleImageMouseDown}
+              >
+                <img
+                  ref={imageRef}
+                  src={originalImage}
+                  alt="Original"
+                  style={{
+                    position: 'absolute',
+                    left: `${imageOffset.x}px`,
+                    top: `${imageOffset.y}px`,
+                    width: `${imageSize.width * zoom}px`,
+                    height: `${imageSize.height * zoom}px`,
+                    transformOrigin: 'top left',
+                    pointerEvents: 'none'
+                  }}
+                />
+              </div>
               {imageLoaded && (
                 <Rnd
                   size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
@@ -361,16 +341,12 @@ function AgregarCamiseta({ onClose, onAgregar }) {
                   }}
                   bounds="parent"
                   enableResizing={false}
-                  style={{
-                    position: 'absolute',
-                    zIndex: 1000
-                  }}
+                  className="selector"
                 >
                   <div className="selector-overlay" />
                 </Rnd>
               )}
             </div>
-
             <div className="image-modal-buttons">
               <button 
                 type="button" 
@@ -448,21 +424,20 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           onChange={handleChange} 
         />
         <input 
-        type="text" 
-        name="dorsal" 
-        placeholder="Dorsal" 
-        value={formData.dorsal || ''} 
-        onChange={(e) => {
-          const value = e.target.value;
-          // Solo permite números y vacío
-          if (value === '' || /^[0-9]+$/.test(value)) {
-            setFormData(prev => ({
-              ...prev,
-              dorsal: value === '' ? '' : parseInt(value)
-            }));
-          }
-        }}
-      />
+          type="text" 
+          name="dorsal" 
+          placeholder="Dorsal" 
+          value={formData.dorsal || ''} 
+          onChange={(e) => {
+            const value = e.target.value;
+            if (value === '' || /^[0-9]+$/.test(value)) {
+              setFormData(prev => ({
+                ...prev,
+                dorsal: value === '' ? '' : parseInt(value)
+              }));
+            }
+          }}
+        />
 
         <select 
           name="talle" 
