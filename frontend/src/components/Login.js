@@ -11,20 +11,13 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Limpiar localStorage cuando se accede a la página de login
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuarioId');
-
-    // Si hay un token válido, redirigir automáticamente a /camisetas
+    // Solo limpiar si no hay un token válido
     const token = localStorage.getItem('token');
-    if (token) {
-      const usuarioId = decodeToken(token);
-      if (usuarioId) {
-        localStorage.setItem('usuarioId', usuarioId);
-        navigate('/camisetas');
-      }
+    if (!token) {
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuarioId');
     }
-  }, [navigate]);
+}, [navigate]);
 
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => setShowRegister(false);
@@ -37,16 +30,15 @@ function Login() {
     });
   };
 
-  // Función para decodificar el token JWT y extraer el usuarioId
   const decodeToken = (token) => {
     try {
-      const payload = JSON.parse(atob(token.split('.')[1])); // Decodifica el payload del JWT
-      return payload.usuarioId || null;  // Asegúrate de que el backend envía el campo usuarioId en el payload
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return payload.usuarioId || null;
     } catch (error) {
-      console.error('Error al decodificar el token', error);
-      return null;
+        console.error('Error al decodificar el token:', error);
+        return null;
     }
-  };
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,28 +50,35 @@ function Login() {
         body: JSON.stringify(credentials),
       });
 
+      console.log('Status:', response.status);
+
       if (!response.ok) {
         setError('Usuario o contraseña incorrectos');
         return;
       }
 
       const data = await response.json();
-      localStorage.setItem('token', data.token); // Guardar token para futuras peticiones
+      console.log('Respuesta del servidor:', data);
 
-      // Decodificar token para obtener usuarioId
-      const usuarioId = decodeToken(data.token);
-      if (usuarioId) {
-        localStorage.setItem('usuarioId', usuarioId);  // Guardar el usuarioId en localStorage
-        navigate('/camisetas');  // Redirigir a la página de camisetas
+      // Guardar directamente token y usuarioId de la respuesta
+      if (data && data.token && data.usuarioId) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuarioId', data.usuarioId.toString());
+        
+        // Agregar log para verificar que se guardó correctamente
+        console.log('Token guardado:', localStorage.getItem('token'));
+        console.log('Usuario ID guardado:', localStorage.getItem('usuarioId'));
+        
+        navigate('/camisetas');
       } else {
-        setError('No se pudo obtener la información del usuario');
-        return;
+        setError('Error en la respuesta del servidor');
       }
 
     } catch (error) {
+      console.error('Error completo:', error);
       setError('Error en la conexión al servidor');
     }
-  };
+};
 
   return (
     <>

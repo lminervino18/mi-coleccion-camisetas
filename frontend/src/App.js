@@ -1,44 +1,81 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
+import { 
+  BrowserRouter as Router, 
+  Route, 
+  Routes, 
+  Navigate
+} from 'react-router-dom';
+
+// Importar componentes
 import Login from './components/Login';
 import Camisetas from './components/Camisetas';
 import DetalleCamiseta from './components/DetalleCamiseta';
-import PrivateRoute from './PrivateRoute';
+
+// Componente de transición simple usando React.memo para evitar re-renders innecesarios
+const PageTransition = React.memo(({ children }) => {
+  return (
+    <div className="page-transition">
+      {children}
+    </div>
+  );
+});
+
+// Asignar un displayName para mejor debugging
+PageTransition.displayName = 'PageTransition';
 
 function App() {
   const isLoggedIn = localStorage.getItem('token');
 
   return (
     <Router>
-      <Routes>
-        {/* Redirige a la página correcta según si el usuario está logueado o no */}
-        <Route 
-          path="/" 
-          element={isLoggedIn ? <Navigate to="/camisetas" /> : <Navigate to="/login" />} 
-        />
+      <div className="page-container">
+        <Routes>
+          <Route 
+            path="/" 
+            element={isLoggedIn ? <Navigate to="/camisetas" /> : <Navigate to="/login" />} 
+          />
 
-        {/* Ruta pública para login */}
-        <Route 
-          path="/login" 
-          element={<Login />} 
-        />
+          <Route 
+            path="/login" 
+            element={
+              <PageTransition>
+                <Login />
+              </PageTransition>
+            } 
+          />
 
-        {/* Rutas protegidas */}
-        <Route 
-          path="/camisetas" 
-          element={<PrivateRoute element={<Camisetas />} />} 
-        />
-        <Route 
-          path="/camiseta/:id" 
-          element={<PrivateRoute element={<DetalleCamiseta />} />} 
-        />
+          <Route 
+            path="/camisetas" 
+            element={
+              isLoggedIn ? (
+                <PageTransition>
+                  <Camisetas />
+                </PageTransition>
+              ) : (
+                <Navigate to="/login" />
+              )
+            } 
+          />
 
-        {/* Ruta para manejar URLs no encontradas */}
-        <Route 
-          path="*" 
-          element={<Navigate to="/" />} 
-        />
-      </Routes>
+          <Route 
+            path="/camiseta/:id" 
+            element={
+              isLoggedIn ? (
+                <PageTransition>
+                  <DetalleCamiseta />
+                </PageTransition>
+              ) : (
+                <Navigate to="/login" />
+              )
+            } 
+          />
+
+          <Route 
+            path="*" 
+            element={<Navigate to="/" />} 
+          />
+        </Routes>
+      </div>
     </Router>
   );
 }

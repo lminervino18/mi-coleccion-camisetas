@@ -529,3 +529,388 @@
     font-size: 1.2rem;
   }
 }
+
+/* Botones de filtro y ordenamiento */
+.filter-button,
+.sort-button {
+  width: 40px;
+  height: 40px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 18px;
+}
+
+.filter-button:hover,
+.sort-button:hover {
+  transform: scale(1.1);
+  background-color: #5a6268;
+}
+
+/* Modal de Filtros */
+.filters-modal {
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 25px;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90vw;
+  color: white;
+}
+
+.filters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.filters-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.filter-section {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+}
+
+.filter-section h4 {
+  margin: 0 0 10px 0;
+  color: #007bff;
+}
+
+.filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.checkbox-label,
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 5px 10px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  transition: background-color 0.2s ease;
+}
+
+.checkbox-label:hover,
+.radio-label:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.active-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+  min-height: 30px;
+}
+
+.filter-tag {
+  background-color: rgba(0, 123, 255, 0.2);
+  border: 1px solid #007bff;
+  border-radius: 15px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+}
+
+.filter-tag button {
+  background: none;
+  border: none;
+  color: #dc3545;
+  cursor: pointer;
+  padding: 0 2px;
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.filters-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.apply-btn,
+.clear-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.apply-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.clear-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.apply-btn:hover,
+.clear-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Modal de Ordenamiento */
+.sort-modal {
+  background-color: rgba(0, 0, 0, 0.9);
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90vw;
+  color: white;
+}
+
+.sort-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sort-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.sort-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.sort-option:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.sort-direction {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.direction-btn {
+  background: none;
+  border: 1px solid #6c757d;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.direction-btn.active {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+.direction-btn:hover {
+  background-color: rgba(0, 123, 255, 0.2);
+}
+
+/* Scrollbar personalizado para los contenedores con scroll */
+.filters-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.filters-content::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.filters-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+}
+
+.filters-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.back-button {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  transition: transform 0.2s ease;
+}
+
+.back-button:hover {
+  transform: translateX(-3px);
+}
+
+.filter-select-container {
+  width: 100%;
+}
+
+.filter-select-container select {
+  width: 100%;
+  padding: 8px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+.filter-select-container select:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.filter-select-container select option {
+  background-color: #333;
+  color: white;
+}
+
+.filters-header,
+.sort-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.filters-header h3,
+.sort-header h3 {
+  text-align: center;
+  margin: 0;
+}
+
+/* Añade estas clases al final de tu archivo CSS existente */
+
+/* Animaciones para elementos que aparecen/desaparecen */
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 300ms ease-in;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 300ms ease-in;
+}
+
+/* Estilos para las camisetas con animación */
+.camiseta-item.dragging {
+  transform: scale(0.95);
+  opacity: 0.8;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+/* Animaciones para los modales */
+.modal-overlay {
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+.modal-content {
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Mejoras en las transiciones existentes */
+.camiseta-item {
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out;
+}
+
+.filter-tag {
+  animation: tagAppear 0.3s ease-out forwards;
+}
+
+@keyframes tagAppear {
+  from {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Mejoras en la interactividad */
+.btn:active {
+  transform: scale(0.95);
+}
+
+.profile-photo:active {
+  transform: scale(0.95);
+}
+
+/* Optimizaciones para el rendimiento */
+.camiseta-item,
+.modal-overlay,
+.modal-content {
+  will-change: transform, opacity;
+}
+
+/* Ajustes para animaciones suaves en dispositivos móviles */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

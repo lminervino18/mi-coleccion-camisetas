@@ -4,14 +4,69 @@ import { Rnd } from 'react-rnd';
 import './Camisetas.css';
 import AgregarCamiseta from './AgregarCamiseta';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignOutAlt } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faSignOutAlt, 
+  faFilter, 
+  faSort, 
+  faSortAmountUp, 
+  faSortAmountDown,
+  faTimes,
+  faArrowLeft
+} from '@fortawesome/free-solid-svg-icons';
 
+// Componente para cada camiseta individual
+const CamisetaItem = React.memo(({ 
+  camiseta, 
+  isDraggingCamiseta, 
+  draggedCamiseta,
+  onMouseDown,
+  onMouseUp,
+  onMouseMove,
+  onClick 
+}) => {
+  const isBeingDragged = draggedCamiseta === camiseta.id;
+  
+  return (
+    <div 
+      className={`camiseta-item ${isBeingDragged ? 'dragging' : ''}`}
+      style={{
+        cursor: isDraggingCamiseta ? 'grabbing' : 'pointer',
+        zIndex: isBeingDragged ? 999 : 1
+      }}
+      onMouseDown={(e) => onMouseDown(e, camiseta.id)}
+      onMouseUp={onMouseUp}
+      onMouseMove={(e) => onMouseMove(e, camiseta.id)}
+      onClick={() => onClick(camiseta.id)}
+    >
+      <div className="camiseta-image-wrapper">
+        {camiseta.imagenRecortadaBase64 ? (
+          <img
+            src={`data:image/jpeg;base64,${camiseta.imagenRecortadaBase64}`}
+            alt={camiseta.club}
+            className="camiseta-image"
+          />
+        ) : (
+          <div className="no-image">Sin imagen</div>
+        )}
+      </div>
+      <div className="camiseta-info">
+        <h3>{camiseta.club} {camiseta.temporada}</h3>
+        <h3>{camiseta.numeroEquipacion}</h3>
+      </div>
+    </div>
+  );
+});
+
+CamisetaItem.displayName = 'CamisetaItem';
 function Camisetas() {
   const [camisetas, setCamisetas] = useState([]);
+  const [filteredCamisetas, setFilteredCamisetas] = useState([]);
   const [search, setSearch] = useState('');
   const [showForm, setShowForm] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSort, setShowSort] = useState(false);
   const [userData, setUserData] = useState(null);
   const [originalImage, setOriginalImage] = useState(null);
   const [imageSize, setImageSize] = useState({ width: 'auto', height: 'auto' });
@@ -21,12 +76,45 @@ function Camisetas() {
   const [zoom, setZoom] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
+  const [activeFilters, setActiveFilters] = useState({
+    talle: [],
+    dorsal: null,
+    colores: [],
+    temporada: [],
+    pais: [],
+    club: [],
+    numeroEquipacion: []
+  });
+  const [sortBy, setSortBy] = useState(null);
+  const [sortDirection, setSortDirection] = useState('asc');
+  const [availableClubs, setAvailableClubs] = useState([]);
+  const [availablePaises, setAvailablePaises] = useState([]);
+  const [selectedClub, setSelectedClub] = useState('');
+  const [selectedPais, setSelectedPais] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const [selectedEquipacion, setSelectedEquipacion] = useState('');
+  const [isDraggingCamiseta, setIsDraggingCamiseta] = useState(false);
+  const [draggedCamiseta, setDraggedCamiseta] = useState(null);
+  const [dragTimeout, setDragTimeout] = useState(null);
+  const [customOrder, setCustomOrder] = useState([]);
+  const [tempSortBy, setTempSortBy] = useState(null);
+  const [tempSortDirection, setTempSortDirection] = useState('asc');
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
   const navigate = useNavigate();
 
   const SELECTOR_SIZE = 200;
+
+  const talles = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Otro'];
+  const coloresDisponibles = [
+    'Rojo', 'Azul', 'Verde', 'Amarillo', 'Negro', 'Blanco', 'Gris',
+    'Naranja', 'Violeta', 'Celeste', 'Bordó', 'Rosa', 'Dorado', 'Plateado', 'Marrón'
+  ];
+  const equipaciones = [
+    'Titular', 'Suplente', 'Tercera', 'Arquero',
+    'Arquero Suplente', 'Arquero Tercera', 'Entrenamiento', 'Edición especial', 'Otra'
+  ];
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -57,6 +145,16 @@ function Camisetas() {
         if (response.ok) {
           const data = await response.json();
           setCamisetas(data);
+          setFilteredCamisetas(data);
+          
+          const savedOrder = localStorage.getItem(`customOrder_${usuarioId}`);
+          if (savedOrder) {
+            setCustomOrder(JSON.parse(savedOrder));
+          } else {
+            const newOrder = data.map(c => c.id);
+            setCustomOrder(newOrder);
+            localStorage.setItem(`customOrder_${usuarioId}`, JSON.stringify(newOrder));
+          }
         }
       } catch (error) {
         console.error('Error al obtener camisetas', error);
@@ -68,46 +166,212 @@ function Camisetas() {
   }, []);
 
   useEffect(() => {
-    if (showProfileModal && imageRef.current && containerRef.current) {
-      const img = imageRef.current;
-      const container = containerRef.current;
-      const containerRect = container.getBoundingClientRect();
+    const clubs = [...new Set(camisetas.map(c => c.club))].sort();
+    const paises = [...new Set(camisetas.map(c => c.pais))].sort();
+    
+    setAvailableClubs(clubs);
+    setAvailablePaises(paises);
+  }, [camisetas]);
 
-      const handleImageLoad = () => {
-        const imgAspectRatio = img.naturalWidth / img.naturalHeight;
-        const containerAspectRatio = containerRect.width / containerRect.height;
-        
-        let width, height;
-
-        if (imgAspectRatio > containerAspectRatio) {
-          width = containerRect.width;
-          height = width / imgAspectRatio;
-        } else {
-          height = containerRect.height;
-          width = height * imgAspectRatio;
-        }
-
-        setImageSize({ width, height });
-        
-        const offsetX = Math.max(0, (containerRect.width - width) / 2);
-        const offsetY = Math.max(0, (containerRect.height - height) / 2);
-        setImageOffset({ x: offsetX, y: offsetY });
-
-        setSelectorPosition({
-          x: offsetX + (width - SELECTOR_SIZE) / 2,
-          y: offsetY + (height - SELECTOR_SIZE) / 2
-        });
-
-        setImageLoaded(true);
-      };
-
-      if (img.complete) {
-        handleImageLoad();
+  const handleFilterChange = (filterType, value, isChecked = null) => {
+    setActiveFilters(prev => {
+      const newFilters = { ...prev };
+      
+      if (filterType === 'dorsal') {
+        newFilters.dorsal = value;
       } else {
-        img.onload = handleImageLoad;
+        if (isChecked !== null) {
+          if (isChecked) {
+            newFilters[filterType] = [...prev[filterType], value];
+          } else {
+            newFilters[filterType] = prev[filterType].filter(item => item !== value);
+          }
+        }
+      }
+      
+      return newFilters;
+    });
+  };
+
+  const removeFilter = (filterType, value) => {
+    setActiveFilters(prev => ({
+      ...prev,
+      [filterType]: prev[filterType].filter(item => item !== value)
+    }));
+    
+    switch(filterType) {
+      case 'club':
+        setSelectedClub('');
+        break;
+      case 'pais':
+        setSelectedPais('');
+        break;
+      case 'colores':
+        setSelectedColor('');
+        break;
+      case 'numeroEquipacion':
+        setSelectedEquipacion('');
+        break;
+      default:
+        break;
+    }
+  };
+
+  const clearFilters = () => {
+    setActiveFilters({
+      talle: [],
+      dorsal: null,
+      colores: [],
+      temporada: [],
+      pais: [],
+      club: [],
+      numeroEquipacion: []
+    });
+    setSelectedClub('');
+    setSelectedPais('');
+    setSelectedColor('');
+    setSelectedEquipacion('');
+  };
+
+  const applyFilters = () => {
+    let filtered = [...camisetas];
+
+    if (activeFilters.talle.length > 0) {
+      filtered = filtered.filter(camiseta => 
+        activeFilters.talle.includes(camiseta.talle)
+      );
+    }
+
+    if (activeFilters.dorsal !== null) {
+      filtered = filtered.filter(camiseta => 
+        activeFilters.dorsal ? camiseta.dorsal : !camiseta.dorsal
+      );
+    }
+
+    if (activeFilters.colores.length > 0) {
+      filtered = filtered.filter(camiseta => 
+        camiseta.colores.some(color => activeFilters.colores.includes(color))
+      );
+    }
+
+    if (activeFilters.temporada.length > 0) {
+      filtered = filtered.filter(camiseta =>
+        activeFilters.temporada.includes(camiseta.temporada)
+      );
+    }
+
+    if (activeFilters.pais.length > 0) {
+      filtered = filtered.filter(camiseta =>
+        activeFilters.pais.includes(camiseta.pais)
+      );
+    }
+
+    if (activeFilters.club.length > 0) {
+      filtered = filtered.filter(camiseta =>
+        activeFilters.club.includes(camiseta.club)
+      );
+    }
+
+    if (activeFilters.numeroEquipacion.length > 0) {
+      filtered = filtered.filter(camiseta =>
+        activeFilters.numeroEquipacion.includes(camiseta.numeroEquipacion)
+      );
+    }
+
+    setFilteredCamisetas(filtered);
+    setShowFilters(false);
+  };
+
+  const handleSortChange = (value) => {
+    setTempSortBy(value);
+  };
+
+  const applySort = () => {
+    setSortBy(tempSortBy);
+    setSortDirection(tempSortDirection);
+    
+    let sorted = [...filteredCamisetas];
+    if (tempSortBy) {
+      sorted.sort((a, b) => {
+        let comparison = 0;
+        
+        switch (tempSortBy) {
+          case 'talle':
+            const talleOrder = { 'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5, 'XXL': 6, 'Otro': 7 };
+            comparison = talleOrder[a.talle] - talleOrder[b.talle];
+            break;
+          
+          case 'temporada':
+            const getYear = (temp) => {
+              const year = temp.split('/')[0];
+              return parseInt(year);
+            };
+            comparison = getYear(a.temporada) - getYear(b.temporada);
+            break;
+          
+          default:
+            comparison = a[tempSortBy].localeCompare(b[tempSortBy]);
+        }
+        
+        return tempSortDirection === 'asc' ? comparison : -comparison;
+      });
+    } else {
+      sorted.sort((a, b) => {
+        return customOrder.indexOf(a.id) - customOrder.indexOf(b.id);
+      });
+    }
+
+    setFilteredCamisetas(sorted);
+    setShowSort(false);
+  };
+
+  const handleCamisetaMouseDown = (e, camisetaId) => {
+    e.preventDefault();
+    const timeout = setTimeout(() => {
+      setIsDraggingCamiseta(true);
+      setDraggedCamiseta(camisetaId);
+      if (window.navigator.vibrate) {
+        window.navigator.vibrate(50);
+      }
+    }, 200);
+
+    setDragTimeout(timeout);
+  };
+
+  const handleCamisetaMouseUp = () => {
+    if (dragTimeout) {
+      clearTimeout(dragTimeout);
+    }
+    if (!isDraggingCamiseta) {
+      if (draggedCamiseta) {
+        handleCamisetaClick(draggedCamiseta);
       }
     }
-  }, [showProfileModal, originalImage]);
+    setIsDraggingCamiseta(false);
+    setDraggedCamiseta(null);
+  };
+
+  const handleCamisetaMouseMove = (e, targetCamisetaId) => {
+    if (isDraggingCamiseta && draggedCamiseta && draggedCamiseta !== targetCamisetaId) {
+      const newOrder = [...customOrder];
+      const draggedIndex = newOrder.indexOf(draggedCamiseta);
+      const targetIndex = newOrder.indexOf(targetCamisetaId);
+      
+      newOrder.splice(draggedIndex, 1);
+      newOrder.splice(targetIndex, 0, draggedCamiseta);
+      
+      setCustomOrder(newOrder);
+      
+      const usuarioId = localStorage.getItem('usuarioId');
+      localStorage.setItem(`customOrder_${usuarioId}`, JSON.stringify(newOrder));
+      
+      const reorderedCamisetas = [...filteredCamisetas].sort((a, b) => {
+        return newOrder.indexOf(a.id) - newOrder.indexOf(b.id);
+      });
+      
+      setFilteredCamisetas(reorderedCamisetas);
+    }
+  };
 
   const handleMouseDown = (e) => {
     if (e.button === 0) {
@@ -118,7 +382,6 @@ function Camisetas() {
       });
     }
   };
-
 
   useEffect(() => {
     if (isDragging) {
@@ -179,7 +442,6 @@ function Camisetas() {
       reader.readAsDataURL(file);
     }
   };
-
 
   const handleImageSelect = async () => {
     if (!imageRef.current || !imageLoaded) return;
@@ -260,12 +522,16 @@ function Camisetas() {
   };
 
   const handleAgregarCamiseta = (nuevaCamiseta) => {
-    setCamisetas([...camisetas, nuevaCamiseta]);
+    setCamisetas(prev => [...prev, nuevaCamiseta]);
+    setFilteredCamisetas(prev => [...prev, nuevaCamiseta]);
+    setCustomOrder(prev => [...prev, nuevaCamiseta.id]);
     setShowForm(false);
   };
 
   const handleCamisetaClick = (camisetaId) => {
-    navigate(`/camiseta/${camisetaId}`);
+    if (!isDraggingCamiseta) {
+      navigate(`/camiseta/${camisetaId}`);
+    }
   };
 
   const getInitials = (name) => {
@@ -294,7 +560,13 @@ function Camisetas() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button className="add-button" onClick={() => setShowForm(true)}>
+          <button className="filter-button" onClick={() => setShowFilters(true)} title="Filtrar">
+            <FontAwesomeIcon icon={faFilter} />
+          </button>
+          <button className="sort-button" onClick={() => setShowSort(true)} title="Ordenar">
+            <FontAwesomeIcon icon={faSort} />
+          </button>
+          <button className="add-button" onClick={() => setShowForm(true)} title="Agregar camiseta">
             +
           </button>
         </div>
@@ -321,9 +593,239 @@ function Camisetas() {
         </div>
       </div>
 
+      {showFilters && (
+        <div className="modal-overlay">
+          <div className="modal-content filters-modal">
+            <div className="filters-header">
+              <button className="back-button" onClick={() => setShowFilters(false)}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
+              <h3>Filtros</h3>
+              <button className="close-button" onClick={() => setShowFilters(false)}>
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+            
+            <div className="filters-content">
+              {/* Talle */}
+              <div className="filter-section">
+                <h4>Talle</h4>
+                <div className="filter-options">
+                  {talles.map(talle => (
+                    <label key={talle} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={activeFilters.talle.includes(talle)}
+                        onChange={(e) => handleFilterChange('talle', talle, e.target.checked)}
+                      />
+                      {talle}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Club */}
+              <div className="filter-section">
+                <h4>Club</h4>
+                <div className="filter-select-container">
+                  <select 
+                    value={selectedClub}
+                    onChange={(e) => {
+                      setSelectedClub(e.target.value);
+                      if (e.target.value && !activeFilters.club.includes(e.target.value)) {
+                        handleFilterChange('club', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar club</option>
+                    {availableClubs.map(club => (
+                      <option key={club} value={club}>{club}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* País */}
+              <div className="filter-section">
+                <h4>País</h4>
+                <div className="filter-select-container">
+                  <select 
+                    value={selectedPais}
+                    onChange={(e) => {
+                      setSelectedPais(e.target.value);
+                      if (e.target.value && !activeFilters.pais.includes(e.target.value)) {
+                        handleFilterChange('pais', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar país</option>
+                    {availablePaises.map(pais => (
+                      <option key={pais} value={pais}>{pais}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Colores */}
+              <div className="filter-section">
+                <h4>Colores</h4>
+                <div className="filter-select-container">
+                  <select
+                    value={selectedColor}
+                    onChange={(e) => {
+                      setSelectedColor(e.target.value);
+                      if (e.target.value && !activeFilters.colores.includes(e.target.value)) {
+                        handleFilterChange('colores', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar color</option>
+                    {coloresDisponibles.map(color => (
+                      <option key={color} value={color}>{color}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Equipación */}
+              <div className="filter-section">
+                <h4>Equipación</h4>
+                <div className="filter-select-container">
+                  <select
+                    value={selectedEquipacion}
+                    onChange={(e) => {
+                      setSelectedEquipacion(e.target.value);
+                      if (e.target.value && !activeFilters.numeroEquipacion.includes(e.target.value)) {
+                        handleFilterChange('numeroEquipacion', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar equipación</option>
+                    {equipaciones.map(equipacion => (
+                      <option key={equipacion} value={equipacion}>{equipacion}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Dorsal */}
+              <div className="filter-section">
+                <h4>Dorsal</h4>
+                <div className="filter-options">
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      checked={activeFilters.dorsal === true}
+                      onChange={() => handleFilterChange('dorsal', true)}
+                    />
+                    Con dorsal
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      checked={activeFilters.dorsal === false}
+                      onChange={() => handleFilterChange('dorsal', false)}
+                    />
+                    Sin dorsal
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="active-filters">
+              {Object.entries(activeFilters).map(([key, value]) => {
+                if (Array.isArray(value) && value.length > 0) {
+                  return value.map(v => (
+                    <span key={`${key}-${v}`} className="filter-tag">
+                      {`${key}: ${v}`}
+                      <button onClick={() => removeFilter(key, v)}>×</button>
+                    </span>
+                  ));
+                }
+                return null;
+              })}
+            </div>
+
+            <div className="filters-footer">
+              <button onClick={applyFilters} className="apply-btn">
+                Aplicar
+              </button>
+              <button onClick={clearFilters} className="clear-btn">
+                Limpiar filtros
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showSort && (
+        <div className="modal-overlay">
+          <div className="modal-content sort-modal">
+            <div className="sort-header">
+              <button className="back-button" onClick={() => {
+                setShowSort(false);
+                setTempSortBy(sortBy);
+                setTempSortDirection(sortDirection);
+              }}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
+              <h3>Ordenar por</h3>
+              <button className="close-button" onClick={() => setShowSort(false)}>
+                <FontAwesomeIcon icon={faTimes} />
+              </button>
+            </div>
+
+            <div className="sort-options">
+              {[
+                { value: 'club', label: 'Club' },
+                { value: 'pais', label: 'País' },
+                { value: 'talle', label: 'Talle' },
+                { value: 'temporada', label: 'Temporada' }
+              ].map(option => (
+                <label key={option.value} className="sort-option">
+                  <input
+                    type="radio"
+                    name="sort"
+                    checked={tempSortBy === option.value}
+                    onChange={() => handleSortChange(option.value)}
+                  />
+                  {option.label}
+                </label>
+              ))}
+            </div>
+
+            {tempSortBy && (
+              <div className="sort-direction">
+                <button
+                  className={`direction-btn ${tempSortDirection === 'asc' ? 'active' : ''}`}
+                  onClick={() => setTempSortDirection('asc')}
+                >
+                  <FontAwesomeIcon icon={faSortAmountUp} />
+                </button>
+                <button
+                  className={`direction-btn ${tempSortDirection === 'desc' ? 'active' : ''}`}
+                  onClick={() => setTempSortDirection('desc')}
+                >
+                  <FontAwesomeIcon icon={faSortAmountDown} />
+                </button>
+              </div>
+            )}
+
+            <div className="sort-footer">
+              <button 
+                className="apply-sort-btn"
+                onClick={applySort}
+              >
+                Aplicar ordenamiento
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showLogoutConfirm && (
-        <div className="confirm-modal-overlay">
-          <div className="confirm-modal">
+        <div className="modal-overlay">
+          <div className="modal-content confirm-modal">
             <h3>¿Estás seguro que deseas cerrar sesión?</h3>
             <div className="confirm-modal-buttons">
               <button className="confirm-btn" onClick={confirmLogout}>
@@ -337,9 +839,9 @@ function Camisetas() {
         </div>
       )}
 
-      {showProfileModal && (
+{showProfileModal && (
         <div className="modal-overlay">
-          <div className="profile-modal">
+          <div className="modal-content profile-modal">
             <div className="profile-modal-header">
               <h3>Foto de perfil</h3>
               <button className="close-button" onClick={handleCloseModal}>×</button>
@@ -449,30 +951,19 @@ function Camisetas() {
         <AgregarCamiseta onClose={() => setShowForm(false)} onAgregar={handleAgregarCamiseta} />
       ) : (
         <div className="grid-container">
-          {camisetas
+          {filteredCamisetas
             .filter((camiseta) => camiseta.club.toLowerCase().includes(search.toLowerCase()))
             .map((camiseta) => (
-              <div 
-                key={camiseta.id} 
-                className="camiseta-item"
-                onClick={() => handleCamisetaClick(camiseta.id)}
-              >
-                <div className="camiseta-image-wrapper">
-                  {camiseta.imagenRecortadaBase64 ? (
-                    <img
-                      src={`data:image/jpeg;base64,${camiseta.imagenRecortadaBase64}`}
-                      alt={camiseta.club}
-                      className="camiseta-image"
-                    />
-                  ) : (
-                    <div className="no-image">Sin imagen</div>
-                  )}
-                </div>
-                <div className="camiseta-info">
-                  <h3>{camiseta.club} {camiseta.temporada}</h3>
-                  <h3>{camiseta.numeroEquipacion}</h3>
-                </div>
-              </div>
+              <CamisetaItem
+                key={camiseta.id}
+                camiseta={camiseta}
+                isDraggingCamiseta={isDraggingCamiseta}
+                draggedCamiseta={draggedCamiseta}
+                onMouseDown={handleCamisetaMouseDown}
+                onMouseUp={handleCamisetaMouseUp}
+                onMouseMove={handleCamisetaMouseMove}
+                onClick={handleCamisetaClick}
+              />
             ))}
         </div>
       )}
