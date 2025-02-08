@@ -39,8 +39,8 @@ function EditarCamiseta({
   const [showImageModal, setShowImageModal] = useState(false);
   const [originalImage, setOriginalImage] = useState(null);
   const [previewImage, setPreviewImage] = useState(
-    camisetaSeleccionada.imagenCompletaBase64 
-      ? `data:image/jpeg;base64,${camisetaSeleccionada.imagenCompletaBase64}` 
+    camisetaSeleccionada.imagenRecortadaBase64 
+      ? `data:image/jpeg;base64,${camisetaSeleccionada.imagenRecortadaBase64}` 
       : null
   );
   const [imageSize, setImageSize] = useState({ width: 'auto', height: 'auto' });
@@ -50,12 +50,14 @@ function EditarCamiseta({
   const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
+  const [isDragging, setIsDragging] = useState(false);
+  const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
 
   const imageRef = useRef(null);
   const containerRef = useRef(null);
 
   const SELECTOR_SIZE = 300;
-
   const talles = ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'Otro'];
   const equipaciones = [
     'Titular', 'Suplente', 'Tercera', 'Arquero',
@@ -66,65 +68,51 @@ function EditarCamiseta({
     'Naranja', 'Violeta', 'Celeste', 'Bordó', 'Rosa', 'Dorado', 'Plateado', 'Marrón'
   ];
 
+  useEffect(() => {
+    setImagePosition({ x: 0, y: 0 });
+  }, [zoom]);
 
-
-  const handlePreviewClick = () => {
-    // Si hay una imagen recortada, vamos a usar la imagen completa
-    if (camisetaSeleccionada.imagenCompletaBase64) {
-      // Convertir la imagen completa a un objeto Image para obtener sus dimensiones naturales
-      const img = new Image();
-      img.onload = () => {
-        setOriginalImage(`data:image/jpeg;base64,${camisetaSeleccionada.imagenCompletaBase64}`);
-        setImageLoaded(false);
-        setZoom(1);
-        setShowImageModal(true);
-      };
-      img.src = `data:image/jpeg;base64,${camisetaSeleccionada.imagenCompletaBase64}`;
-    } else if (originalImage) {
-      // Lógica original si no hay imagen completa base64
-      setZoom(1);
-      setShowImageModal(true);
+  const handleImageMouseDown = (e) => {
+    if (e.button === 0) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - imagePosition.x,
+        y: e.clientY - imagePosition.y
+      });
     }
   };
 
+  const handleImageMouseMove = (e) => {
+    if (isDragging) {
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+      setImagePosition({ x: newX, y: newY });
+    }
+  };
 
+  const handleImageMouseUp = () => {
+    setIsDragging(false);
+  };
+
+  const handlePreviewClick = () => {
+    if (originalImage) {
+      setZoom(1);
+      setImagePosition({ x: 0, y: 0 });
+      setShowImageModal(true);
+    } else if (camisetaSeleccionada.imagenCompletaBase64) {
+      setOriginalImage(`data:image/jpeg;base64,${camisetaSeleccionada.imagenCompletaBase64}`);
+      setZoom(1);
+      setImagePosition({ x: 0, y: 0 });
+      setShowImageModal(true);
+    }
+  };
   const handleWheel = (e) => {
     if (e.ctrlKey) {
       e.preventDefault();
       const delta = e.deltaY * -0.01;
       setZoom(prevZoom => {
-        const newZoom = prevZoom * (1 - delta);
-        return Math.min(Math.max(0.5, newZoom), 3);
-      });
-    }
-  };
-
-  const calculateImageDimensions = (img, containerRect) => {
-    if (!img.naturalWidth || !img.naturalHeight) return;
-
-    const imgAspectRatio = img.naturalWidth / img.naturalHeight;
-    const containerAspectRatio = containerRect.width / containerRect.height;
-    let width, height;
-
-    if (imgAspectRatio > containerAspectRatio) {
-      width = containerRect.width;
-      height = width / imgAspectRatio;
-    } else {
-      height = containerRect.height;
-      width = height * imgAspectRatio;
-    }
-
-    if (isFinite(width) && isFinite(height)) {
-      setImageSize({ width, height });
-      setImageDimensions({ width: img.naturalWidth, height: img.naturalHeight });
-      
-      const offsetX = (containerRect.width - width) / 2;
-      const offsetY = (containerRect.height - height) / 2;
-      setImageOffset({ x: offsetX, y: offsetY });
-
-      setSelectorPosition({
-        x: offsetX + (width - SELECTOR_SIZE) / 2,
-        y: offsetY + (height - SELECTOR_SIZE) / 2
+        const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
+        return Number(newZoom.toFixed(2));
       });
     }
   };
@@ -136,7 +124,34 @@ function EditarCamiseta({
       const containerRect = container.getBoundingClientRect();
 
       const handleImageLoad = () => {
-        calculateImageDimensions(img, containerRect);
+        const imgAspectRatio = img.naturalWidth / img.naturalHeight;
+        const containerAspectRatio = containerRect.width / containerRect.height;
+        
+        let width, height;
+
+        if (imgAspectRatio > containerAspectRatio) {
+          width = containerRect.width;
+          height = width / imgAspectRatio;
+        } else {
+          height = containerRect.height;
+          width = height * imgAspectRatio;
+        }
+
+        setImageSize({ width, height });
+        setImageDimensions({ 
+          width: img.naturalWidth, 
+          height: img.naturalHeight 
+        });
+        
+        const offsetX = Math.max(0, (containerRect.width - width) / 2);
+        const offsetY = Math.max(0, (containerRect.height - height) / 2);
+        setImageOffset({ x: offsetX, y: offsetY });
+
+        setSelectorPosition({
+          x: offsetX + (width - SELECTOR_SIZE) / 2,
+          y: offsetY + (height - SELECTOR_SIZE) / 2
+        });
+
         setImageLoaded(true);
       };
 
@@ -146,7 +161,7 @@ function EditarCamiseta({
         img.onload = handleImageLoad;
       }
     }
-  }, [showImageModal]);
+  }, [showImageModal, originalImage]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -159,6 +174,7 @@ function EditarCamiseta({
       setImageFormat(file.type || 'image/jpeg');
       setImageLoaded(false);
       setZoom(1);
+      setImagePosition({ x: 0, y: 0 });
       
       setFormData(prev => ({
         ...prev,
@@ -173,48 +189,36 @@ function EditarCamiseta({
       reader.readAsDataURL(file);
     }
   };
-
   const handleImageSelect = () => {
     if (!imageRef.current || !imageLoaded) return;
-  
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
     canvas.width = SELECTOR_SIZE;
     canvas.height = SELECTOR_SIZE;
-  
+
     const img = imageRef.current;
     
-    // Calculamos las dimensiones reales de la imagen mostrada
     const displayedWidth = imageSize.width * zoom;
     const displayedHeight = imageSize.height * zoom;
     
-    // Calculamos la relación entre las dimensiones originales y las mostradas
     const scaleX = img.naturalWidth / displayedWidth;
     const scaleY = img.naturalHeight / displayedHeight;
-  
-    // Calculamos la posición relativa del selector respecto a la imagen
-    const imageLeft = imageOffset.x;
-    const imageTop = imageOffset.y;
-    
-    // Calculamos las coordenadas del recorte en la imagen original
-    const sourceX = (selectorPosition.x - imageLeft) * scaleX;
-    const sourceY = (selectorPosition.y - imageTop) * scaleY;
+
+    const sourceX = ((selectorPosition.x - imageOffset.x - imagePosition.x) * scaleX);
+    const sourceY = ((selectorPosition.y - imageOffset.y - imagePosition.y) * scaleY);
     const sourceWidth = SELECTOR_SIZE * scaleX;
     const sourceHeight = SELECTOR_SIZE * scaleY;
-  
-    // Aseguramos que las coordenadas estén dentro de los límites de la imagen
-    const clampedSourceX = Math.max(0, Math.min(sourceX, img.naturalWidth - sourceWidth));
-    const clampedSourceY = Math.max(0, Math.min(sourceY, img.naturalHeight - sourceHeight));
-  
-    ctx.fillStyle = '#FFFFFF';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-  
+
     try {
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(0, 0, SELECTOR_SIZE, SELECTOR_SIZE);
+
       ctx.drawImage(
         img,
-        clampedSourceX,
-        clampedSourceY,
+        sourceX,
+        sourceY,
         sourceWidth,
         sourceHeight,
         0,
@@ -222,37 +226,16 @@ function EditarCamiseta({
         SELECTOR_SIZE,
         SELECTOR_SIZE
       );
-  
+
       canvas.toBlob(
         (blob) => {
           if (blob) {
             const croppedImageUrl = URL.createObjectURL(blob);
             setPreviewImage(croppedImageUrl);
-            
-            // Si la imagen original viene de la camiseta existente
-            if (camisetaSeleccionada.imagenCompletaBase64) {
-              // Convertir base64 a File
-              const byteCharacters = atob(camisetaSeleccionada.imagenCompletaBase64);
-              const byteNumbers = new Array(byteCharacters.length);
-              for (let i = 0; i < byteCharacters.length; i++) {
-                byteNumbers[i] = byteCharacters.charCodeAt(i);
-              }
-              const byteArray = new Uint8Array(byteNumbers);
-              const completeImageFile = new File([byteArray], 'imagen-completa.jpg', { type: 'image/jpeg' });
-  
-              setFormData(prev => ({ 
-                ...prev, 
-                imagenRecortada: blob,
-                imagenCompleta: completeImageFile
-              }));
-            } else {
-              // Si es una imagen nueva
-              setFormData(prev => ({ 
-                ...prev, 
-                imagenRecortada: blob 
-              }));
-            }
-            
+            setFormData(prev => ({ 
+              ...prev, 
+              imagenRecortada: blob 
+            }));
             setShowImageModal(false);
           }
         },
@@ -274,7 +257,6 @@ function EditarCamiseta({
   const removeColor = (color) => {
     setSelectedColors(prev => prev.filter(c => c !== color));
   };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -334,50 +316,66 @@ function EditarCamiseta({
       alert('Error al actualizar la camiseta. Por favor, intente nuevamente.');
     }
   };
-
   return (
     <div className="form-overlay">
       {showImageModal && (
         <div className="image-modal-overlay">
           <div className="image-modal">
-            <h3>Seleccionar área de la imagen</h3>
+            <h3>Elige el área que se mostrará como miniatura</h3>
             <div 
               className="image-container" 
               ref={containerRef}
               onWheel={handleWheel}
-              style={{ touchAction: 'none' }}
+              onMouseMove={handleImageMouseMove}
+              onMouseUp={handleImageMouseUp}
+              onMouseLeave={handleImageMouseUp}
+              style={{ 
+                position: 'relative',
+                width: '100%',
+                height: '500px',
+                overflow: 'hidden',
+                cursor: isDragging ? 'grabbing' : 'grab'
+              }}
             >
-              {originalImage && (
-                <>
-                  <img
-                    ref={imageRef}
-                    src={originalImage}
-                    alt="Original"
-                    className="original-image"
-                    style={{
-                      width: imageSize.width * zoom,
-                      height: imageSize.height * zoom,
-                      left: imageOffset.x,
-                      top: imageOffset.y,
-                      transform: `scale(${zoom})`,
-                      transformOrigin: 'center',
-                    }}
-                  />
-                  {imageLoaded && (
-                    <Rnd
-                      size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
-                      position={selectorPosition}
-                      onDragStop={(e, d) => {
-                        setSelectorPosition({ x: d.x, y: d.y });
-                      }}
-                      bounds="parent"
-                      enableResizing={false}
-                      className="selector"
-                    >
-                      <div className="selector-overlay" />
-                    </Rnd>
-                  )}
-                </>
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${imagePosition.x}px`,
+                  top: `${imagePosition.y}px`,
+                  width: '100%',
+                  height: '100%',
+                  cursor: isDragging ? 'grabbing' : 'grab'
+                }}
+                onMouseDown={handleImageMouseDown}
+              >
+                <img
+                  ref={imageRef}
+                  src={originalImage}
+                  alt="Original"
+                  style={{
+                    position: 'absolute',
+                    left: `${imageOffset.x}px`,
+                    top: `${imageOffset.y}px`,
+                    width: `${imageSize.width * zoom}px`,
+                    height: `${imageSize.height * zoom}px`,
+                    transformOrigin: 'top left',
+                    pointerEvents: 'none'
+                  }}
+                />
+              </div>
+              {imageLoaded && (
+                <Rnd
+                  size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
+                  position={selectorPosition}
+                  onDragStop={(e, d) => {
+                    setSelectorPosition({ x: d.x, y: d.y });
+                  }}
+                  bounds="parent"
+                  enableResizing={false}
+                  className="selector"
+                >
+                  <div className="selector-overlay" />
+                </Rnd>
               )}
             </div>
             <div className="image-modal-buttons">
@@ -433,12 +431,12 @@ function EditarCamiseta({
           accept="image/*" 
           onChange={handleImageChange} 
         />
-        {previewImage && (
+                {previewImage && (
           <div 
             className="preview-container" 
             onClick={handlePreviewClick}
             style={{ cursor: 'pointer' }}
-            title="Elige el área que se mostrará como miniatura"
+            title="Haz clic para volver a recortar"
           >
             <img 
               src={previewImage} 
@@ -462,7 +460,6 @@ function EditarCamiseta({
           value={formData.dorsal || ''} 
           onChange={(e) => {
             const value = e.target.value;
-            // Solo permite números y vacío
             if (value === '' || /^[0-9]+$/.test(value)) {
               setFormData(prev => ({
                 ...prev,
@@ -484,7 +481,6 @@ function EditarCamiseta({
             <option key={talle} value={talle}>{talle}</option>
           ))}
         </select>
-
         <select 
           onChange={handleColorChange} 
           value="" 

@@ -59,6 +59,8 @@ const CamisetaItem = React.memo(({
 
 CamisetaItem.displayName = 'CamisetaItem';
 function Camisetas() {
+
+  const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [camisetas, setCamisetas] = useState([]);
   const [filteredCamisetas, setFilteredCamisetas] = useState([]);
   const [search, setSearch] = useState('');
@@ -373,60 +375,80 @@ function Camisetas() {
     }
   };
 
-  const handleMouseDown = (e) => {
-    if (e.button === 0) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - imageOffset.x,
-        y: e.clientY - imageOffset.y
-      });
-    }
-  };
+  
+// Actualiza también el manejador de arrastre
+const handleMouseDown = (e) => {
+  if (e.target.closest('.profile-selector')) {
+    return; // No iniciar arrastre si el clic es en el selector
+  }
+  
+  if (e.button === 0) { // Solo botón izquierdo
+    setIsDragging(true);
+    setDragStart({
+      x: e.clientX - imageOffset.x,
+      y: e.clientY - imageOffset.y
+    });
+    e.preventDefault();
+  }
+};
 
-  useEffect(() => {
-    if (isDragging) {
-      const handleMouseMoveEffect = (e) => {
-        if (imageRef.current && containerRef.current) {
-          const container = containerRef.current;
-          const containerRect = container.getBoundingClientRect();
-          
-          const newX = e.clientX - dragStart.x;
-          const newY = e.clientY - dragStart.y;
-          
-          const maxX = containerRect.width - (imageSize.width * zoom);
-          const maxY = containerRect.height - (imageSize.height * zoom);
-          
-          setImageOffset({
-            x: Math.min(Math.max(newX, maxX), 0),
-            y: Math.min(Math.max(newY, maxY), 0)
-          });
-        }
-      };
-  
-      const handleMouseUpEffect = () => {
-        setIsDragging(false);
-      };
-  
-      window.addEventListener('mousemove', handleMouseMoveEffect);
-      window.addEventListener('mouseup', handleMouseUpEffect);
-  
-      return () => {
-        window.removeEventListener('mousemove', handleMouseMoveEffect);
-        window.removeEventListener('mouseup', handleMouseUpEffect);
-      };
-    }
-  }, [isDragging, dragStart, imageSize.width, imageSize.height, zoom]);
+useEffect(() => {
+  if (isDragging) {
+    const handleMouseMove = (e) => {
+      if (imageRef.current && containerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const newX = e.clientX - dragStart.x;
+        const newY = e.clientY - dragStart.y;
+        
+        // Calcular límites
+        const maxX = containerRect.width - (imageSize.width * zoom);
+        const maxY = containerRect.height - (imageSize.height * zoom);
+        
+        setImageOffset({
+          x: Math.min(Math.max(newX, maxX), 0),
+          y: Math.min(Math.max(newY, maxY), 0)
+        });
+      }
+    };
 
-  const handleWheel = (e) => {
-    if (e.ctrlKey) {
-      e.preventDefault();
-      const delta = e.deltaY * -0.01;
-      setZoom(prevZoom => {
-        const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
-        return Number(newZoom.toFixed(2));
-      });
-    }
-  };
+    const handleMouseUp = () => {
+      setIsDragging(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }
+}, [isDragging, dragStart, imageSize, zoom]);
+
+const handleWheel = (e) => {
+  if (e.ctrlKey) {
+    e.preventDefault();
+    const delta = e.deltaY * -0.01;
+    
+    // Calcula el punto central del contenedor
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const centerX = containerRect.width / 2;
+    const centerY = containerRect.height / 2;
+    
+    setZoom(prevZoom => {
+      const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
+      
+      // Ajusta la posición para mantener el centro
+      const scaleChange = newZoom / prevZoom;
+      setImagePosition(prev => ({
+        x: centerX - ((centerX - prev.x) * scaleChange),
+        y: centerY - ((centerY - prev.y) * scaleChange)
+      }));
+      
+      return newZoom;
+    });
+  }
+};
 
   const handleProfilePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -443,9 +465,36 @@ function Camisetas() {
     }
   };
 
+  const handleImageMouseDown = (e) => {
+    if (e.target.closest('.profile-selector')) {
+      return; // No iniciar arrastre si el clic es en el selector
+    }
+    
+    if (e.button === 0) {
+      setIsDragging(true);
+      setDragStart({
+        x: e.clientX - imagePosition.x,
+        y: e.clientY - imagePosition.y
+      });
+      e.preventDefault();
+    }
+  };
+  
+  const handleImageMouseMove = (e) => {
+    if (isDragging) {
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+      setImagePosition({ x: newX, y: newY });
+    }
+  };
+  
+  const handleImageMouseUp = () => {
+    setIsDragging(false);
+  };
+
   const handleImageSelect = async () => {
     if (!imageRef.current || !imageLoaded) return;
-  
+
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
@@ -460,8 +509,8 @@ function Camisetas() {
     const scaleX = img.naturalWidth / displayedWidth;
     const scaleY = img.naturalHeight / displayedHeight;
   
-    const sourceX = (selectorPosition.x - imageOffset.x) * scaleX;
-    const sourceY = (selectorPosition.y - imageOffset.y) * scaleY;
+    const sourceX = ((selectorPosition.x - imageOffset.x - imagePosition.x) * scaleX);
+    const sourceY = ((selectorPosition.y - imageOffset.y - imagePosition.y) * scaleY);
     const sourceWidth = SELECTOR_SIZE * scaleX;
     const sourceHeight = SELECTOR_SIZE * scaleY;
   
@@ -864,21 +913,47 @@ function Camisetas() {
             >
               {originalImage ? (
                 <>
-                  <img
-                    ref={imageRef}
-                    src={originalImage}
-                    alt="Original"
-                    className="profile-original-image"
-                    style={{
-                      position: 'absolute',
-                      left: `${imageOffset.x}px`,
-                      top: `${imageOffset.y}px`,
-                      width: `${imageSize.width * zoom}px`,
-                      height: `${imageSize.height * zoom}px`,
-                      transformOrigin: 'top left',
-                      pointerEvents: 'none'
-                    }}
-                  />
+            <img
+            ref={imageRef}
+            src={originalImage}
+            alt="Original"
+            className="profile-original-image"
+            onLoad={(e) => {
+              const img = e.target;
+              const containerRect = containerRef.current.getBoundingClientRect();
+              const scale = Math.min(
+                containerRect.width / img.naturalWidth,
+                containerRect.height / img.naturalHeight
+              );
+              
+              setImageSize({
+                width: img.naturalWidth * scale,
+                height: img.naturalHeight * scale
+              });
+              
+              const offsetX = (containerRect.width - (img.naturalWidth * scale)) / 2;
+              const offsetY = (containerRect.height - (img.naturalHeight * scale)) / 2;
+              
+              setImageOffset({ x: offsetX, y: offsetY });
+              setImagePosition({ x: 0, y: 0 });
+              
+              setSelectorPosition({
+                x: (containerRect.width - SELECTOR_SIZE) / 2,
+                y: (containerRect.height - SELECTOR_SIZE) / 2
+              });
+              
+              setImageLoaded(true);
+            }}
+            style={{
+              position: 'absolute',
+              left: `${imageOffset.x + imagePosition.x}px`,
+              top: `${imageOffset.y + imagePosition.y}px`,
+              width: `${imageSize.width * zoom}px`,
+              height: `${imageSize.height * zoom}px`,
+              transformOrigin: 'top left',
+              pointerEvents: 'none'
+            }}
+          />
                   {imageLoaded && (
                     <Rnd
                       size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
@@ -896,19 +971,19 @@ function Camisetas() {
                 </>
               ) : (
                 <div className="profile-controls-container">
-                  <p>Selecciona una imagen para tu foto de perfil</p>
-                  <div className="file-input-wrapper">
-                    <button className="file-input-button">
-                      Seleccionar imagen
-                    </button>
+                <p>Selecciona una imagen para tu foto de perfil</p>
+                <div className="file-input-wrapper">
+                  <label className="file-input-button">
+                    Seleccionar imagen
                     <input
                       type="file"
                       accept="image/*"
                       onChange={handleProfilePhotoChange}
                       className="profile-file-input"
                     />
-                  </div>
+                  </label>
                 </div>
+              </div>
               )}
             </div>
 
