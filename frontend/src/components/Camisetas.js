@@ -11,7 +11,8 @@ import {
   faSortAmountUp, 
   faSortAmountDown,
   faTimes,
-  faArrowLeft
+  faArrowLeft,
+  faExclamation  
 } from '@fortawesome/free-solid-svg-icons';
 
 // Componente para cada camiseta individual
@@ -101,7 +102,9 @@ function Camisetas() {
   const [customOrder, setCustomOrder] = useState([]);
   const [tempSortBy, setTempSortBy] = useState(null);
   const [tempSortDirection, setTempSortDirection] = useState('asc');
-
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [password, setPassword] = useState('');
   const imageRef = useRef(null);
   const containerRef = useRef(null);
   const navigate = useNavigate();
@@ -312,17 +315,17 @@ function Camisetas() {
             break;
           
           default:
+            if (tempSortBy === null) {
+              // Restaurar el orden original o personalizado
+              return customOrder.indexOf(a.id) - customOrder.indexOf(b.id);
+            }
             comparison = a[tempSortBy].localeCompare(b[tempSortBy]);
         }
         
         return tempSortDirection === 'asc' ? comparison : -comparison;
       });
-    } else {
-      sorted.sort((a, b) => {
-        return customOrder.indexOf(a.id) - customOrder.indexOf(b.id);
-      });
     }
-
+  
     setFilteredCamisetas(sorted);
     setShowSort(false);
   };
@@ -396,17 +399,13 @@ useEffect(() => {
   if (isDragging) {
     const handleMouseMove = (e) => {
       if (imageRef.current && containerRef.current) {
-        const containerRect = containerRef.current.getBoundingClientRect();
         const newX = e.clientX - dragStart.x;
         const newY = e.clientY - dragStart.y;
         
-        // Calcular límites
-        const maxX = containerRect.width - (imageSize.width * zoom);
-        const maxY = containerRect.height - (imageSize.height * zoom);
-        
+        // Permitir movimiento más allá de los límites
         setImageOffset({
-          x: Math.min(Math.max(newX, maxX), 0),
-          y: Math.min(Math.max(newY, maxY), 0)
+          x: newX,
+          y: newY
         });
       }
     };
@@ -423,7 +422,7 @@ useEffect(() => {
       window.removeEventListener('mouseup', handleMouseUp);
     };
   }
-}, [isDragging, dragStart, imageSize, zoom]);
+}, [isDragging, dragStart]);
 
 const handleWheel = (e) => {
   if (e.ctrlKey) {
@@ -599,6 +598,33 @@ const handleWheel = (e) => {
     setImageOffset({ x: 0, y: 0 });
   };
 
+  // Para el menú de perfil
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showProfileMenu && !event.target.closest('.profile-photo-container')) {
+        setShowProfileMenu(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [showProfileMenu]);
+
+  const handleBackInPhotoEdit = () => {
+    if (originalImage) {
+      // Si hay una imagen siendo editada, solo vuelve al estado anterior
+      setOriginalImage(null);
+      setImageLoaded(false);
+      setZoom(1);
+      setImageOffset({ x: 0, y: 0 });
+    } else {
+      // Si no hay imagen siendo editada, cierra el modal completamente
+      handleCloseModal();
+    }
+  };
+
   return (
     <div className="camisetas-container">
       <div className="top-bar">
@@ -609,28 +635,58 @@ const handleWheel = (e) => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <button className="filter-button" onClick={() => setShowFilters(true)} title="Filtrar">
-            <FontAwesomeIcon icon={faFilter} />
-          </button>
-          <button className="sort-button" onClick={() => setShowSort(true)} title="Ordenar">
-            <FontAwesomeIcon icon={faSort} />
-          </button>
+          <button 
+          className={`filter-button ${Object.values(activeFilters).some(filter => 
+            Array.isArray(filter) ? filter.length > 0 : filter !== null
+          ) ? 'active' : ''}`} 
+          onClick={() => setShowFilters(true)} 
+          title="Filtrar"
+        >
+          <FontAwesomeIcon icon={faFilter} />
+        </button>
+
+        <button 
+          className={`sort-button ${sortBy ? 'active' : ''}`} 
+          onClick={() => setShowSort(true)} 
+          title="Ordenar"
+        >
+          <FontAwesomeIcon icon={faSort} />
+        </button>
           <button className="add-button" onClick={() => setShowForm(true)} title="Agregar camiseta">
             +
           </button>
         </div>
         <div className="user-profile">
           <span className="username">{userData?.username}</span>
-          <div 
-            className="profile-photo" 
-            onClick={() => setShowProfileModal(true)}
-          >
-            {userData?.fotoDePerfil ? (
-              <img src={userData.fotoDePerfil} alt="Perfil" />
-            ) : (
-              <div className="initials">
-                {userData?.username && getInitials(userData.username)}
-              </div>
+          <div className="profile-photo-container">
+            <div 
+              className="profile-photo" 
+              onClick={() => setShowProfileMenu(!showProfileMenu)}
+            >
+              {userData?.fotoDePerfil ? (
+                <img src={userData.fotoDePerfil} alt="Perfil" />
+              ) : (
+                <div className="initials">
+                  {userData?.username && getInitials(userData.username)}
+                </div>
+              )}
+            </div>
+            
+            {showProfileMenu && (
+              <div className="profile-menu">
+              <button onClick={() => {
+                setShowProfileModal(true);
+                setShowProfileMenu(false);
+              }}>
+                Cambiar foto
+              </button>
+              <button onClick={() => {
+                setShowDeleteConfirm(true);
+                setShowProfileMenu(false);
+              }}>
+                Eliminar cuenta
+              </button>
+            </div>
             )}
           </div>
           <FontAwesomeIcon 
@@ -643,16 +699,199 @@ const handleWheel = (e) => {
       </div>
 
       {showFilters && (
-        <div className="modal-overlay">
-          <div className="modal-content filters-modal">
+        <div 
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target.className === 'modal-overlay') {
+              setShowFilters(false);
+              // Restaurar estado anterior de los filtros
+              setActiveFilters(prev => ({ ...prev }));
+              setSelectedClub('');
+              setSelectedPais('');
+              setSelectedColor('');
+              setSelectedEquipacion('');
+            }
+          }}
+        >
+          <div className="modal-content filters-modal" onClick={e => e.stopPropagation()}>
             <div className="filters-header">
               <button className="back-button" onClick={() => setShowFilters(false)}>
                 <FontAwesomeIcon icon={faArrowLeft} />
               </button>
               <h3>Filtros</h3>
-              <button className="close-button" onClick={() => setShowFilters(false)}>
-                <FontAwesomeIcon icon={faTimes} />
+            </div>
+            
+            <div className="filters-content">
+              {/* Talle */}
+              <div className="filter-section">
+                <h4>Talle</h4>
+                <div className="filter-options">
+                  {talles.map(talle => (
+                    <label key={talle} className="checkbox-label">
+                      <input
+                        type="checkbox"
+                        checked={activeFilters.talle.includes(talle)}
+                        onChange={(e) => handleFilterChange('talle', talle, e.target.checked)}
+                      />
+                      {talle}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              {/* Club */}
+              <div className="filter-section">
+                <h4>Club</h4>
+                <div className="filter-select-container">
+                  <select 
+                    value={selectedClub}
+                    onChange={(e) => {
+                      setSelectedClub(e.target.value);
+                      if (e.target.value && !activeFilters.club.includes(e.target.value)) {
+                        handleFilterChange('club', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar club</option>
+                    {availableClubs.map(club => (
+                      <option key={club} value={club}>{club}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* País */}
+              <div className="filter-section">
+                <h4>País</h4>
+                <div className="filter-select-container">
+                  <select 
+                    value={selectedPais}
+                    onChange={(e) => {
+                      setSelectedPais(e.target.value);
+                      if (e.target.value && !activeFilters.pais.includes(e.target.value)) {
+                        handleFilterChange('pais', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar país</option>
+                    {availablePaises.map(pais => (
+                      <option key={pais} value={pais}>{pais}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Colores */}
+              <div className="filter-section">
+                <h4>Colores</h4>
+                <div className="filter-select-container">
+                  <select
+                    value={selectedColor}
+                    onChange={(e) => {
+                      setSelectedColor(e.target.value);
+                      if (e.target.value && !activeFilters.colores.includes(e.target.value)) {
+                        handleFilterChange('colores', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar color</option>
+                    {coloresDisponibles.map(color => (
+                      <option key={color} value={color}>{color}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Equipación */}
+              <div className="filter-section">
+                <h4>Equipación</h4>
+                <div className="filter-select-container">
+                  <select
+                    value={selectedEquipacion}
+                    onChange={(e) => {
+                      setSelectedEquipacion(e.target.value);
+                      if (e.target.value && !activeFilters.numeroEquipacion.includes(e.target.value)) {
+                        handleFilterChange('numeroEquipacion', e.target.value, true);
+                      }
+                    }}
+                  >
+                    <option value="">Seleccionar equipación</option>
+                    {equipaciones.map(equipacion => (
+                      <option key={equipacion} value={equipacion}>{equipacion}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Dorsal */}
+              <div className="filter-section">
+                <h4>Dorsal</h4>
+                <div className="filter-options">
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      checked={activeFilters.dorsal === true}
+                      onChange={() => handleFilterChange('dorsal', true)}
+                    />
+                    Con dorsal
+                  </label>
+                  <label className="radio-label">
+                    <input
+                      type="radio"
+                      checked={activeFilters.dorsal === false}
+                      onChange={() => handleFilterChange('dorsal', false)}
+                    />
+                    Sin dorsal
+                  </label>
+                </div>
+              </div>
+            </div>
+
+            <div className="active-filters">
+              {Object.entries(activeFilters).map(([key, value]) => {
+                if (Array.isArray(value) && value.length > 0) {
+                  return value.map(v => (
+                    <span key={`${key}-${v}`} className="filter-tag">
+                      {`${key}: ${v}`}
+                      <button onClick={() => removeFilter(key, v)}>×</button>
+                    </span>
+                  ));
+                }
+                return null;
+              })}
+            </div>
+
+            <div className="filters-footer">
+              <button onClick={applyFilters} className="apply-btn">
+                Aplicar
               </button>
+              <button onClick={clearFilters} className="clear-btn">
+                Limpiar filtros
+              </button>
+            </div>
+          </div>
+        </div>
+      )}{showFilters && (
+        <div 
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target.className === 'modal-overlay') {
+              setShowFilters(false);
+              // Restaurar estado anterior de los filtros
+              setActiveFilters(prev => ({ ...prev }));
+              setSelectedClub('');
+              setSelectedPais('');
+              setSelectedColor('');
+              setSelectedEquipacion('');
+            }
+          }}
+        >
+          <div className="modal-content filters-modal" onClick={e => e.stopPropagation()}>
+            <div className="filters-header">
+              <button className="back-button" onClick={() => setShowFilters(false)}>
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
+              <h3>Filtros</h3>
             </div>
             
             <div className="filters-content">
@@ -808,42 +1047,60 @@ const handleWheel = (e) => {
       )}
 
       {showSort && (
-        <div className="modal-overlay">
-          <div className="modal-content sort-modal">
+        <div 
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target.className === 'modal-overlay') {
+              setShowSort(false);
+              setTempSortBy(sortBy);
+              setTempSortDirection(sortDirection);
+            }
+          }}
+        >
+          <div className="modal-content sort-modal" onClick={e => e.stopPropagation()}>
             <div className="sort-header">
-              <button className="back-button" onClick={() => {
-                setShowSort(false);
-                setTempSortBy(sortBy);
-                setTempSortDirection(sortDirection);
-              }}>
+              <button 
+                className="back-button" 
+                onClick={() => {
+                  setShowSort(false);
+                  setTempSortBy(sortBy);
+                  setTempSortDirection(sortDirection);
+                }}
+              >
                 <FontAwesomeIcon icon={faArrowLeft} />
               </button>
               <h3>Ordenar por</h3>
-              <button className="close-button" onClick={() => setShowSort(false)}>
-                <FontAwesomeIcon icon={faTimes} />
-              </button>
             </div>
 
             <div className="sort-options">
               {[
+                { value: null, label: 'Sin ordenamiento' }, // Opción para quitar el ordenamiento
                 { value: 'club', label: 'Club' },
                 { value: 'pais', label: 'País' },
                 { value: 'talle', label: 'Talle' },
                 { value: 'temporada', label: 'Temporada' }
               ].map(option => (
-                <label key={option.value} className="sort-option">
+                <label 
+                  key={option.value || 'none'} 
+                  className={`sort-option ${tempSortBy === option.value ? 'active' : ''}`}
+                >
                   <input
                     type="radio"
                     name="sort"
                     checked={tempSortBy === option.value}
-                    onChange={() => handleSortChange(option.value)}
+                    onChange={() => {
+                      handleSortChange(option.value);
+                      if (option.value === null) {
+                        setTempSortDirection('asc');
+                      }
+                    }}
                   />
                   {option.label}
                 </label>
               ))}
             </div>
 
-            {tempSortBy && (
+            {tempSortBy && tempSortBy !== null && (
               <div className="sort-direction">
                 <button
                   className={`direction-btn ${tempSortDirection === 'asc' ? 'active' : ''}`}
@@ -862,10 +1119,10 @@ const handleWheel = (e) => {
 
             <div className="sort-footer">
               <button 
-                className="apply-sort-btn"
+                className={`apply-sort-btn ${tempSortBy ? 'active' : ''}`}
                 onClick={applySort}
               >
-                Aplicar ordenamiento
+                {tempSortBy === null ? 'Quitar ordenamiento' : 'Aplicar ordenamiento'}
               </button>
             </div>
           </div>
@@ -888,12 +1145,106 @@ const handleWheel = (e) => {
         </div>
       )}
 
-{showProfileModal && (
-        <div className="modal-overlay">
-          <div className="modal-content profile-modal">
+      {showDeleteConfirm && (
+        <div 
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target.className === 'modal-overlay') {
+              setShowDeleteConfirm(false);
+              setPassword('');
+            }
+          }}
+        >
+          <div className="modal-content delete-account-modal" onClick={e => e.stopPropagation()}>
+            <div className="delete-modal-header">
+              <button 
+                className="back-button" 
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setPassword('');
+                }}
+              >
+                <FontAwesomeIcon icon={faArrowLeft} />
+              </button>
+              <h3>Eliminar cuenta</h3>
+            </div>
+
+            <div className="delete-modal-content">
+              <div className="warning-icon">
+                <FontAwesomeIcon icon={faExclamation} />
+              </div>
+              <p>Esta acción es irreversible. Por favor, ingresa tu contraseña para confirmar:</p>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Contraseña"
+                className="password-input"
+              />
+            </div>
+
+            <div className="delete-modal-footer">
+              <div className="button-group">
+                <button 
+                  className="delete-btn"
+                  onClick={async () => {
+                    try {
+                      const response = await fetch(`http://localhost:8080/api/usuarios/${userData.id}`, {
+                        method: 'DELETE',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'Authorization': `Bearer ${localStorage.getItem('token')}`,
+                        },
+                        body: JSON.stringify({ password }),
+                      });
+                      
+                      if (response.ok) {
+                        localStorage.removeItem('token');
+                        localStorage.removeItem('usuarioId');
+                        navigate('/login');
+                      } else {
+                        alert('Contraseña incorrecta');
+                      }
+                    } catch (error) {
+                      console.error('Error:', error);
+                      alert('Error al eliminar la cuenta');
+                    }
+                  }}
+                >
+                  Eliminar cuenta
+                </button>
+                <button 
+                  className="cancel-btn"
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setPassword('');
+                  }}
+                >
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+      {showProfileModal && (
+        <div 
+          className="modal-overlay"
+          onClick={(e) => {
+            if (e.target.className === 'modal-overlay') {
+              handleCloseModal();
+            }
+          }}
+        >
+          <div className="modal-content profile-modal" onClick={e => e.stopPropagation()}>
             <div className="profile-modal-header">
+              <button 
+              className="back-button" 
+              onClick={handleBackInPhotoEdit}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
               <h3>Foto de perfil</h3>
-              <button className="close-button" onClick={handleCloseModal}>×</button>
             </div>
 
             {userData?.fotoDePerfil && !originalImage && (
@@ -913,47 +1264,47 @@ const handleWheel = (e) => {
             >
               {originalImage ? (
                 <>
-            <img
-            ref={imageRef}
-            src={originalImage}
-            alt="Original"
-            className="profile-original-image"
-            onLoad={(e) => {
-              const img = e.target;
-              const containerRect = containerRef.current.getBoundingClientRect();
-              const scale = Math.min(
-                containerRect.width / img.naturalWidth,
-                containerRect.height / img.naturalHeight
-              );
-              
-              setImageSize({
-                width: img.naturalWidth * scale,
-                height: img.naturalHeight * scale
-              });
-              
-              const offsetX = (containerRect.width - (img.naturalWidth * scale)) / 2;
-              const offsetY = (containerRect.height - (img.naturalHeight * scale)) / 2;
-              
-              setImageOffset({ x: offsetX, y: offsetY });
-              setImagePosition({ x: 0, y: 0 });
-              
-              setSelectorPosition({
-                x: (containerRect.width - SELECTOR_SIZE) / 2,
-                y: (containerRect.height - SELECTOR_SIZE) / 2
-              });
-              
-              setImageLoaded(true);
-            }}
-            style={{
-              position: 'absolute',
-              left: `${imageOffset.x + imagePosition.x}px`,
-              top: `${imageOffset.y + imagePosition.y}px`,
-              width: `${imageSize.width * zoom}px`,
-              height: `${imageSize.height * zoom}px`,
-              transformOrigin: 'top left',
-              pointerEvents: 'none'
-            }}
-          />
+                  <img
+                    ref={imageRef}
+                    src={originalImage}
+                    alt="Original"
+                    className="profile-original-image"
+                    onLoad={(e) => {
+                      const img = e.target;
+                      const containerRect = containerRef.current.getBoundingClientRect();
+                      const scale = Math.min(
+                        containerRect.width / img.naturalWidth,
+                        containerRect.height / img.naturalHeight
+                      );
+                      
+                      setImageSize({
+                        width: img.naturalWidth * scale,
+                        height: img.naturalHeight * scale
+                      });
+                      
+                      const offsetX = (containerRect.width - (img.naturalWidth * scale)) / 2;
+                      const offsetY = (containerRect.height - (img.naturalHeight * scale)) / 2;
+                      
+                      setImageOffset({ x: offsetX, y: offsetY });
+                      setImagePosition({ x: 0, y: 0 });
+                      
+                      setSelectorPosition({
+                        x: (containerRect.width - SELECTOR_SIZE) / 2,
+                        y: (containerRect.height - SELECTOR_SIZE) / 2
+                      });
+                      
+                      setImageLoaded(true);
+                    }}
+                    style={{
+                      position: 'absolute',
+                      left: `${imageOffset.x + imagePosition.x}px`,
+                      top: `${imageOffset.y + imagePosition.y}px`,
+                      width: `${imageSize.width * zoom}px`,
+                      height: `${imageSize.height * zoom}px`,
+                      transformOrigin: 'top left',
+                      pointerEvents: 'none'
+                    }}
+                  />
                   {imageLoaded && (
                     <Rnd
                       size={{ width: SELECTOR_SIZE, height: SELECTOR_SIZE }}
@@ -971,19 +1322,19 @@ const handleWheel = (e) => {
                 </>
               ) : (
                 <div className="profile-controls-container">
-                <p>Selecciona una imagen para tu foto de perfil</p>
-                <div className="file-input-wrapper">
-                  <label className="file-input-button">
-                    Seleccionar imagen
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleProfilePhotoChange}
-                      className="profile-file-input"
-                    />
-                  </label>
+                  <p>Selecciona una imagen para tu foto de perfil</p>
+                  <div className="file-input-wrapper">
+                    <label className="file-input-button">
+                      Seleccionar imagen
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleProfilePhotoChange}
+                        className="profile-file-input"
+                      />
+                    </label>
+                  </div>
                 </div>
-              </div>
               )}
             </div>
 
@@ -1027,19 +1378,31 @@ const handleWheel = (e) => {
       ) : (
         <div className="grid-container">
           {filteredCamisetas
-            .filter((camiseta) => camiseta.club.toLowerCase().includes(search.toLowerCase()))
-            .map((camiseta) => (
-              <CamisetaItem
-                key={camiseta.id}
-                camiseta={camiseta}
-                isDraggingCamiseta={isDraggingCamiseta}
-                draggedCamiseta={draggedCamiseta}
-                onMouseDown={handleCamisetaMouseDown}
-                onMouseUp={handleCamisetaMouseUp}
-                onMouseMove={handleCamisetaMouseMove}
-                onClick={handleCamisetaClick}
-              />
-            ))}
+          .filter((camiseta) => {
+            const searchTerm = search.toLowerCase();
+            return (
+              camiseta.club.toLowerCase().includes(searchTerm) ||
+              camiseta.pais.toLowerCase().includes(searchTerm) ||
+              camiseta.temporada.toLowerCase().includes(searchTerm) ||
+              camiseta.numeroEquipacion.toLowerCase().includes(searchTerm) ||
+              (camiseta.nombre && camiseta.nombre.toLowerCase().includes(searchTerm)) ||
+              (camiseta.dorsal && camiseta.dorsal.toString().includes(searchTerm)) ||
+              camiseta.talle.toLowerCase().includes(searchTerm) ||
+              camiseta.colores.some(color => color.toLowerCase().includes(searchTerm))
+            );
+          })
+          .map((camiseta) => (
+            <CamisetaItem
+              key={camiseta.id}
+              camiseta={camiseta}
+              isDraggingCamiseta={isDraggingCamiseta}
+              draggedCamiseta={draggedCamiseta}
+              onMouseDown={handleCamisetaMouseDown}
+              onMouseUp={handleCamisetaMouseUp}
+              onMouseMove={handleCamisetaMouseMove}
+              onClick={handleCamisetaClick}
+            />
+          ))}
         </div>
       )}
     </div>

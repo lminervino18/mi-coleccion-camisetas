@@ -37,7 +37,11 @@ function EditarCamiseta({
 
   const [selectedColors, setSelectedColors] = useState(parseColores());
   const [showImageModal, setShowImageModal] = useState(false);
-  const [originalImage, setOriginalImage] = useState(null);
+  const [originalImage, setOriginalImage] = useState(
+    camisetaSeleccionada.imagenCompletaBase64 
+      ? `data:image/jpeg;base64,${camisetaSeleccionada.imagenCompletaBase64}`
+      : null
+  );
   const [previewImage, setPreviewImage] = useState(
     camisetaSeleccionada.imagenRecortadaBase64 
       ? `data:image/jpeg;base64,${camisetaSeleccionada.imagenRecortadaBase64}` 
@@ -191,13 +195,13 @@ function EditarCamiseta({
   };
   const handleImageSelect = () => {
     if (!imageRef.current || !imageLoaded) return;
-
+  
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
     
     canvas.width = SELECTOR_SIZE;
     canvas.height = SELECTOR_SIZE;
-
+  
     const img = imageRef.current;
     
     const displayedWidth = imageSize.width * zoom;
@@ -205,16 +209,16 @@ function EditarCamiseta({
     
     const scaleX = img.naturalWidth / displayedWidth;
     const scaleY = img.naturalHeight / displayedHeight;
-
+  
     const sourceX = ((selectorPosition.x - imageOffset.x - imagePosition.x) * scaleX);
     const sourceY = ((selectorPosition.y - imageOffset.y - imagePosition.y) * scaleY);
     const sourceWidth = SELECTOR_SIZE * scaleX;
     const sourceHeight = SELECTOR_SIZE * scaleY;
-
+  
     try {
       ctx.fillStyle = '#FFFFFF';
       ctx.fillRect(0, 0, SELECTOR_SIZE, SELECTOR_SIZE);
-
+  
       ctx.drawImage(
         img,
         sourceX,
@@ -226,16 +230,30 @@ function EditarCamiseta({
         SELECTOR_SIZE,
         SELECTOR_SIZE
       );
-
+  
       canvas.toBlob(
-        (blob) => {
+        async (blob) => {
           if (blob) {
             const croppedImageUrl = URL.createObjectURL(blob);
             setPreviewImage(croppedImageUrl);
-            setFormData(prev => ({ 
-              ...prev, 
-              imagenRecortada: blob 
-            }));
+  
+            // Si no hay una nueva imagen completa, necesitamos crear un Blob de la imagen existente
+            if (!formData.imagenCompleta && camisetaSeleccionada.imagenCompletaBase64) {
+              // Convertir la imagen base64 existente a Blob
+              const response = await fetch(`data:image/jpeg;base64,${camisetaSeleccionada.imagenCompletaBase64}`);
+              const originalBlob = await response.blob();
+              
+              setFormData(prev => ({ 
+                ...prev, 
+                imagenCompleta: originalBlob,
+                imagenRecortada: blob 
+              }));
+            } else {
+              setFormData(prev => ({ 
+                ...prev, 
+                imagenRecortada: blob 
+              }));
+            }
             setShowImageModal(false);
           }
         },
@@ -277,9 +295,11 @@ function EditarCamiseta({
     submitFormData.append('id', formData.id);
     submitFormData.append('usuarioId', usuarioId);
     
-    // Agregar imágenes si se han modificado
-    if (formData.imagenCompleta) {
-      submitFormData.append('imagenCompleta', formData.imagenCompleta);
+    // Agregar imágenes si hay una nueva área recortada o una nueva imagen
+    if (formData.imagenRecortada) {
+      if (formData.imagenCompleta) {
+        submitFormData.append('imagenCompleta', formData.imagenCompleta);
+      }
       submitFormData.append('imagenRecortada', formData.imagenRecortada);
     }
     
@@ -315,7 +335,7 @@ function EditarCamiseta({
       console.error('Error al actualizar la camiseta:', error);
       alert('Error al actualizar la camiseta. Por favor, intente nuevamente.');
     }
-  };
+};
   return (
     <div className="form-overlay">
       {showImageModal && (
@@ -418,7 +438,7 @@ function EditarCamiseta({
           required 
         />
         <input 
-          type="text" 
+          type="text" Actu
           name="temporada" 
           placeholder="Temporada (ej: 2017/2018)" 
           value={formData.temporada} 
