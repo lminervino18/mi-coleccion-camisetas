@@ -38,14 +38,14 @@ public class CamisetaController {
             @RequestParam("colores") String colores,
             @RequestParam("numeroEquipacion") String numeroEquipacion,
             @RequestParam("temporada") String temporada,
-            @RequestParam("comentarios") String comentarios) {
+            @RequestParam("comentarios") String comentarios,
+            @RequestParam("tipoDeCamiseta") String tipoDeCamiseta,
+            @RequestParam(value = "liga", required = false) String liga) {
         try {
-            // Verificar si el usuario existe
             if (usuarioService.getUsuarioById(usuarioId).isEmpty()) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
             }
 
-            // Construir DTO de camiseta
             CamisetaDTO camisetaDTO = new CamisetaDTO();
             camisetaDTO.setUsuarioId(usuarioId);
             camisetaDTO.setClub(club);
@@ -53,36 +53,18 @@ public class CamisetaController {
             camisetaDTO.setDorsal(dorsal);
             camisetaDTO.setNombre(nombre);
             camisetaDTO.setTalle(talle);
-            camisetaDTO.setColores(List.of(colores.split(","))); // Convertir colores a lista
+            camisetaDTO.setColores(List.of(colores.split(",")));
             camisetaDTO.setNumeroEquipacion(numeroEquipacion);
             camisetaDTO.setTemporada(temporada);
             camisetaDTO.setComentarios(comentarios);
+            camisetaDTO.setTipoDeCamiseta(tipoDeCamiseta);
+            camisetaDTO.setLiga(liga);
 
-            // Guardar camiseta
             CamisetaDTO nuevaCamiseta = camisetaService.saveCamiseta(camisetaDTO, imagenRecortada, imagenCompleta);
             return ResponseEntity.status(HttpStatus.CREATED).body(nuevaCamiseta);
 
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error al procesar la imagen");
-        }
-    }
-
-    @GetMapping("/{usuarioId}")
-    public ResponseEntity<List<CamisetaDTO>> getCamisetasByUsuario(@PathVariable Long usuarioId) {
-        List<CamisetaDTO> camisetas = camisetaService.getCamisetasByUsuario(usuarioId);
-        return ResponseEntity.ok(camisetas);
-    }
-
-    @DeleteMapping("/usuario/{usuarioId}/camiseta/{id}")
-    public ResponseEntity<?> deleteCamiseta(
-            @PathVariable Long usuarioId,
-            @PathVariable Long id) {
-        try {
-            camisetaService.deleteCamiseta(id, usuarioId);
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND)
-                    .body("Camiseta no encontrada o no pertenece al usuario");
         }
     }
 
@@ -100,7 +82,9 @@ public class CamisetaController {
             @RequestParam("colores") String colores,
             @RequestParam("numeroEquipacion") String numeroEquipacion,
             @RequestParam("temporada") String temporada,
-            @RequestParam("comentarios") String comentarios) {
+            @RequestParam("comentarios") String comentarios,
+            @RequestParam("tipoDeCamiseta") String tipoDeCamiseta,
+            @RequestParam(value = "liga", required = false) String liga) {
         try {
             CamisetaDTO camisetaDTO = new CamisetaDTO();
             camisetaDTO.setId(id);
@@ -114,6 +98,8 @@ public class CamisetaController {
             camisetaDTO.setNumeroEquipacion(numeroEquipacion);
             camisetaDTO.setTemporada(temporada);
             camisetaDTO.setComentarios(comentarios);
+            camisetaDTO.setTipoDeCamiseta(tipoDeCamiseta);
+            camisetaDTO.setLiga(liga);
 
             CamisetaDTO updatedCamiseta = camisetaService.updateCamiseta(
                     camisetaDTO,
@@ -126,6 +112,26 @@ public class CamisetaController {
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al procesar la imagen");
+        }
+    }
+
+    // Los demás métodos permanecen sin cambios ya que no necesitan modificaciones
+    @GetMapping("/{usuarioId}")
+    public ResponseEntity<List<CamisetaDTO>> getCamisetasByUsuario(@PathVariable Long usuarioId) {
+        List<CamisetaDTO> camisetas = camisetaService.getCamisetasByUsuario(usuarioId);
+        return ResponseEntity.ok(camisetas);
+    }
+
+    @DeleteMapping("/usuario/{usuarioId}/camiseta/{id}")
+    public ResponseEntity<?> deleteCamiseta(
+            @PathVariable Long usuarioId,
+            @PathVariable Long id) {
+        try {
+            camisetaService.deleteCamiseta(id, usuarioId);
+            return ResponseEntity.noContent().build();
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body("Camiseta no encontrada o no pertenece al usuario");
         }
     }
 

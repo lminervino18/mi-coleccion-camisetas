@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import './DetalleCamiseta.css';
-import EditarCamiseta from './EditarCamiseta'; // Importa el nuevo componente
+import EditarCamiseta from './EditarCamiseta';
 
 function DetalleCamiseta() {
   const [camiseta, setCamiseta] = useState(null);
@@ -12,7 +12,6 @@ function DetalleCamiseta() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Función auxiliar para normalizar nombres de colores
   const normalizeColorName = (color) => {
     const colorMap = {
       'ROJO': 'rojo',
@@ -102,11 +101,14 @@ function DetalleCamiseta() {
     );
   }
 
-  // Si está en modo edición, muestra el componente EditarCamiseta
   if (showEditForm) {
     return (
       <EditarCamiseta
-        camisetaSeleccionada={camiseta}
+        camisetaSeleccionada={{
+          ...camiseta,
+          tipoDeCamiseta: camiseta.tipoDeCamiseta || 'Club',
+          liga: camiseta.liga || ''
+        }}
         onClose={() => setShowEditForm(false)}
         onActualizar={handleUpdate}
       />
@@ -137,7 +139,10 @@ function DetalleCamiseta() {
             </div>
           </div>
           <h1 className="detalle-titulo">
-            {camiseta.club} {camiseta.temporada}
+            {camiseta.tipoDeCamiseta === 'Club' 
+              ? `${camiseta.club} - ${camiseta.temporada}`
+              : `${camiseta.pais} - ${camiseta.temporada}`
+            }
           </h1>
         </div>
 
@@ -156,6 +161,22 @@ function DetalleCamiseta() {
 
           <div className="detalle-info">
             <div className="info-section">
+              <div className="info-item">
+                <span className="info-label">Tipo:</span>
+                <span className="info-value">{camiseta.tipoDeCamiseta}</span>
+              </div>
+              {camiseta.tipoDeCamiseta === 'Club' && (
+                <>
+                  <div className="info-item">
+                    <span className="info-label">Club:</span>
+                    <span className="info-value">{camiseta.club}</span>
+                  </div>
+                  <div className="info-item">
+                    <span className="info-label">Liga:</span>
+                    <span className="info-value">{camiseta.liga || 'No especificada'}</span>
+                  </div>
+                </>
+              )}
               <div className="info-item">
                 <span className="info-label">País:</span>
                 <span className="info-value">{camiseta.pais}</span>

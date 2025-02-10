@@ -379,6 +379,57 @@
   cursor: grabbing !important;
 }
 
+/* Estilos para el contenedor de tipo de camiseta */
+.tipo-camiseta-container {
+  width: calc(100% - 20px);
+  margin: 0 auto 15px;
+}
+
+.tipo-camiseta-options {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.tipo-option {
+  flex: 1;
+  padding: 12px;
+  border: 1px solid #666;
+  border-radius: 5px;
+  background-color: rgba(87, 85, 85, 0.2);
+  color: #666060;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  max-width: 200px;
+}
+
+.tipo-option input[type="radio"] {
+  display: none;
+}
+
+.tipo-option.active {
+  background-color: rgba(187, 187, 187, 0.3);
+  color: white;
+  border-color: #bbb;
+}
+
+.tipo-option:hover {
+  background-color: rgba(87, 85, 85, 0.3);
+}
+
+/* Estilo para input deshabilitado */
+.camiseta-form input:disabled {
+  background-color: rgba(87, 85, 85, 0.1);
+  color: #4a4a4a;
+  cursor: not-allowed;
+}
+
+.camiseta-form input:disabled::placeholder {
+  color: #4a4a4a;
+}
+
 @media (max-width: 900px) {
   .image-container {
     width: 100%;

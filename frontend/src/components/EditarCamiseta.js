@@ -22,6 +22,8 @@ function EditarCamiseta({
 
   const [formData, setFormData] = useState({
     id: camisetaSeleccionada.id,
+    tipoDeCamiseta: camisetaSeleccionada.tipoDeCamiseta || 'Club',
+    liga: camisetaSeleccionada.liga || '',
     imagenRecortada: null,
     imagenCompleta: null,
     club: camisetaSeleccionada.club || '',
@@ -34,7 +36,6 @@ function EditarCamiseta({
     numeroEquipacion: camisetaSeleccionada.numeroEquipacion || '',
     comentarios: camisetaSeleccionada.comentarios || '',
   });
-
   const [selectedColors, setSelectedColors] = useState(parseColores());
   const [showImageModal, setShowImageModal] = useState(false);
   const [originalImage, setOriginalImage] = useState(
@@ -169,7 +170,49 @@ function EditarCamiseta({
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    
+    switch (name) {
+      case 'tipoDeCamiseta':
+        setFormData(prev => ({
+          ...prev,
+          tipoDeCamiseta: value,
+          liga: value === 'Seleccion' ? '' : prev.liga,
+          club: value === 'Seleccion' ? prev.pais : prev.club
+        }));
+        break;
+  
+      case 'pais':
+        setFormData(prev => ({
+          ...prev,
+          pais: value,
+          club: prev.tipoDeCamiseta === 'Seleccion' ? value : prev.club
+        }));
+        break;
+  
+      case 'club':
+        if (formData.tipoDeCamiseta !== 'Seleccion') {
+          setFormData(prev => ({
+            ...prev,
+            club: value
+          }));
+        }
+        break;
+  
+      case 'liga':
+        if (formData.tipoDeCamiseta === 'Club') {
+          setFormData(prev => ({
+            ...prev,
+            liga: value
+          }));
+        }
+        break;
+  
+      default:
+        setFormData(prev => ({
+          ...prev,
+          [name]: value
+        }));
+    }
   };
 
   const handleImageChange = (e) => {
@@ -312,6 +355,9 @@ function EditarCamiseta({
     submitFormData.append('colores', selectedColors.join(','));
     submitFormData.append('numeroEquipacion', formData.numeroEquipacion);
     submitFormData.append('comentarios', formData.comentarios || '');
+    submitFormData.append('tipoDeCamiseta', formData.tipoDeCamiseta);
+    submitFormData.append('liga', formData.liga || '');
+
 
     try {
       const response = await fetch(`http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${formData.id}`, {
@@ -420,14 +466,53 @@ function EditarCamiseta({
       )}
       <form className="camiseta-form" onSubmit={handleSubmit}>
         <h2>Editar Camiseta</h2>
+        <div className="tipo-camiseta-container">
+          <div className="tipo-camiseta-options">
+            <label className={`tipo-option ${formData.tipoDeCamiseta === 'Club' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="tipoDeCamiseta"
+                value="Club"
+                checked={formData.tipoDeCamiseta === 'Club'}
+                onChange={handleChange}
+                required
+              />
+              Club
+            </label>
+            <label className={`tipo-option ${formData.tipoDeCamiseta === 'Seleccion' ? 'active' : ''}`}>
+              <input
+                type="radio"
+                name="tipoDeCamiseta"
+                value="Seleccion"
+                checked={formData.tipoDeCamiseta === 'Seleccion'}
+                onChange={handleChange}
+              />
+              Selección
+            </label>
+          </div>
+        </div>
+
+        {formData.tipoDeCamiseta === 'Club' && (
+          <input 
+          type="text" 
+          name="liga" 
+          placeholder="Liga" 
+          value={formData.liga} 
+          onChange={handleChange}
+          disabled={formData.tipoDeCamiseta === 'Seleccion'}
+          className="form-input"
+        />
+        )}
 
         <input 
           type="text" 
           name="club" 
           placeholder="Club" 
           value={formData.club} 
-          onChange={handleChange} 
+          onChange={handleChange}
+          disabled={formData.tipoDeCamiseta === 'Seleccion'}
           required 
+          className="form-input"
         />
         <input 
           type="text" 

@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CamisetaDTO {
     private Long id;
-    private Long usuarioId; // Relacionar con el usuario
+    private Long usuarioId;
     private String club;
     private String pais;
     private Integer dorsal;
@@ -17,7 +17,10 @@ public class CamisetaDTO {
     private String temporada;
     private String comentarios;
     private String imagenCompletaBase64;
-    private String imagenRecortadaBase64; // Campo para almacenar la imagen en formato Base64 con prefijo
+    private String imagenRecortadaBase64;
+    // Nuevos campos
+    private String tipoDeCamiseta;
+    private String liga;
 
     // Constructor vacío
     public CamisetaDTO() {
@@ -36,6 +39,10 @@ public class CamisetaDTO {
         this.temporada = camiseta.getTemporada();
         this.numeroEquipacion = camiseta.getNumeroEquipacion();
         this.comentarios = camiseta.getComentarios();
+        // Nuevos campos
+        this.tipoDeCamiseta = camiseta.getTipoDeCamiseta();
+        this.liga = camiseta.getLiga();
+
         if (camiseta.getImagenCompleta() != null && camiseta.getImagenCompleta().length > 0) {
             this.imagenCompletaBase64 = "data:image/jpeg;base64,"
                     + Base64.getEncoder().encodeToString(camiseta.getImagenCompleta());
@@ -46,7 +53,7 @@ public class CamisetaDTO {
         }
     }
 
-    // Getters
+    // Getters existentes...
     public Long getId() {
         return id;
     }
@@ -95,7 +102,20 @@ public class CamisetaDTO {
         return imagenRecortadaBase64;
     }
 
-    // Setters
+    public String getTemporada() {
+        return temporada;
+    }
+
+    // Nuevos getters
+    public String getTipoDeCamiseta() {
+        return tipoDeCamiseta;
+    }
+
+    public String getLiga() {
+        return liga;
+    }
+
+    // Setters existentes...
     public void setId(Long id) {
         this.id = id;
     }
@@ -132,10 +152,6 @@ public class CamisetaDTO {
         this.numeroEquipacion = numeroEquipacion;
     }
 
-    public String getTemporada() {
-        return temporada;
-    }
-
     public void setTemporada(String temporada) {
         this.temporada = temporada;
     }
@@ -150,5 +166,14 @@ public class CamisetaDTO {
 
     public void setImagenRecortadaBase64(String imagenBase64) {
         this.imagenRecortadaBase64 = imagenBase64;
+    }
+
+    // Nuevos setters
+    public void setTipoDeCamiseta(String tipoDeCamiseta) {
+        this.tipoDeCamiseta = tipoDeCamiseta;
+    }
+
+    public void setLiga(String liga) {
+        this.liga = liga;
     }
 }

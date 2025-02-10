@@ -45,6 +45,9 @@ public class CamisetaService {
         camiseta.setNumeroEquipacion(camisetaDTO.getNumeroEquipacion());
         camiseta.setTemporada(camisetaDTO.getTemporada());
         camiseta.setComentarios(camisetaDTO.getComentarios());
+        // Nuevos campos
+        camiseta.setTipoDeCamiseta(camisetaDTO.getTipoDeCamiseta());
+        camiseta.setLiga(camisetaDTO.getLiga());
 
         // Guardar imagen recortada
         if (imagenRecortada != null && !imagenRecortada.isEmpty()) {
@@ -93,6 +96,9 @@ public class CamisetaService {
         camiseta.setNumeroEquipacion(camisetaDTO.getNumeroEquipacion());
         camiseta.setTemporada(camisetaDTO.getTemporada());
         camiseta.setComentarios(camisetaDTO.getComentarios());
+        // Nuevos campos
+        camiseta.setTipoDeCamiseta(camisetaDTO.getTipoDeCamiseta());
+        camiseta.setLiga(camisetaDTO.getLiga());
 
         // Actualizar imágenes solo si se proporcionan nuevas
         if (imagenRecortada != null && !imagenRecortada.isEmpty()) {
@@ -118,12 +124,15 @@ public class CamisetaService {
         return responseDTO;
     }
 
+    // Los demás métodos permanecen sin cambios ya que trabajan con el objeto
+    // CamisetaDTO
+    // que ya incluirá los nuevos campos
+
     public List<CamisetaDTO> getCamisetasByUsuario(Long usuarioId) {
         List<Camiseta> camisetas = camisetaRepository.findByUsuarioId(usuarioId);
         return camisetas.stream()
                 .map(camiseta -> {
                     CamisetaDTO dto = new CamisetaDTO(camiseta);
-                    // Para la vista en cuadrícula solo necesitamos la imagen recortada
                     if (camiseta.getImagenRecortada() != null) {
                         dto.setImagenRecortadaBase64(
                                 Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));
@@ -138,7 +147,6 @@ public class CamisetaService {
 
         return camisetaOpt.map(camiseta -> {
             CamisetaDTO dto = new CamisetaDTO(camiseta);
-            // Para el detalle enviamos ambas imágenes
             if (camiseta.getImagenRecortada() != null) {
                 dto.setImagenRecortadaBase64(
                         Base64.getEncoder().encodeToString(camiseta.getImagenRecortada()));

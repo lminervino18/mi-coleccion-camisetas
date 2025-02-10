@@ -24,6 +24,12 @@ public class Camiseta {
     @Column(name = "imagen_recortada", columnDefinition = "LONGBLOB")
     private byte[] imagenRecortada;
 
+    @Column(nullable = false, length = 50)
+    private String tipoDeCamiseta;
+
+    @Column(length = 100)
+    private String liga;
+
     @Column(nullable = false, length = 100)
     private String club;
 
@@ -63,7 +69,7 @@ public class Camiseta {
     public Camiseta(Usuario usuario, byte[] imagenCompleta, byte[] imagenRecortada,
             String club, String pais, Integer dorsal, String nombre,
             String talle, List<String> colores, String numeroEquipacion,
-            String temporada, String comentarios) {
+            String temporada, String comentarios, String tipoDeCamiseta, String liga) {
         this.usuario = usuario;
         this.imagenCompleta = imagenCompleta != null ? imagenCompleta.clone() : null;
         this.imagenRecortada = imagenRecortada != null ? imagenRecortada.clone() : null;
@@ -76,6 +82,8 @@ public class Camiseta {
         this.numeroEquipacion = numeroEquipacion;
         this.temporada = temporada;
         this.comentarios = comentarios;
+        this.tipoDeCamiseta = tipoDeCamiseta;
+        this.liga = liga;
     }
 
     // Métodos de utilidad para manejar colores
@@ -210,6 +218,28 @@ public class Camiseta {
 
     public void setComentarios(String comentarios) {
         this.comentarios = comentarios != null ? comentarios.trim() : null;
+    }
+
+    public String getTipoDeCamiseta() {
+        return tipoDeCamiseta;
+    }
+
+    public void setTipoDeCamiseta(String tipoDeCamiseta) {
+        if (tipoDeCamiseta == null || tipoDeCamiseta.trim().isEmpty()) {
+            throw new IllegalArgumentException("El tipo de camiseta no puede estar vacío");
+        }
+        if (!tipoDeCamiseta.equals("Club") && !tipoDeCamiseta.equals("Seleccion")) {
+            throw new IllegalArgumentException("El tipo de camiseta solo puede ser 'Club' o 'Seleccion'");
+        }
+        this.tipoDeCamiseta = tipoDeCamiseta.trim();
+    }
+
+    public String getLiga() {
+        return liga;
+    }
+
+    public void setLiga(String liga) {
+        this.liga = liga != null ? liga.trim() : null;
     }
 
     // Equals y HashCode basados solo en el ID

@@ -4,6 +4,8 @@ import './AgregarCamiseta.css';
 
 function AgregarCamiseta({ onClose, onAgregar }) {
   const [formData, setFormData] = useState({
+    tipoDeCamiseta: '', // Nuevo campo
+    liga: '',          // Nuevo campo
     imagenRecortada: null,
     imagenCompleta: null,
     club: '',
@@ -137,10 +139,25 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     }
   }, [showImageModal, originalImage]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      
+      if (name === 'tipoDeCamiseta') {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value,
+          club: value === 'Seleccion' ? prev.pais : prev.club // La selección usa el país como club
+        }));
+      } else if (name === 'pais' && formData.tipoDeCamiseta === 'Seleccion') {
+        setFormData(prev => ({
+          ...prev,
+          [name]: value,
+          club: value // Actualizar club con el país para selecciones
+        }));
+      } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -249,6 +266,8 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     const submitFormData = new FormData();
     
     submitFormData.append('usuarioId', usuarioId);
+    submitFormData.append('tipoDeCamiseta', formData.tipoDeCamiseta);
+    submitFormData.append('liga', formData.liga || '');
     submitFormData.append('imagenCompleta', formData.imagenCompleta);
     submitFormData.append('imagenRecortada', formData.imagenRecortada);
     submitFormData.append('club', formData.club);
@@ -369,15 +388,51 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       )}
       <form className="camiseta-form" onSubmit={handleSubmit}>
         <h2>Agregar Camiseta</h2>
+        <div className="tipo-camiseta-container">
+        <div className="tipo-camiseta-options">
+          <label className={`tipo-option ${formData.tipoDeCamiseta === 'Club' ? 'active' : ''}`}>
+            <input
+              type="radio"
+              name="tipoDeCamiseta"
+              value="Club"
+              checked={formData.tipoDeCamiseta === 'Club'}
+              onChange={handleChange}
+              required
+            />
+            Club
+          </label>
+          <label className={`tipo-option ${formData.tipoDeCamiseta === 'Seleccion' ? 'active' : ''}`}>
+            <input
+              type="radio"
+              name="tipoDeCamiseta"
+              value="Seleccion"
+              checked={formData.tipoDeCamiseta === 'Seleccion'}
+              onChange={handleChange}
+            />
+            Selección
+          </label>
+        </div>
+      </div>
 
-        <input 
-          type="text" 
-          name="club" 
-          placeholder="Club" 
-          value={formData.club} 
-          onChange={handleChange} 
-          required 
-        />
+      <input 
+        type="text" 
+        name="liga" 
+        placeholder="Liga" 
+        value={formData.liga} 
+        onChange={handleChange}
+        className="form-input"
+      />
+
+      <input 
+        type="text" 
+        name="club" 
+        placeholder="Club" 
+        value={formData.club} 
+        onChange={handleChange}
+        disabled={formData.tipoDeCamiseta === 'Seleccion'}
+        required 
+        className="form-input"
+      />
         <input 
           type="text" 
           name="pais" 

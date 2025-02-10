@@ -47,7 +47,7 @@
   height: 40px;
   font-size: 28px;
   background-color: #e4e9ee;
-  color: rgb(12, 12, 12);
+  color: rgb(22, 21, 21);
   border: none;
   border-radius: 50%;
   display: flex;
@@ -62,7 +62,7 @@
 
 .add-button:hover {
   transform: scale(1.1);
-  color: #4e5052;
+  color: #0d0d0e;
 }
 
 /* Estilos de Botones Base */
@@ -76,7 +76,7 @@
 }
 
 .btn.primary {
-  background-color: #007bff;
+  background-color: #686a6d;
   color: white;
   padding: 10px 20px;
   border-radius: 4px;
@@ -119,6 +119,7 @@
   align-items: center;
   justify-content: center;
   transition: transform 0.2s ease;
+  border: white;
 }
 
 .profile-photo:hover {
@@ -140,6 +141,7 @@
 .username {
   color: white;
   font-size: 1.2rem;
+  border-color: rgb(14, 13, 13);
 }
 
 /* Icono de Logout */
@@ -160,7 +162,7 @@
 .profile-modal {
   width: 90%;
   max-width: 600px;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(151, 67, 67, 0.9);
   border-radius: 12px;
   overflow: hidden;
   display: flex;
@@ -205,7 +207,6 @@
   margin: 0 auto 20px;
   display: block;
   object-fit: cover;
-  border: 3px solid #f5f6f8;
 }
 
 .file-input-wrapper {
@@ -259,7 +260,7 @@
 }
 
 .btn.primary {
-  background-color: #007bff;
+  background-color: #4d4f50;
   color: white;
   padding: 12px 24px;
   transition: all 0.3s ease;
@@ -560,14 +561,14 @@
 .filter-button.active,
 .sort-button.active {
   background-color: #c6c8ca;
-  border-color: #007bff;
+  border-color: #575a5e;
   color: white;
 }
 
 .filter-button.active:hover,
 .sort-button.active:hover {
-  background-color: #0056b3;
-  border-color: #0056b3;
+  background-color: #676b6e;
+  border-color: #e4e8ec;
 }
 
 /* Animaciones para las camisetas */
@@ -822,12 +823,12 @@
 }
 
 .direction-btn.active {
-  background-color: #007bff;
-  border-color: #007bff;
+  background-color: #6e7174;
+  border-color: #edeff1;
 }
 
 .direction-btn:hover {
-  background-color: rgba(0, 123, 255, 0.2);
+  background-color: rgba(227, 230, 233, 0.2);
 }
 
 .sort-footer {
@@ -839,7 +840,7 @@
 }
 
 .apply-sort-btn {
-  background-color: #007bff;
+  background-color: #525355;
   color: white;
   padding: 12px 20px;
   border-radius: 8px;
@@ -851,25 +852,25 @@
 }
 
 .apply-sort-btn:hover {
-  background-color: #0056b3;
+  background-color: #e7ebf0;
   transform: translateY(-1px);
 }
 
 /* Estado activo para filtros y ordenamiento */
 .has-active-filters .apply-btn,
 .has-active-sort .apply-sort-btn {
-  background-color: #007bff;
+  background-color: #e2e5e9;
   color: white;
-  box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 2px 4px rgba(238, 240, 243, 0.3);
 }
 
 .sort-option.active {
   background-color: rgba(0, 123, 255, 0.2);
-  border-color: #007bff;
+  border-color: #e7eaee;
 }
 
 .apply-sort-btn.active {
-  background-color: #007bff;
+  background-color: #4a4c4e;
 }
 
 .apply-sort-btn:not(.active) {
@@ -1213,7 +1214,7 @@
 
 .filter-select-container select:focus {
   outline: none;
-  border-color: #007bff;
+  border-color: #e1e4e7;
 }
 
 .filter-select-container select option {

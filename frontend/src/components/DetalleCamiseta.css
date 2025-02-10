@@ -73,7 +73,8 @@
 }
 
 .btn-edit {
-  background-color: #191164; /* Verde cálido */
+  background-color: #4e4e55;
+  color: rgb(233, 227, 227); /* Verde cálido */
 }
 
 .btn-delete {
