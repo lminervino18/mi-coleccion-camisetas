@@ -33,7 +33,7 @@ function DetalleCamiseta() {
     const fetchCamiseta = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, {
+        const response = await fetch(`http://18.118.189.193:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           }
@@ -61,7 +61,7 @@ function DetalleCamiseta() {
     try {
       const usuarioId = localStorage.getItem('usuarioId');
       const response = await fetch(
-        `http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, 
+        `http://18.118.189.193:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, 
         {
           method: 'DELETE',
           headers: {

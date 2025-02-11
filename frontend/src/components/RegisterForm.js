@@ -76,7 +76,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(true);
       try {
         const response = await fetch(
-          `http://localhost:8080/api/usuarios/?nombre=${value.trim()}`
+          `http://18.118.189.193:8080/api/usuarios/?nombre=${value.trim()}`
         );
         if (response.ok) {
           setErrors((prev) => ({
@@ -101,7 +101,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(true);
       try {
         const response = await fetch(
-          `http://localhost:8080/api/usuarios/?email=${value.trim()}`
+          `http://18.118.189.193:8080/api/usuarios/?email=${value.trim()}`
         );
         if (response.ok) {
           setErrors((prev) => ({
@@ -151,7 +151,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
 
     // Intentar registrar al usuario
     try {
-      const response = await fetch("http://localhost:8080/api/usuarios", {
+      const response = await fetch("http://18.118.189.193:8080/api/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

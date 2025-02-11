@@ -360,7 +360,7 @@ function EditarCamiseta({
 
 
     try {
-      const response = await fetch(`http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${formData.id}`, {
+      const response = await fetch(`http://18.118.189.193:8080/api/camisetas/usuario/${usuarioId}/camiseta/${formData.id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

@@ -125,7 +125,7 @@ function Camisetas() {
     const fetchUserData = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioId}`, {
+        const response = await fetch(`http://18.118.189.193:8080/api/usuarios/${usuarioId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -142,7 +142,7 @@ function Camisetas() {
     const fetchCamisetas = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/camisetas/${usuarioId}`, {
+        const response = await fetch(`http://18.118.189.193:8080/api/camisetas/${usuarioId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -533,7 +533,7 @@ const handleWheel = (e) => {
   
       const base64Image = canvas.toDataURL('image/jpeg', 0.8);
       
-      const response = await fetch(`http://localhost:8080/api/usuarios/${localStorage.getItem('usuarioId')}/foto-perfil`, {
+      const response = await fetch(`http://18.118.189.193:8080/api/usuarios/${localStorage.getItem('usuarioId')}/foto-perfil`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1189,7 +1189,7 @@ const handleWheel = (e) => {
                   className="delete-btn"
                   onClick={async () => {
                     try {
-                      const response = await fetch(`http://localhost:8080/api/usuarios/${userData.id}`, {
+                      const response = await fetch(`http://18.118.189.193:8080/api/usuarios/${userData.id}`, {
                         method: 'DELETE',
                         headers: {
                           'Content-Type': 'application/json',

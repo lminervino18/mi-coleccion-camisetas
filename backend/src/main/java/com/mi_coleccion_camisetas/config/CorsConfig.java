@@ -13,9 +13,9 @@ public class CorsConfig {
     public WebMvcConfigurer corsConfigurer() {
         return new WebMvcConfigurer() {
             @Override
-            public void addCorsMappings(@NonNull CorsRegistry registry) { // Añade @NonNull aquí
+            public void addCorsMappings(@NonNull CorsRegistry registry) {
                 registry.addMapping("/**") // Permitir todos los endpoints del backend
-                        .allowedOrigins("http://localhost:3000") // Permitir solicitudes desde el frontend
+                        .allowedOrigins("*") // Permitir solicitudes desde cualquier origen (temporalmente)
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Métodos HTTP permitidos
                         .allowedHeaders("*") // Permitir todos los encabezados
                         .allowCredentials(true); // Permitir credenciales

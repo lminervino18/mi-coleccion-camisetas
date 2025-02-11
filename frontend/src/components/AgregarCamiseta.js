@@ -281,7 +281,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     submitFormData.append('comentarios', formData.comentarios || '');
 
     try {
-      const response = await fetch('http://localhost:8080/api/camisetas', {
+      const response = await fetch('http://18.118.189.193:8080/api/camisetas', {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
