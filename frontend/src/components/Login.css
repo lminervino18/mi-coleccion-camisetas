@@ -4,12 +4,11 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: url('../assets/background.jpg') no-repeat center center;
+  background: url("../assets/background.jpg") no-repeat center center;
   background-size: cover; /* Ajusta automáticamente para cubrir el área */
   background-attachment: fixed; /* Opcional: crea un efecto de paralaje */
   position: relative;
 }
-
 
 /* Superposición oscura sobre el fondo */
 .overlay {
@@ -32,7 +31,7 @@
 }
 
 .logo {
-  height: 50px;
+  height: 150px;
   margin-right: 10px;
 }
 
@@ -63,8 +62,8 @@
 }
 
 .login-form .form-group input {
-  width: 100%;
-  padding: 0.8rem;
+  width: 95%;
+  padding: 10px;
   border: none;
   border-radius: 4px;
   background-color: rgba(255, 255, 255, 0.1);
@@ -76,7 +75,7 @@
 
 .login-form .form-group input:focus {
   outline: none;
-  border: 1px solid #007bff;
+  border: 1px solid #ebecee;
   background-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -86,29 +85,152 @@
   justify-content: space-between;
 }
 
-.btn {
-  padding: 0.7rem 1.2rem;
-  border: none;
-  border-radius: 4px;
+/* Estilos para los botones */
+
+.login-form .btn-primary {
+  width: 100%;
+  padding: 10px;
   font-size: 1rem;
+  border: none;
+  background-color: #cccfd3;
+  color: rgb(15, 15, 15);
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
 }
 
-.btn-primary {
-  background-color: #007bff;
-  color: #fff;
+.login-form .btn-primary:hover {
+  background-color: #fdfdfd;
 }
 
-.btn-primary:hover {
-  background-color: #0056b3;
+.login-form .btn-secondary {
+  margin-top: 10px;
+  width: 100%;
+  padding: 10px;
+  font-size: 1rem;
+  border: none;
+  background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+  color: white;
+  border-radius: 5px;
+  cursor: pointer;
 }
 
-.btn-secondary {
-  background-color: #6c757d;
-  color: #fff;
+.login-form .btn-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.2); /* Más translúcido al pasar */
 }
 
-.btn-secondary:hover {
-  background-color: #545b62;
+/* Estilo para mensajes de error */
+.error-message {
+  color: #ff3333;
+  background-color: rgba(255, 51, 51, 0.1);
+  border: 1px solid #ff3333;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  width: 95%;
+}
+
+/* Animación para el mensaje de error */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-message {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Estilo para mensajes de error generales */
+.register-form .error-message {
+  color: #ff3333;
+  background-color: rgba(255, 51, 51, 0.1);
+  border: 1px solid #ff3333;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  width: 100%;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Animación para el mensaje de error */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilo para errores específicos de campo */
+.form-group .field-error {
+  color: #ff3333;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Estilo para campos con error */
+.form-group input.error {
+  border: 1px solid #ff3333;
+  background-color: rgba(255, 51, 51, 0.05);
+}
+
+.form-group input.error:focus {
+  border-color: #ff3333;
+  box-shadow: 0 0 0 2px rgba(255, 51, 51, 0.2);
+}
+
+/* Estilo para el contenedor de mensajes de error */
+.error-container {
+  margin-bottom: 1.5rem;
+  width: 100%;
+}
+
+/* Estilo para múltiples mensajes de error */
+.error-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.error-list li {
+  color: #ff3333;
+  margin-bottom: 5px;
+  font-size: 0.9rem;
+}
+
+/* Estilo para el mensaje de éxito actualizado */
+.register-form .success-message {
+  text-align: center;
+  color: #4caf50;
+  border: 1px solid #4caf50;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  background-color: rgba(76, 175, 80, 0.1);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.register-form .success-message h2 {
+  font-size: 1.4rem;
+  margin-bottom: 10px;
+  color: #ffffff;
+}
+
+.register-form .success-message p {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  color: #ffffff;
 }

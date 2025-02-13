@@ -1,11 +1,49 @@
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  background-color: #f0f8ff; /* Color celeste claro */
+/* Estilos base que ya tenías */
+.page-container {
+  width: 100%;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden; /* Añadido para prevenir scroll horizontal durante animaciones */
 }
 
-h1 {
-  text-align: center;
-  color: #2c3e50;
+#root {
+  min-height: 100vh;
+  width: 100%;
+}
+
+/* Nuevos estilos para las animaciones */
+.page-transition {
+  animation: fadeIn 0.3s ease-in-out;
+  width: 100%;
+  min-height: 100vh;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Estilos adicionales para mejorar la experiencia de usuario */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f8ff; /* Color celeste claro que tenías antes */
+  overflow-x: hidden;
+}
+
+/* Asegurar que las transiciones sean suaves */
+.page-transition > * {
+  width: 100%;
+  height: 100%;
 }

@@ -8,6 +8,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String home() {
-        return "redirect:/api/usuarios"; // Cambia la ruta según tu necesidad
+        // Si no estás autenticado, redirige a la página de login
+        return "redirect:/login"; // Cambia esta URL según sea necesario
     }
 }

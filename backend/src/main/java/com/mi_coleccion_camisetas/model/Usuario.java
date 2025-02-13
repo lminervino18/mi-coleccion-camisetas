@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
 import java.util.Objects;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "usuarios")
@@ -18,10 +20,12 @@ public class Usuario {
     private Long id;
 
     @NotEmpty(message = "El nombre de usuario es obligatorio.")
+    @Column(unique = true)
     private String username;
 
     @Email(message = "Debe ser un correo electrónico válido.")
     @NotEmpty(message = "El correo es obligatorio.")
+    @Column(unique = true)
     private String email;
 
     @NotEmpty(message = "La contraseña es obligatoria.")
@@ -37,15 +41,21 @@ public class Usuario {
     @UpdateTimestamp
     private Timestamp updatedAt;
 
+    @Column(name = "foto_perfil", columnDefinition = "TEXT")
+    private String fotoDePerfil;
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Camiseta> camisetas = new ArrayList<>();
+
     // Constructores
     public Usuario() {
     }
 
     public Usuario(String username, String email, String password, Role role) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.role = role;
+        setUsername(username);
+        setEmail(email);
+        setPassword(password);
+        setRole(role);
     }
 
     // Getters
@@ -77,21 +87,73 @@ public class Usuario {
         return updatedAt;
     }
 
-    // Setters
+    public List<Camiseta> getCamisetas() {
+        return new ArrayList<>(camisetas);
+    }
+
+    public String getFotoDePerfil() {
+        return fotoDePerfil;
+    }
+
+    // Setters con validaciones
     public void setUsername(String username) {
-        this.username = username;
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de usuario no puede estar vacío");
+        }
+        this.username = username.trim();
     }
 
     public void setEmail(String email) {
-        this.email = email;
+        if (email == null || email.trim().isEmpty()) {
+            throw new IllegalArgumentException("El email no puede estar vacío");
+        }
+        if (!email.matches("^[A-Za-z0-9+_.-]+@(.+)$")) {
+            throw new IllegalArgumentException("Formato de email inválido");
+        }
+        this.email = email.trim().toLowerCase();
     }
 
     public void setPassword(String password) {
+        if (password == null || password.trim().isEmpty()) {
+            throw new IllegalArgumentException("La contraseña no puede estar vacía");
+        }
+        if (password.length() < 6) {
+            throw new IllegalArgumentException("La contraseña debe tener al menos 6 caracteres");
+        }
         this.password = password;
     }
 
     public void setRole(Role role) {
+        if (role == null) {
+            throw new IllegalArgumentException("El rol no puede ser nulo");
+        }
         this.role = role;
+    }
+
+    public void setFotoDePerfil(String fotoDePerfil) {
+        // Validar que la cadena base64 sea válida
+        if (fotoDePerfil != null && !fotoDePerfil.isEmpty()) {
+            try {
+                // Verificar si la cadena comienza con el formato data:image
+                if (!fotoDePerfil.startsWith("data:image")) {
+                    throw new IllegalArgumentException("Formato de imagen no válido");
+                }
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("La imagen proporcionada no es válida");
+            }
+        }
+        this.fotoDePerfil = fotoDePerfil;
+    }
+
+    // Métodos para manejar la relación con camisetas
+    public void addCamiseta(Camiseta camiseta) {
+        camisetas.add(camiseta);
+        camiseta.setUsuario(this);
+    }
+
+    public void removeCamiseta(Camiseta camiseta) {
+        camisetas.remove(camiseta);
+        camiseta.setUsuario(null);
     }
 
     // Métodos adicionales
@@ -102,6 +164,7 @@ public class Usuario {
                 ", username='" + username + '\'' +
                 ", email='" + email + '\'' +
                 ", role=" + role +
+                ", hasFotoDePerfil=" + (fotoDePerfil != null) +
                 '}';
     }
 
