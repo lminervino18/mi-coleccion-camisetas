@@ -2,75 +2,116 @@
 
 **Mi Colección de Camisetas** es una aplicación web diseñada para gestionar un inventario personalizado de camisetas de fútbol. La plataforma permite a los usuarios almacenar y organizar su colección personal, con características como subir imágenes, añadir información detallada de cada camiseta y realizar consultas de manera eficiente.
 
-![Imagen de ejemplo de la aplicación](./frontend/public/sample.png) <!-- Aquí puedes agregar la ruta a la imagen de la aplicación -->
+![Imagen de ejemplo de la aplicación](./frontend/public/sample.png)
 
 ## Tecnologías utilizadas
 
 ### Frontend
-
-- **React**: Usado para construir una interfaz de usuario moderna y responsiva. React facilita la creación de componentes reutilizables que mejoran la experiencia del usuario.
-- **CSS/Bootstrap**: Para estilizar y diseñar la interfaz.
+- **React**: Usado para construir una interfaz de usuario moderna y responsiva
+- **CSS**: Para estilizar y diseñar la interfaz
 
 ### Backend
-
-- **Spring Boot**: Un framework robusto de Java que permite construir aplicaciones backend escalables y seguras.
-- **Maven**: Para gestionar las dependencias del proyecto y simplificar la construcción del backend.
+- **Spring Boot**: Framework de Java para construir aplicaciones backend escalables y seguras
+- **Maven**: Para gestión de dependencias y construcción del proyecto
 
 ### Base de datos
+- **MySQL**: Base de datos relacional para almacenar usuarios y camisetas
 
-- **MySQL**: Base de datos relacional utilizada para almacenar la información de los usuarios y sus camisetas.
+## Modelo de Base de Datos
 
----
+El siguiente diagrama muestra la estructura de la base de datos:
+
+![Modelo de la base de datos](./frontend/public/bdd.png))
+
+### Estructura de Tablas
+
+#### Usuarios
+- `id`: Identificador único
+- `username`: Nombre de usuario (único)
+- `email`: Correo electrónico (único)
+- `password`: Contraseña encriptada
+- `role`: Rol del usuario (ADMIN/USER)
+- `created_at`: Fecha de creación
+- `updated_at`: Fecha de última actualización
+- `foto_perfil`: Foto de perfil en formato base64
+
+#### Camisetas
+- `id`: Identificador único
+- `usuario_id`: ID del usuario propietario
+- `imagen_completa`: Imagen completa de la camiseta
+- `imagen_recortada`: Miniatura de la camiseta
+- `tipo_de_camiseta`: Club o Selección
+- `liga`: Liga a la que pertenece (opcional)
+- `club`: Nombre del club (opcional)
+- `pais`: País de la camiseta
+- `dorsal`: Número de la camiseta (opcional)
+- `nombre`: Nombre en la camiseta (opcional)
+- `talle`: Talle de la camiseta
+- `numero_equipacion`: Tipo de equipación
+- `temporada`: Temporada de la camiseta
+- `comentarios`: Comentarios adicionales
+
+#### Camiseta_Colores
+- `camiseta_id`: ID de la camiseta
+- `color`: Color de la camiseta
 
 ## Funcionalidades principales
 
-### Usuarios
+### Gestión de Usuarios
+- Registro y autenticación
+- Actualización de perfil
+- Gestión de foto de perfil
 
-Cada usuario tiene su propia cuenta con:
+### Gestión de Camisetas
+- Agregar nuevas camisetas con imágenes
+- Editar información de camisetas existentes
+- Eliminar camisetas
+- Filtrar y ordenar camisetas
+- Visualización en formato grilla
 
-- Nombre de usuario
-- Contraseña (encriptada para mayor seguridad)
-- Foto de perfil (permite subir una imagen personalizada como foto de perfil)
-- Registro de camiseta (el usuario puede agregar y editar camisetas en su colección)
+## Configuración y Ejecución
 
-### Colección de camisetas
+### Requisitos previos
+- Java 17 o superior
+- Node.js y npm
+- MySQL
 
-Cada usuario puede gestionar su propia colección de camisetas, añadiendo detalles como:
+### Ejecución Automática
 
-- Imagen de la camiseta
-- Club al que pertenece
-- País de origen
-- Número/dorsal de la camiseta
-- Talle (S, M, L, etc.)
-- Número de equipación (primera, segunda, tercera, etc.)
-- Comentarios adicionales
+```bash
+./run_all.sh
+```
 
----
+Este script inicia automáticamente:
 
-## Estructura general de la aplicación
+- Servidor MySQL local
+- Backend Spring Boot
+- Frontend React
 
-### Frontend
+### Ejecución Manual
 
-El frontend está desarrollado en React y permite a los usuarios:
+Backend
+BASH
 
-1. Registrarse y autenticarse.
-2. Subir imágenes y detalles de sus camisetas.
-3. Visualizar, editar o eliminar camisetas de su colección.
-4. Modificar la foto de perfil del usuario.
+```
+cd backend
+mvn spring-boot:run
+ ```
 
-### Backend
+Frontend
+BASH
 
-El backend está desarrollado en Spring Boot y provee una API REST para:
+```
+cd frontend
+npm install
+npm start
+```
 
-1. Gestión de usuarios (registro, autenticación y perfil).
-2. Operaciones CRUD (Crear, Leer, Actualizar, Eliminar) para las camisetas.
+Base de datos
+- Crear una base de datos MySQL
+- Configurar las credenciales en application.properties
 
-## Cómo agregar una foto
-
-Para agregar una foto de perfil al usuario, asegúrate de subir la imagen a través del formulario de registro o perfil en la aplicación. La foto se almacena en la base de datos y puede ser editada en cualquier momento desde la sección de perfil del usuario.
-
----
-
-**Nota:** Asegúrate de tener todos los servicios corriendo, tanto el frontend como el backend, antes de realizar cualquier acción en la aplicación.
-
----
+### Notas de seguridad
+- Contraseñas encriptadas
+- Autenticación mediante JWT
+- Validación de datos en frontend y backend
