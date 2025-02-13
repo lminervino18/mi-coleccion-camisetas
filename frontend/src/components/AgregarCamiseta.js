@@ -27,13 +27,12 @@ function AgregarCamiseta({ onClose, onAgregar }) {
   const [selectorPosition, setSelectorPosition] = useState({ x: 0, y: 0 });
   const [imageFormat, setImageFormat] = useState('image/jpeg');
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
+  const [temporadaError, setTemporadaError] = useState('');
   const imageRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -82,29 +81,32 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     }
   };
 
-  const handleWheel = (e) => {
-    if (e.ctrlKey) {
-      e.preventDefault();
-      const delta = e.deltaY * -0.01;
-      setZoom(prevZoom => {
-        const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
-        return Number(newZoom.toFixed(2));
-      });
-    }
-  };
-
   useEffect(() => {
     if (showImageModal && imageRef.current && containerRef.current) {
       const img = imageRef.current;
       const container = containerRef.current;
       const containerRect = container.getBoundingClientRect();
 
+      // Agregar el event listener para el wheel
+      const wheelHandler = (e) => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          const delta = e.deltaY * -0.01;
+          setZoom(prevZoom => {
+            const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
+            return Number(newZoom.toFixed(2));
+          });
+        }
+      };
+
+      container.addEventListener('wheel', wheelHandler, { passive: false });
+
       const handleImageLoad = () => {
         const imgAspectRatio = img.naturalWidth / img.naturalHeight;
         const containerAspectRatio = containerRect.width / containerRect.height;
         
         let width, height;
-
+      
         if (imgAspectRatio > containerAspectRatio) {
           width = containerRect.width;
           height = width / imgAspectRatio;
@@ -112,22 +114,18 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           height = containerRect.height;
           width = height * imgAspectRatio;
         }
-
+      
         setImageSize({ width, height });
-        setImageDimensions({ 
-          width: img.naturalWidth, 
-          height: img.naturalHeight 
-        });
         
         const offsetX = Math.max(0, (containerRect.width - width) / 2);
         const offsetY = Math.max(0, (containerRect.height - height) / 2);
         setImageOffset({ x: offsetX, y: offsetY });
-
+      
         setSelectorPosition({
           x: offsetX + (width - SELECTOR_SIZE) / 2,
           y: offsetY + (height - SELECTOR_SIZE) / 2
         });
-
+      
         setImageLoaded(true);
       };
 
@@ -136,28 +134,33 @@ function AgregarCamiseta({ onClose, onAgregar }) {
       } else {
         img.onload = handleImageLoad;
       }
+
+      // Cleanup function
+      return () => {
+        container.removeEventListener('wheel', wheelHandler);
+        img.onload = null;
+      };
     }
   }, [showImageModal, originalImage]);
 
-    const handleChange = (e) => {
-      const { name, value } = e.target;
-      
-      if (name === 'tipoDeCamiseta') {
-        setFormData(prev => ({
-          ...prev,
-          [name]: value,
-          club: value === 'Seleccion' ? prev.pais : prev.club // La selección usa el país como club
-        }));
-      } else if (name === 'pais' && formData.tipoDeCamiseta === 'Seleccion') {
-        setFormData(prev => ({
-          ...prev,
-          [name]: value,
-          club: value // Actualizar club con el país para selecciones
-        }));
-      } else {
-        setFormData(prev => ({ ...prev, [name]: value }));
-      }
-    };
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'tipoDeCamiseta') {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value,
+        club: '',
+        liga: ''
+      }));
+    } else if (name === 'temporada') {
+      setFormData(prev => ({ ...prev, [name]: value }));
+      const error = validarTemporada(value);
+      setTemporadaError(error);
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
+  };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -249,11 +252,46 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     setSelectedColors(prev => prev.filter(c => c !== color));
   };
 
+  const validarTemporada = (temporada) => {
+    // Si está vacío, no mostrar error
+    if (!temporada) return '';
+  
+    // Regex básico para el formato
+    const temporadaRegex = /^\d{4}(?:\/\d{4})?$/;
+    if (!temporadaRegex.test(temporada)) {
+      return 'Formato inválido. Use: YYYY o YYYY/YYYY (ejemplo: 2023 o 2023/2024)';
+    }
+  
+    if (temporada.includes('/')) {
+      const [primerAño, segundoAño] = temporada.split('/').map(Number);
+      
+      // Validar que los años sean razonables
+      if (primerAño < 1900) {
+        return 'El año no puede ser anterior a 1900';
+      }
+  
+      // Validar que el segundo año sea el siguiente al primero
+      if (segundoAño !== primerAño + 1) {
+        return 'El segundo año debe ser el siguiente al primero';
+      }
+    } else {
+      const año = Number(temporada);
+      
+      // Validar que el año sea razonable
+      if (año < 1800) {
+        return 'El año no puede ser anterior a 1900';
+      }
+    }
+  
+    return ''; // Sin errores
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.club || !formData.pais || !formData.temporada) {
-      alert('Los campos "Club", "País" y "Temporada" son obligatorios.');
+      // Modificar la validación para que el club solo sea obligatorio si es tipo Club
+    if ((!formData.club && formData.tipoDeCamiseta === 'Club') || !formData.pais || !formData.temporada) {
+      alert('Por favor, complete todos los campos obligatorios.');
       return;
     }
 
@@ -313,7 +351,6 @@ function AgregarCamiseta({ onClose, onAgregar }) {
             <div 
               className="image-container" 
               ref={containerRef}
-              onWheel={handleWheel}
               onMouseMove={handleImageMouseMove}
               onMouseUp={handleImageMouseUp}
               onMouseLeave={handleImageMouseUp}
@@ -414,26 +451,8 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         </div>
       </div>
 
-      <input 
-        type="text" 
-        name="liga" 
-        placeholder="Liga" 
-        value={formData.liga} 
-        onChange={handleChange}
-        className="form-input"
-      />
 
       <input 
-        type="text" 
-        name="club" 
-        placeholder="Club" 
-        value={formData.club} 
-        onChange={handleChange}
-        disabled={formData.tipoDeCamiseta === 'Seleccion'}
-        required 
-        className="form-input"
-      />
-        <input 
           type="text" 
           name="pais" 
           placeholder="País" 
@@ -441,14 +460,40 @@ function AgregarCamiseta({ onClose, onAgregar }) {
           onChange={handleChange} 
           required 
         />
-        <input 
+
+
+      <input 
+        type="text" 
+        name="liga" 
+        placeholder="Liga" 
+        value={formData.liga} 
+        onChange={handleChange}
+        disabled={formData.tipoDeCamiseta === 'Seleccion'}
+        className="form-input"
+      />
+
+      <input 
           type="text" 
-          name="temporada" 
-          placeholder="Temporada (ej: 2017/2018)" 
-          value={formData.temporada} 
-          onChange={handleChange} 
-          required 
+          name="club" 
+          placeholder="Club" 
+          value={formData.club} 
+          onChange={handleChange}
+          disabled={formData.tipoDeCamiseta === 'Seleccion'}
+          required={formData.tipoDeCamiseta === 'Club'} 
+          className="form-input"
         />
+        <div className="input-group">
+          <input 
+            type="text" 
+            name="temporada" 
+            placeholder="Temporada (ej: 2023 o 2023/2024)" 
+            value={formData.temporada} 
+            onChange={handleChange} 
+            required 
+            className={`form-input ${temporadaError ? 'error' : ''}`}
+          />
+          {temporadaError && <span className="error-message">{temporadaError}</span>}
+        </div>
 
         <input 
           type="file" 

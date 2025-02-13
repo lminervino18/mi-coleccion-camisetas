@@ -30,7 +30,7 @@ public class Camiseta {
     @Column(length = 100)
     private String liga;
 
-    @Column(nullable = false, length = 100)
+    @Column(nullable = true, length = 100)
     private String club;
 
     @Column(nullable = false, length = 100)
@@ -138,9 +138,6 @@ public class Camiseta {
     }
 
     public void setClub(String club) {
-        if (club == null || club.trim().isEmpty()) {
-            throw new IllegalArgumentException("El club no puede estar vacío");
-        }
         this.club = club.trim();
     }
 

@@ -285,6 +285,12 @@
   justify-content: center;
   align-items: center;
   touch-action: none;
+  user-select: none;
+}
+
+.image-container img {
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .original-image {
@@ -325,6 +331,8 @@
   background-color: rgba(87, 85, 85, 0.1);
   cursor: move !important;
   z-index: 2;
+  pointer-events: all;
+  touch-action:none;
 }
 
 .selector-overlay {
@@ -374,6 +382,23 @@
 
 .image-modal-buttons .modal-button.secondary:hover {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.form-input.error {
+  border-color: #ff4444;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  display: block;
 }
 
 @media (max-width: 900px) {

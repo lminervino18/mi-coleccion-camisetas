@@ -52,13 +52,12 @@ function EditarCamiseta({
   const [selectorPosition, setSelectorPosition] = useState({ x: 0, y: 0 });
   const [imageFormat, setImageFormat] = useState('image/jpeg');
   const [imageLoaded, setImageLoaded] = useState(false);
-  const [imageDimensions, setImageDimensions] = useState({ width: 0, height: 0 });
   const [imageOffset, setImageOffset] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-
+  const [temporadaError, setTemporadaError] = useState('');
   const imageRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -87,18 +86,6 @@ function EditarCamiseta({
     }
   };
 
-  const handleImageMouseMove = (e) => {
-    if (isDragging) {
-      const newX = e.clientX - dragStart.x;
-      const newY = e.clientY - dragStart.y;
-      setImagePosition({ x: newX, y: newY });
-    }
-  };
-
-  const handleImageMouseUp = () => {
-    setIsDragging(false);
-  };
-
   const handlePreviewClick = () => {
     if (originalImage) {
       setZoom(1);
@@ -111,15 +98,39 @@ function EditarCamiseta({
       setShowImageModal(true);
     }
   };
-  const handleWheel = (e) => {
-    if (e.ctrlKey) {
-      e.preventDefault();
-      const delta = e.deltaY * -0.01;
-      setZoom(prevZoom => {
-        const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
-        return Number(newZoom.toFixed(2));
-      });
+
+  const validarTemporada = (temporada) => {
+    // Si está vacío, no mostrar error
+    if (!temporada) return '';
+  
+    // Regex básico para el formato
+    const temporadaRegex = /^\d{4}(?:\/\d{4})?$/;
+    if (!temporadaRegex.test(temporada)) {
+      return 'Formato inválido. Use: YYYY o YYYY/YYYY (ejemplo: 2023 o 2023/2024)';
     }
+  
+    if (temporada.includes('/')) {
+      const [primerAño, segundoAño] = temporada.split('/').map(Number);
+      
+      // Validar que los años sean razonables
+      if (primerAño < 1900) {
+        return 'El año no puede ser anterior a 1900';
+      }
+  
+      // Validar que el segundo año sea el siguiente al primero
+      if (segundoAño !== primerAño + 1) {
+        return 'El segundo año debe ser el siguiente al primero';
+      }
+    } else {
+      const año = Number(temporada);
+      
+      // Validar que el año sea razonable
+      if (año < 1800) {
+        return 'El año no puede ser anterior a 1900';
+      }
+    }
+  
+    return ''; // Sin errores
   };
 
   useEffect(() => {
@@ -133,7 +144,7 @@ function EditarCamiseta({
         const containerAspectRatio = containerRect.width / containerRect.height;
         
         let width, height;
-
+      
         if (imgAspectRatio > containerAspectRatio) {
           width = containerRect.width;
           height = width / imgAspectRatio;
@@ -141,22 +152,18 @@ function EditarCamiseta({
           height = containerRect.height;
           width = height * imgAspectRatio;
         }
-
+      
         setImageSize({ width, height });
-        setImageDimensions({ 
-          width: img.naturalWidth, 
-          height: img.naturalHeight 
-        });
         
         const offsetX = Math.max(0, (containerRect.width - width) / 2);
         const offsetY = Math.max(0, (containerRect.height - height) / 2);
         setImageOffset({ x: offsetX, y: offsetY });
-
+      
         setSelectorPosition({
           x: offsetX + (width - SELECTOR_SIZE) / 2,
           y: offsetY + (height - SELECTOR_SIZE) / 2
         });
-
+      
         setImageLoaded(true);
       };
 
@@ -167,53 +174,102 @@ function EditarCamiseta({
       }
     }
   }, [showImageModal, originalImage]);
+      // Efecto para manejar el zoom
+    useEffect(() => {
+      const container = containerRef.current;
+      if (container && showImageModal) {
+        const handleWheel = (e) => {
+          if (e.ctrlKey) {
+            e.preventDefault();
+            const delta = e.deltaY * -0.01;
+            
+            const containerRect = container.getBoundingClientRect();
+            const centerX = containerRect.width / 2;
+            const centerY = containerRect.height / 2;
+            
+            setZoom(prevZoom => {
+              const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
+              
+              // Ajusta la posición para mantener el centro
+              const scaleChange = newZoom / prevZoom;
+              setImagePosition(prev => ({
+                x: centerX - ((centerX - prev.x) * scaleChange),
+                y: centerY - ((centerY - prev.y) * scaleChange)
+              }));
+              
+              return newZoom;
+            });
+          }
+        };
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    switch (name) {
-      case 'tipoDeCamiseta':
+        const handleMouseDown = (e) => {
+          if (e.target.closest('.selector')) return;
+          
+          if (e.button === 0) {
+            setIsDragging(true);
+            setDragStart({
+              x: e.clientX - imagePosition.x,
+              y: e.clientY - imagePosition.y
+            });
+            e.preventDefault();
+          }
+        };
+
+        container.addEventListener('wheel', handleWheel, { passive: false });
+        container.addEventListener('mousedown', handleMouseDown);
+
+        return () => {
+          container.removeEventListener('wheel', handleWheel);
+          container.removeEventListener('mousedown', handleMouseDown);
+        };
+      }
+    }, [showImageModal, imagePosition, zoom]);
+
+    // Efecto para manejar el arrastre
+    useEffect(() => {
+      if (isDragging) {
+        const handleMouseMove = (e) => {
+          const newX = e.clientX - dragStart.x;
+          const newY = e.clientY - dragStart.y;
+          setImagePosition({ x: newX, y: newY });
+        };
+
+        const handleMouseUp = () => {
+          setIsDragging(false);
+        };
+
+        window.addEventListener('mousemove', handleMouseMove);
+        window.addEventListener('mouseup', handleMouseUp);
+        window.addEventListener('mouseleave', handleMouseUp);
+
+        return () => {
+          window.removeEventListener('mousemove', handleMouseMove);
+          window.removeEventListener('mouseup', handleMouseUp);
+          window.removeEventListener('mouseleave', handleMouseUp);
+        };
+      }
+    }, [isDragging, dragStart]);
+
+
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      
+      if (name === 'tipoDeCamiseta') {
         setFormData(prev => ({
           ...prev,
-          tipoDeCamiseta: value,
-          liga: value === 'Seleccion' ? '' : prev.liga,
-          club: value === 'Seleccion' ? prev.pais : prev.club
+          [name]: value,
+          // Limpiar club y liga cuando se cambia el tipo
+          club: '',
+          liga: ''
         }));
-        break;
-  
-      case 'pais':
-        setFormData(prev => ({
-          ...prev,
-          pais: value,
-          club: prev.tipoDeCamiseta === 'Seleccion' ? value : prev.club
-        }));
-        break;
-  
-      case 'club':
-        if (formData.tipoDeCamiseta !== 'Seleccion') {
-          setFormData(prev => ({
-            ...prev,
-            club: value
-          }));
-        }
-        break;
-  
-      case 'liga':
-        if (formData.tipoDeCamiseta === 'Club') {
-          setFormData(prev => ({
-            ...prev,
-            liga: value
-          }));
-        }
-        break;
-  
-      default:
-        setFormData(prev => ({
-          ...prev,
-          [name]: value
-        }));
-    }
-  };
+      } else if (name === 'temporada') {
+        setFormData(prev => ({ ...prev, [name]: value }));
+        const error = validarTemporada(value);
+        setTemporadaError(error);
+      } else {
+        setFormData(prev => ({ ...prev, [name]: value }));
+      }
+    };
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -321,8 +377,16 @@ function EditarCamiseta({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.club || !formData.pais || !formData.temporada) {
-      alert('Los campos "Club", "País" y "Temporada" son obligatorios.');
+      // Validar temporada
+    const temporadaError = validarTemporada(formData.temporada);
+    if (temporadaError) {
+      alert(temporadaError);
+      return;
+    }
+
+    // Modificar la validación para que el club solo sea obligatorio si es tipo Club
+    if ((!formData.club && formData.tipoDeCamiseta === 'Club') || !formData.pais || !formData.temporada) {
+      alert('Por favor, complete todos los campos obligatorios.');
       return;
     }
 
@@ -389,20 +453,16 @@ function EditarCamiseta({
           <div className="image-modal">
             <h3>Elige el área que se mostrará como miniatura</h3>
             <div 
-              className="image-container" 
-              ref={containerRef}
-              onWheel={handleWheel}
-              onMouseMove={handleImageMouseMove}
-              onMouseUp={handleImageMouseUp}
-              onMouseLeave={handleImageMouseUp}
-              style={{ 
-                position: 'relative',
-                width: '100%',
-                height: '500px',
-                overflow: 'hidden',
-                cursor: isDragging ? 'grabbing' : 'grab'
-              }}
-            >
+                className="image-container" 
+                ref={containerRef}
+                style={{ 
+                  position: 'relative',
+                  width: '100%',
+                  height: '500px',
+                  overflow: 'hidden',
+                  cursor: isDragging ? 'grabbing' : 'grab'
+                }}
+              >
               <div
                 style={{
                   position: 'absolute',
@@ -492,28 +552,6 @@ function EditarCamiseta({
           </div>
         </div>
 
-        {formData.tipoDeCamiseta === 'Club' && (
-          <input 
-          type="text" 
-          name="liga" 
-          placeholder="Liga" 
-          value={formData.liga} 
-          onChange={handleChange}
-          disabled={formData.tipoDeCamiseta === 'Seleccion'}
-          className="form-input"
-        />
-        )}
-
-        <input 
-          type="text" 
-          name="club" 
-          placeholder="Club" 
-          value={formData.club} 
-          onChange={handleChange}
-          disabled={formData.tipoDeCamiseta === 'Seleccion'}
-          required 
-          className="form-input"
-        />
         <input 
           type="text" 
           name="pais" 
@@ -523,13 +561,38 @@ function EditarCamiseta({
           required 
         />
         <input 
-          type="text" Actu
-          name="temporada" 
-          placeholder="Temporada (ej: 2017/2018)" 
-          value={formData.temporada} 
-          onChange={handleChange} 
-          required 
+          type="text" 
+          name="liga" 
+          placeholder="Liga" 
+          value={formData.liga} 
+          onChange={handleChange}
+          disabled={formData.tipoDeCamiseta === 'Seleccion'}
+          className="form-input"
         />
+
+        <input 
+          type="text" 
+          name="club" 
+          placeholder="Club" 
+          value={formData.club} 
+          onChange={handleChange}
+          disabled={formData.tipoDeCamiseta === 'Seleccion'}
+          required={formData.tipoDeCamiseta === 'Club'} 
+          className="form-input"
+        />
+        
+        <div className="input-group">
+          <input 
+            type="text" 
+            name="temporada" 
+            placeholder="Temporada (ej: 2023 o 2023/2024)" 
+            value={formData.temporada} 
+            onChange={handleChange} 
+            required 
+            className={`form-input ${temporadaError ? 'error' : ''}`}
+          />
+          {temporadaError && <span className="error-message">{temporadaError}</span>}
+        </div>
 
         <input 
           type="file" 

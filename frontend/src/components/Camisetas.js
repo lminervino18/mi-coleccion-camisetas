@@ -10,7 +10,6 @@ import {
   faSort, 
   faSortAmountUp, 
   faSortAmountDown,
-  faTimes,
   faArrowLeft,
   faExclamation  
 } from '@fortawesome/free-solid-svg-icons';
@@ -51,8 +50,7 @@ const CamisetaItem = React.memo(({
         )}
       </div>
       <div className="camiseta-info">
-        <h3>{camiseta.club} {camiseta.temporada}</h3>
-        <h3>{camiseta.numeroEquipacion}</h3>
+      <h3>{camiseta.tipoDeCamiseta === 'Club' ? camiseta.club : camiseta.pais} {camiseta.temporada}</h3>        <h3>{camiseta.numeroEquipacion}</h3>
       </div>
     </div>
   );
@@ -178,6 +176,58 @@ function Camisetas() {
     setAvailablePaises(paises);
   }, [camisetas]);
 
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (container && showProfileModal) {
+      const handleWheel = (e) => {
+        if (e.ctrlKey) {
+          e.preventDefault();
+          const delta = e.deltaY * -0.01;
+          
+          const containerRect = container.getBoundingClientRect();
+          const centerX = containerRect.width / 2;
+          const centerY = containerRect.height / 2;
+          
+          setZoom(prevZoom => {
+            const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
+            
+            // Ajusta la posición para mantener el centro
+            const scaleChange = newZoom / prevZoom;
+            setImagePosition(prev => ({
+              x: centerX - ((centerX - prev.x) * scaleChange),
+              y: centerY - ((centerY - prev.y) * scaleChange)
+            }));
+            
+            return newZoom;
+          });
+        }
+      };
+  
+      const handleMouseDown = (e) => {
+        if (e.target.closest('.profile-selector')) return;
+        
+        if (e.button === 0) {
+          setIsDragging(true);
+          setDragStart({
+            x: e.clientX - imagePosition.x,
+            y: e.clientY - imagePosition.y
+          });
+          e.preventDefault();
+        }
+      };
+  
+      container.addEventListener('wheel', handleWheel, { passive: false });
+      container.addEventListener('mousedown', handleMouseDown);
+  
+      return () => {
+        container.removeEventListener('wheel', handleWheel);
+        container.removeEventListener('mousedown', handleMouseDown);
+      };
+    }
+  }, [showProfileModal, imagePosition, zoom]);
+
+  
   const handleFilterChange = (filterType, value, isChecked = null) => {
     setActiveFilters(prev => {
       const newFilters = { ...prev };
@@ -378,36 +428,13 @@ function Camisetas() {
     }
   };
 
-  
-// Actualiza también el manejador de arrastre
-const handleMouseDown = (e) => {
-  if (e.target.closest('.profile-selector')) {
-    return; // No iniciar arrastre si el clic es en el selector
-  }
-  
-  if (e.button === 0) { // Solo botón izquierdo
-    setIsDragging(true);
-    setDragStart({
-      x: e.clientX - imageOffset.x,
-      y: e.clientY - imageOffset.y
-    });
-    e.preventDefault();
-  }
-};
 
 useEffect(() => {
   if (isDragging) {
     const handleMouseMove = (e) => {
-      if (imageRef.current && containerRef.current) {
-        const newX = e.clientX - dragStart.x;
-        const newY = e.clientY - dragStart.y;
-        
-        // Permitir movimiento más allá de los límites
-        setImageOffset({
-          x: newX,
-          y: newY
-        });
-      }
+      const newX = e.clientX - dragStart.x;
+      const newY = e.clientY - dragStart.y;
+      setImagePosition({ x: newX, y: newY });
     };
 
     const handleMouseUp = () => {
@@ -416,38 +443,15 @@ useEffect(() => {
 
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('mouseleave', handleMouseUp);
 
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('mouseleave', handleMouseUp);
     };
   }
 }, [isDragging, dragStart]);
-
-const handleWheel = (e) => {
-  if (e.ctrlKey) {
-    e.preventDefault();
-    const delta = e.deltaY * -0.01;
-    
-    // Calcula el punto central del contenedor
-    const containerRect = containerRef.current.getBoundingClientRect();
-    const centerX = containerRect.width / 2;
-    const centerY = containerRect.height / 2;
-    
-    setZoom(prevZoom => {
-      const newZoom = Math.max(0.5, Math.min(3, prevZoom * (1 - delta)));
-      
-      // Ajusta la posición para mantener el centro
-      const scaleChange = newZoom / prevZoom;
-      setImagePosition(prev => ({
-        x: centerX - ((centerX - prev.x) * scaleChange),
-        y: centerY - ((centerY - prev.y) * scaleChange)
-      }));
-      
-      return newZoom;
-    });
-  }
-};
 
   const handleProfilePhotoChange = (e) => {
     const file = e.target.files[0];
@@ -462,33 +466,6 @@ const handleWheel = (e) => {
       };
       reader.readAsDataURL(file);
     }
-  };
-
-  const handleImageMouseDown = (e) => {
-    if (e.target.closest('.profile-selector')) {
-      return; // No iniciar arrastre si el clic es en el selector
-    }
-    
-    if (e.button === 0) {
-      setIsDragging(true);
-      setDragStart({
-        x: e.clientX - imagePosition.x,
-        y: e.clientY - imagePosition.y
-      });
-      e.preventDefault();
-    }
-  };
-  
-  const handleImageMouseMove = (e) => {
-    if (isDragging) {
-      const newX = e.clientX - dragStart.x;
-      const newY = e.clientY - dragStart.y;
-      setImagePosition({ x: newX, y: newY });
-    }
-  };
-  
-  const handleImageMouseUp = () => {
-    setIsDragging(false);
   };
 
   const handleImageSelect = async () => {
@@ -1255,13 +1232,17 @@ const handleWheel = (e) => {
               />
             )}
 
-            <div 
-              className="profile-image-container" 
-              ref={containerRef}
-              onWheel={handleWheel}
-              onMouseDown={handleMouseDown}
-              style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
-            >
+              <div 
+                className="profile-image-container" 
+                ref={containerRef}
+                style={{ 
+                  cursor: isDragging ? 'grabbing' : 'grab',
+                  position: 'relative',
+                  overflow: 'hidden',
+                  width: '100%',
+                  height: '400px' // o el tamaño que prefieras
+                }}
+              >
               {originalImage ? (
                 <>
                   <img

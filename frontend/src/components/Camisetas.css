@@ -340,6 +340,8 @@
   max-height: none;
   transform-origin: center;
   will-change: transform;
+  pointer-events: none;
+  -webkit-user-drag: none;
 }
 
 .profile-image-wrapper {
@@ -1067,6 +1069,8 @@
 
   .profile-image-container {
     height: 300px;
+    touch-action: none;
+    user-select: none;
   }
 
   .btn {

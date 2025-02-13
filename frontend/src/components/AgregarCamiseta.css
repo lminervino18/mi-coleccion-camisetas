@@ -280,6 +280,7 @@
 
 .image-container:active {
   cursor: grabbing;
+  touch-action: none;
 }
 
 .original-image {
@@ -428,6 +429,23 @@
 
 .camiseta-form input:disabled::placeholder {
   color: #4a4a4a;
+}
+
+.input-group {
+  position: relative;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.form-input.error {
+  border-color: #ff4444;
+}
+
+.error-message {
+  color: #ff4444;
+  font-size: 0.8rem;
+  margin-top: 0.2rem;
+  display: block;
 }
 
 @media (max-width: 900px) {
