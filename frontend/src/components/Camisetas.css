@@ -1,3 +1,8 @@
+:root {
+  --transition-speed: 0.3s;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 /* Layout Principal */
 .camisetas-container {
   padding: 20px;
@@ -16,17 +21,25 @@
 .top-bar {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start; /* Cambiado de center a flex-start */
   width: 80%;
   margin-bottom: 20px;
   padding: 15px 25px;
   border-radius: 8px;
-  height: 70px;
+  min-height: 70px; /* Cambiado de height fijo a min-height */
   background-color: rgba(0, 0, 0, 0.8);
 }
 
 /* Búsqueda y Botón Agregar */
 .search-container {
+  display: flex;
+  flex-direction: column; /* Cambiado a column */
+  gap: 15px;
+  flex: 1; /* Añadido para que tome el espacio disponible */
+}
+
+/* Nueva clase para los controles de búsqueda */
+.search-controls {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -1076,6 +1089,45 @@
   transform: translateY(0);
 }
 
+
+/* Botones de filtro rápido */
+.filter-type-button {
+  padding: 8px 16px;
+  background-color: rgba(87, 85, 85, 0.2);
+  color: #666060;
+  border: 1px solid #666;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-timing);
+  white-space: nowrap;
+  font-size: 0.9rem;
+}
+
+.filter-type-button:hover {
+  background-color: rgba(87, 85, 85, 0.3);
+  color: #e0e0e0;
+  transform: translateY(-1px);
+}
+
+/* Estado activo para los botones */
+.filter-type-button.active {
+  background-color: #c6c8ca;
+  border-color: #575a5e;
+  color: black;
+}
+
+.filter-type-button.active:hover {
+  background-color: #676b6e;
+  border-color: #e4e8ec;
+  color: white;
+}
+
+/* Animación al hacer click */
+.filter-type-button:active {
+  transform: translateY(1px);
+}
+
+
 /* Media Queries */
 @media (max-width: 1200px) {
   .grid-container {
@@ -1203,6 +1255,55 @@
   will-change: transform, opacity;
 }
 
+.quick-filters-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+  margin-top: 5px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: none; /* Para Firefox */
+  -ms-overflow-style: none; /* Para IE y Edge */
+}
+
+.quick-filters-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Botones de filtro rápido */
+.quick-filter-button {
+  padding: 6px 12px;
+  background-color: rgba(87, 85, 85, 0.2);
+  color: #666060;
+  border: 1px solid #666;
+  border-radius: 15px;
+  cursor: pointer;
+  transition: all var(--transition-speed) var(--transition-timing);
+  white-space: nowrap;
+  font-size: 0.85rem;
+  min-height: 28px;
+}
+
+.quick-filter-button:hover {
+  background-color: rgba(87, 85, 85, 0.3);
+  color: #e0e0e0;
+  transform: translateY(-1px);
+}
+
+.quick-filter-button.active {
+  background-color: #c6c8ca;
+  border-color: #575a5e;
+  color: black;
+}
+
+.quick-filter-button.active:hover {
+  background-color: #676b6e;
+  border-color: #e4e8ec;
+  color: white;
+}
+
 /* Ajustes para animaciones suaves en dispositivos móviles */
 @media (prefers-reduced-motion: reduce) {
   *,
@@ -1212,6 +1313,27 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Ajustes responsivos */
+@media (max-width: 768px) {
+  .top-bar {
+    padding: 12px 15px;
+  }
+
+  .search-container {
+    gap: 10px;
+  }
+
+  .quick-filters-container {
+    padding-top: 8px;
+    gap: 6px;
+  }
+
+  .quick-filter-button {
+    padding: 4px 10px;
+    font-size: 0.8rem;
   }
 }
 

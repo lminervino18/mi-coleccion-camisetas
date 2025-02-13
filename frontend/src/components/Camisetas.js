@@ -59,6 +59,21 @@ const CamisetaItem = React.memo(({
 CamisetaItem.displayName = 'CamisetaItem';
 function Camisetas() {
 
+
+
+   // Funciones para manejar el localStorage
+   const saveToLocalStorage = (key, value) => {
+    const usuarioId = localStorage.getItem('usuarioId');
+    localStorage.setItem(`${key}_${usuarioId}`, JSON.stringify(value));
+  };
+
+    const getFromLocalStorage = (key) => {
+      const usuarioId = localStorage.getItem('usuarioId');
+      const value = localStorage.getItem(`${key}_${usuarioId}`);
+      return value ? JSON.parse(value) : null;
+    };
+
+
   const [imagePosition, setImagePosition] = useState({ x: 0, y: 0 });
   const [camisetas, setCamisetas] = useState([]);
   const [filteredCamisetas, setFilteredCamisetas] = useState([]);
@@ -77,17 +92,21 @@ function Camisetas() {
   const [zoom, setZoom] = useState(1);
   const [isDragging, setIsDragging] = useState(false);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
-  const [activeFilters, setActiveFilters] = useState({
-    talle: [],
-    dorsal: null,
-    colores: [],
-    temporada: [],
-    pais: [],
-    club: [],
-    numeroEquipacion: []
-  });
-  const [sortBy, setSortBy] = useState(null);
-  const [sortDirection, setSortDirection] = useState('asc');
+  const [activeFilters, setActiveFilters] = useState(() => 
+    getFromLocalStorage('activeFilters') || {
+      talle: [],
+      dorsal: null,
+      colores: [],
+      temporada: [],
+      pais: [],
+      club: [],
+      numeroEquipacion: []
+    }
+  );
+  
+  const [sortBy, setSortBy] = useState(() => getFromLocalStorage('sortBy') || null);
+  const [sortDirection, setSortDirection] = useState(() => getFromLocalStorage('sortDirection') || 'asc');
+  const [quickFilter, setQuickFilter] = useState(() => getFromLocalStorage('quickFilter') || null);
   const [availableClubs, setAvailableClubs] = useState([]);
   const [availablePaises, setAvailablePaises] = useState([]);
   const [selectedClub, setSelectedClub] = useState('');
@@ -105,6 +124,9 @@ function Camisetas() {
   const [password, setPassword] = useState('');
   const imageRef = useRef(null);
   const containerRef = useRef(null);
+  const [tipoCamisetaFilter, setTipoCamisetaFilter] = useState(null);
+  const [ligaFilter, setLigaFilter] = useState(null);
+  const [availableLigas, setAvailableLigas] = useState([]);
   const navigate = useNavigate();
 
   const SELECTOR_SIZE = 200;
@@ -118,6 +140,9 @@ function Camisetas() {
     'Titular', 'Suplente', 'Tercera', 'Arquero',
     'Arquero Suplente', 'Arquero Tercera', 'Entrenamiento', 'Edición especial', 'Otra'
   ];
+
+
+     
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -228,6 +253,51 @@ function Camisetas() {
   }, [showProfileModal, imagePosition, zoom]);
 
   
+    // Agrega este useEffect para obtener las ligas únicas
+    useEffect(() => {
+      const ligas = [...new Set(camisetas.map(c => c.liga))].sort();
+      setAvailableLigas(ligas);
+    }, [camisetas]);
+
+
+    useEffect(() => {
+      saveToLocalStorage('activeFilters', activeFilters);
+    }, [activeFilters]);
+    
+    useEffect(() => {
+      saveToLocalStorage('sortBy', sortBy);
+    }, [sortBy]);
+    
+    useEffect(() => {
+      saveToLocalStorage('sortDirection', sortDirection);
+    }, [sortDirection]);
+    
+    useEffect(() => {
+      saveToLocalStorage('quickFilter', quickFilter);
+    }, [quickFilter]);
+
+    // Agrega esta función para manejar el filtrado por tipo y liga
+    const handleFilterButtonClick = (tipo, liga = null) => {
+      if (tipo) {
+        setTipoCamisetaFilter(tipoCamisetaFilter === tipo ? null : tipo);
+        setLigaFilter(null);
+      } else if (liga) {
+        setLigaFilter(ligaFilter === liga ? null : liga);
+        setTipoCamisetaFilter(null);
+      }
+    };
+
+    // Modifica el filtrado de camisetas para incluir estos nuevos filtros
+    const filteredCamisetasWithType = filteredCamisetas.filter(camiseta => {
+      if (tipoCamisetaFilter) {
+        return camiseta.tipoDeCamiseta === tipoCamisetaFilter;
+      }
+      if (ligaFilter) {
+        return camiseta.liga === ligaFilter;
+      }
+      return true;
+    });
+
   const handleFilterChange = (filterType, value, isChecked = null) => {
     setActiveFilters(prev => {
       const newFilters = { ...prev };
@@ -246,6 +316,14 @@ function Camisetas() {
       
       return newFilters;
     });
+  };
+
+  const handleQuickFilterClick = (filter) => {
+    if (quickFilter === filter) {
+      setQuickFilter(null);
+    } else {
+      setQuickFilter(filter);
+    }
   };
 
   const removeFilter = (filterType, value) => {
@@ -273,6 +351,8 @@ function Camisetas() {
   };
 
   const clearFilters = () => {
+    const usuarioId = localStorage.getItem('usuarioId');
+    
     setActiveFilters({
       talle: [],
       dorsal: null,
@@ -282,14 +362,43 @@ function Camisetas() {
       club: [],
       numeroEquipacion: []
     });
+    
+    localStorage.removeItem(`activeFilters_${usuarioId}`);
+    
     setSelectedClub('');
     setSelectedPais('');
     setSelectedColor('');
     setSelectedEquipacion('');
   };
 
+  const clearAllFilters = () => {
+    const usuarioId = localStorage.getItem('usuarioId');
+    
+    clearFilters();
+    setQuickFilter(null);
+    setSortBy(null);
+    setSortDirection('asc');
+    
+    localStorage.removeItem(`quickFilter_${usuarioId}`);
+    localStorage.removeItem(`sortBy_${usuarioId}`);
+    localStorage.removeItem(`sortDirection_${usuarioId}`);
+  };
+
   const applyFilters = () => {
     let filtered = [...camisetas];
+
+    if (quickFilter) {
+      if (quickFilter === 'Club' || quickFilter === 'Seleccion') {
+        filtered = filtered.filter(camiseta => 
+          camiseta.tipoDeCamiseta === quickFilter
+        );
+      } else {
+        filtered = filtered.filter(camiseta => 
+          camiseta.liga === quickFilter
+        );
+      }
+    }
+
 
     if (activeFilters.talle.length > 0) {
       filtered = filtered.filter(camiseta => 
@@ -562,17 +671,19 @@ useEffect(() => {
   const confirmLogout = () => {
     const usuarioId = localStorage.getItem('usuarioId');
     
-    // Limpiar el customOrder del usuario actual
-    if (usuarioId) {
-        localStorage.removeItem(`customOrder_${usuarioId}`);
-    }
+    // Limpiar filtros y ordenamiento
+    localStorage.removeItem(`activeFilters_${usuarioId}`);
+    localStorage.removeItem(`quickFilter_${usuarioId}`);
+    localStorage.removeItem(`sortBy_${usuarioId}`);
+    localStorage.removeItem(`sortDirection_${usuarioId}`);
+    localStorage.removeItem(`customOrder_${usuarioId}`);
     
     // Limpiar token y usuarioId
     localStorage.removeItem('token');
     localStorage.removeItem('usuarioId');
     
     navigate('/login');
-};
+  };
 
   const handleAgregarCamiseta = (nuevaCamiseta) => {
     setCamisetas(prev => [...prev, nuevaCamiseta]);
@@ -633,34 +744,60 @@ useEffect(() => {
   return (
     <div className="camisetas-container">
       <div className="top-bar">
-        <div className="search-container">
-          <input
-            type="text"
-            placeholder="Buscar camisetas..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-          />
-          <button 
-          className={`filter-button ${Object.values(activeFilters).some(filter => 
-            Array.isArray(filter) ? filter.length > 0 : filter !== null
-          ) ? 'active' : ''}`} 
-          onClick={() => setShowFilters(true)} 
-          title="Filtrar"
+      <div className="search-container">
+    <div className="search-controls">
+      <input
+        type="text"
+        placeholder="Buscar camisetas..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+      />
+      <button 
+        className={`filter-button ${Object.values(activeFilters).some(filter => 
+          Array.isArray(filter) ? filter.length > 0 : filter !== null
+        ) ? 'active' : ''}`} 
+        onClick={() => setShowFilters(true)} 
+        title="Filtrar"
+      >
+        <FontAwesomeIcon icon={faFilter} />
+      </button>
+      <button 
+        className={`sort-button ${sortBy ? 'active' : ''}`} 
+        onClick={() => setShowSort(true)} 
+        title="Ordenar"
+      >
+        <FontAwesomeIcon icon={faSort} />
+      </button>
+      <button className="add-button" onClick={() => setShowForm(true)} title="Agregar camiseta">
+        +
+      </button>
+    </div>
+    
+    <div className="quick-filters-container">
+      <button 
+        className={`quick-filter-button ${quickFilter === 'Club' ? 'active' : ''}`}
+        onClick={() => handleQuickFilterClick('Club')}
+      >
+        Club
+      </button>
+      <button 
+        className={`quick-filter-button ${quickFilter === 'Seleccion' ? 'active' : ''}`}
+        onClick={() => handleQuickFilterClick('Seleccion')}
+      >
+        Selección
+      </button>
+      {availableLigas.filter(liga => liga).map(liga => (
+        <button
+          key={liga}
+          className={`quick-filter-button ${quickFilter === liga ? 'active' : ''}`}
+          onClick={() => handleQuickFilterClick(liga)}
         >
-          <FontAwesomeIcon icon={faFilter} />
+          {liga}
         </button>
+      ))}
+    </div>
+  </div>
 
-        <button 
-          className={`sort-button ${sortBy ? 'active' : ''}`} 
-          onClick={() => setShowSort(true)} 
-          title="Ordenar"
-        >
-          <FontAwesomeIcon icon={faSort} />
-        </button>
-          <button className="add-button" onClick={() => setShowForm(true)} title="Agregar camiseta">
-            +
-          </button>
-        </div>
         <div className="user-profile">
           <span className="username">{userData?.username}</span>
           <div className="profile-photo-container">
@@ -702,7 +839,6 @@ useEffect(() => {
           />
         </div>
       </div>
-
       {showFilters && (
         <div 
           className="modal-overlay"
@@ -1387,6 +1523,7 @@ useEffect(() => {
               )}
             </div>
           </div>
+          
         </div>
       )}
 
@@ -1397,6 +1534,13 @@ useEffect(() => {
           {filteredCamisetas
           .filter((camiseta) => {
             const searchTerm = search.toLowerCase();
+            if (quickFilter) {
+              if (quickFilter === 'Club' || quickFilter === 'Seleccion') {
+                if (camiseta.tipoDeCamiseta !== quickFilter) return false;
+              } else if (camiseta.liga !== quickFilter) {
+                return false;
+              }
+            }
             return (
               camiseta.club.toLowerCase().includes(searchTerm) ||
               camiseta.pais.toLowerCase().includes(searchTerm) ||
