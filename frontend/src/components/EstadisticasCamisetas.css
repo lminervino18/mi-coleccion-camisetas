@@ -1,0 +1,239 @@
+.estadisticas-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    background-image: url("../assets/background.jpg");
+    background-size: cover;
+    background-position: center;
+    overflow-y: auto;
+  }
+  
+  .estadisticas-container {
+    background-color: rgba(0, 0, 0, 0.85);
+    padding: 20px;
+    min-height: 100vh;
+    color: white;
+  }
+  
+  .estadisticas-header {
+    max-width: 1400px;
+    margin: 0 auto 20px;
+    padding: 0 20px;
+    display: flex;
+    align-items: center;
+  }
+  
+  .estadisticas-header h1 {
+    flex-grow: 1;
+    text-align: center;
+    font-size: 2.5rem;
+    margin: 20px 0;
+    background-color: rgba(87, 85, 85, 0.2);
+    border: 1px solid #666;
+    border-radius: 10px;
+    padding: 10px;
+  }
+  
+  .btn-back {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    min-width: 100px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background-color: #444;
+    margin-right: 20px;
+  }
+  
+  .btn-back:hover {
+    background-color: #555;
+  }
+  
+  .total-camisetas {
+    background-color: rgba(87, 85, 85, 0.2);
+    border: 1px solid #666;
+    border-radius: 10px;
+    padding: 20px;
+    margin: 0 auto 30px;
+    max-width: 1400px;
+    text-align: center;
+  }
+  
+  .total-camisetas h2 {
+    margin: 0;
+    font-size: 2rem;
+    color: white;
+  }
+  
+  .estadisticas-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .chart-section {
+    background-color: rgba(87, 85, 85, 0.2);
+    border: 1px solid #666;
+    border-radius: 10px;
+    padding: 20px;
+  }
+  
+  .chart-section h3 {
+    color: white;
+    text-align: center;
+    margin: 0 0 20px 0;
+    font-size: 1.5rem;
+  }
+  
+  .custom-tooltip {
+    background-color: rgba(0, 0, 0, 0.8);
+    border: 1px solid #666;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+  }
+  
+  .color-matrix {
+    width: 100%;
+    overflow-x: auto;
+    padding: 20px 0;
+  }
+  
+  .matrix-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 4px;
+  }
+  
+  .matrix-label {
+    width: 120px;
+    text-align: right;
+    padding-right: 15px;
+    font-size: 0.9rem;
+    color: white;
+  }
+  
+  .matrix-cells {
+    display: flex;
+    gap: 4px;
+  }
+  
+  .matrix-cell {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+  }
+  
+  /* Estados de carga y error */
+  .estadisticas-loading,
+  .estadisticas-error {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    color: white;
+    font-size: 1.2rem;
+    background-color: rgba(0, 0, 0, 0.9);
+    background-image: url("../assets/background.jpg");
+    background-size: cover;
+    background-position: center;
+    gap: 20px;
+  }
+  
+  /* Estilos para los gráficos de Recharts */
+  .recharts-wrapper {
+    margin: 0 auto;
+  }
+  
+  .recharts-default-tooltip {
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid #666 !important;
+    border-radius: 5px;
+  }
+  
+  .recharts-tooltip-label,
+  .recharts-tooltip-item {
+    color: white !important;
+  }
+  
+  .recharts-legend-item-text {
+    color: white !important;
+  }
+  
+  .recharts-cartesian-axis-tick-value {
+    fill: white !important;
+  }
+  
+  /* Media Queries */
+  @media (max-width: 1024px) {
+    .estadisticas-container {
+      padding: 10px;
+    }
+  
+    .chart-section {
+      padding: 15px;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .estadisticas-header h1 {
+      font-size: 2rem;
+    }
+  
+    .total-camisetas h2 {
+      font-size: 1.5rem;
+    }
+  
+    .chart-section h3 {
+      font-size: 1.2rem;
+    }
+  
+    .matrix-cell {
+      width: 30px;
+      height: 30px;
+      font-size: 0.7rem;
+    }
+  
+    .matrix-label {
+      width: 100px;
+      font-size: 0.8rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .estadisticas-header {
+      flex-direction: column;
+      gap: 15px;
+    }
+  
+    .btn-back {
+      width: 100%;
+      margin-right: 0;
+    }
+  
+    .estadisticas-header h1 {
+      font-size: 1.8rem;
+    }
+  
+    .chart-section {
+      padding: 10px;
+    }
+  }

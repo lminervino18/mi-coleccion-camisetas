@@ -10,6 +10,7 @@ import {
 import Login from './components/Login';
 import Camisetas from './components/Camisetas';
 import DetalleCamiseta from './components/DetalleCamiseta';
+import EstadisticasCamisetas from './components/EstadisticasCamisetas'; // Nueva importación
 
 // Componente de transición simple usando React.memo para evitar re-renders innecesarios
 const PageTransition = React.memo(({ children }) => {
@@ -108,6 +109,20 @@ function App() {
               isLoggedIn ? (
                 <PageTransition>
                   <DetalleCamiseta />
+                </PageTransition>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+
+          {/* Nueva ruta para EstadisticasCamisetas */}
+          <Route 
+            path="/estadisticas-camisetas" 
+            element={
+              isLoggedIn ? (
+                <PageTransition>
+                  <EstadisticasCamisetas />
                 </PageTransition>
               ) : (
                 <Navigate to="/login" replace />

@@ -11,7 +11,8 @@ import {
   faSortAmountUp, 
   faSortAmountDown,
   faArrowLeft,
-  faExclamation  
+  faExclamation,
+  faChartSimple  // Añade este ícono
 } from '@fortawesome/free-solid-svg-icons';
 
 // Componente para cada camiseta individual
@@ -798,46 +799,55 @@ useEffect(() => {
     </div>
   </div>
 
-        <div className="user-profile">
-          <span className="username">{userData?.username}</span>
-          <div className="profile-photo-container">
-            <div 
-              className="profile-photo" 
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-            >
-              {userData?.fotoDePerfil ? (
-                <img src={userData.fotoDePerfil} alt="Perfil" />
-              ) : (
-                <div className="initials">
-                  {userData?.username && getInitials(userData.username)}
-                </div>
-              )}
+      <div className="user-profile">
+      <span className="username">{userData?.username}</span>
+      <div className="profile-photo-container">
+        <div 
+          className="profile-photo" 
+          onClick={() => setShowProfileMenu(!showProfileMenu)}
+        >
+          {userData?.fotoDePerfil ? (
+            <img src={userData.fotoDePerfil} alt="Perfil" />
+          ) : (
+            <div className="initials">
+              {userData?.username && getInitials(userData.username)}
             </div>
-            
-            {showProfileMenu && (
-              <div className="profile-menu">
-              <button onClick={() => {
-                setShowProfileModal(true);
-                setShowProfileMenu(false);
-              }}>
-                Cambiar foto
-              </button>
-              <button onClick={() => {
-                setShowDeleteConfirm(true);
-                setShowProfileMenu(false);
-              }}>
-                Eliminar cuenta
-              </button>
-            </div>
-            )}
-          </div>
-          <FontAwesomeIcon 
-            icon={faSignOutAlt} 
-            className="logout-icon"
-            onClick={handleLogout}
-            title="Cerrar sesión"
-          />
+          )}
         </div>
+        
+        {showProfileMenu && (
+          <div className="profile-menu">
+            <button onClick={() => {
+              setShowProfileModal(true);
+              setShowProfileMenu(false);
+            }}>
+              Cambiar foto
+            </button>
+            <button onClick={() => {
+              setShowDeleteConfirm(true);
+              setShowProfileMenu(false);
+            }}>
+              Eliminar cuenta
+            </button>
+          </div>
+        )}
+      </div>
+      
+      {/* Nuevo botón de estadísticas */}
+      <FontAwesomeIcon 
+        icon={faChartSimple} 
+        className="stats-icon"
+        onClick={() => navigate('/estadisticas-camisetas')}
+        title="Estadísticas"
+      />
+      
+      <FontAwesomeIcon 
+        icon={faSignOutAlt} 
+        className="logout-icon"
+        onClick={handleLogout}
+        title="Cerrar sesión"
+      />
+    </div>
       </div>
       {showFilters && (
         <div 
