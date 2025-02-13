@@ -318,7 +318,7 @@
 .profile-image-container {
   position: relative;
   width: 100%;
-  height: 400px;
+  height: 200px;
   background-color: rgba(0, 0, 0, 0.6);
   overflow: hidden;
   display: flex;
@@ -327,6 +327,7 @@
   cursor: none;
   flex: none;
   user-select: none;
+  cursor: default;
 }
 
 .profile-image-container.dragging {
@@ -841,9 +842,15 @@
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.apply-sort-btn {
-  background-color: #525355;
-  color: white;
+.sort-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 15px;
+  gap: 10px;
+}
+
+.apply-sort-btn,
+.clear-sort-btn {
   padding: 12px 20px;
   border-radius: 8px;
   border: none;
@@ -853,11 +860,32 @@
   width: 45%;
 }
 
+.apply-sort-btn {
+  background-color: #007bff;
+  color: white;
+}
+
 .apply-sort-btn:hover {
-  background-color: #e7ebf0;
+  background-color: #0056b3;
   transform: translateY(-1px);
 }
 
+.apply-sort-btn:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.clear-sort-btn {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  color: #212529;
+}
+
+.clear-sort-btn:hover {
+  background-color: #e2e6ea;
+  transform: translateY(-1px);
+}
 /* Estado activo para filtros y ordenamiento */
 .has-active-filters .apply-btn,
 .has-active-sort .apply-sort-btn {

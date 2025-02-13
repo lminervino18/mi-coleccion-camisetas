@@ -350,13 +350,25 @@ function Camisetas() {
       sorted.sort((a, b) => {
         let comparison = 0;
         
+        // Función auxiliar para comparar considerando null
+        const compareWithNull = (valA, valB) => {
+          if (valA === null && valB === null) return 0;
+          if (valA === null) return 1; // B es más pequeño (viene primero)
+          if (valB === null) return -1; // A es más pequeño (viene primero)
+          return 0; // Continuar con la comparación normal
+        };
+
         switch (tempSortBy) {
           case 'talle':
             const talleOrder = { 'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5, 'XXL': 6, 'Otro': 7 };
+            const nullCheck = compareWithNull(a.talle, b.talle);
+            if (nullCheck !== 0) return nullCheck;
             comparison = talleOrder[a.talle] - talleOrder[b.talle];
             break;
           
           case 'temporada':
+            const nullCheckTemp = compareWithNull(a.temporada, b.temporada);
+            if (nullCheckTemp !== 0) return nullCheckTemp;
             const getYear = (temp) => {
               const year = temp.split('/')[0];
               return parseInt(year);
@@ -364,11 +376,18 @@ function Camisetas() {
             comparison = getYear(a.temporada) - getYear(b.temporada);
             break;
           
+          case 'liga':
+            const nullCheckLiga = compareWithNull(a.liga, b.liga);
+            if (nullCheckLiga !== 0) return nullCheckLiga;
+            comparison = a.liga.localeCompare(b.liga);
+            break;
+
           default:
             if (tempSortBy === null) {
-              // Restaurar el orden original o personalizado
               return customOrder.indexOf(a.id) - customOrder.indexOf(b.id);
             }
+            const nullCheckDefault = compareWithNull(a[tempSortBy], b[tempSortBy]);
+            if (nullCheckDefault !== 0) return nullCheckDefault;
             comparison = a[tempSortBy].localeCompare(b[tempSortBy]);
         }
         
@@ -378,7 +397,7 @@ function Camisetas() {
   
     setFilteredCamisetas(sorted);
     setShowSort(false);
-  };
+};
 
   const handleCamisetaMouseDown = (e, camisetaId) => {
     e.preventDefault();
@@ -541,10 +560,19 @@ useEffect(() => {
   };
 
   const confirmLogout = () => {
+    const usuarioId = localStorage.getItem('usuarioId');
+    
+    // Limpiar el customOrder del usuario actual
+    if (usuarioId) {
+        localStorage.removeItem(`customOrder_${usuarioId}`);
+    }
+    
+    // Limpiar token y usuarioId
     localStorage.removeItem('token');
     localStorage.removeItem('usuarioId');
+    
     navigate('/login');
-  };
+};
 
   const handleAgregarCamiseta = (nuevaCamiseta) => {
     setCamisetas(prev => [...prev, nuevaCamiseta]);
@@ -1050,32 +1078,27 @@ useEffect(() => {
             </div>
 
             <div className="sort-options">
-              {[
-                { value: null, label: 'Sin ordenamiento' }, // Opción para quitar el ordenamiento
-                { value: 'club', label: 'Club' },
-                { value: 'pais', label: 'País' },
-                { value: 'talle', label: 'Talle' },
-                { value: 'temporada', label: 'Temporada' }
-              ].map(option => (
-                <label 
-                  key={option.value || 'none'} 
-                  className={`sort-option ${tempSortBy === option.value ? 'active' : ''}`}
-                >
-                  <input
-                    type="radio"
-                    name="sort"
-                    checked={tempSortBy === option.value}
-                    onChange={() => {
-                      handleSortChange(option.value);
-                      if (option.value === null) {
-                        setTempSortDirection('asc');
-                      }
-                    }}
-                  />
-                  {option.label}
-                </label>
-              ))}
-            </div>
+            {[
+              { value: 'club', label: 'Club' },
+              { value: 'pais', label: 'País' },
+              { value: 'liga', label: 'Liga' },
+              { value: 'talle', label: 'Talle' },
+              { value: 'temporada', label: 'Temporada' }
+            ].map(option => (
+              <label 
+                key={option.value} 
+                className={`sort-option ${tempSortBy === option.value ? 'active' : ''}`}
+              >
+                <input
+                  type="radio"
+                  name="sort"
+                  checked={tempSortBy === option.value}
+                  onChange={() => handleSortChange(option.value)}
+                />
+                {option.label}
+              </label>
+            ))}
+          </div>
 
             {tempSortBy && tempSortBy !== null && (
               <div className="sort-direction">
@@ -1096,10 +1119,30 @@ useEffect(() => {
 
             <div className="sort-footer">
               <button 
-                className={`apply-sort-btn ${tempSortBy ? 'active' : ''}`}
+                className="apply-sort-btn"
                 onClick={applySort}
+                disabled={!tempSortBy}
               >
-                {tempSortBy === null ? 'Quitar ordenamiento' : 'Aplicar ordenamiento'}
+                Aplicar ordenamiento
+              </button>
+              <button 
+                className="clear-sort-btn"
+                onClick={() => {
+                  setTempSortBy(null);
+                  setTempSortDirection('asc');
+                  setSortBy(null);
+                  setSortDirection('asc');
+                  
+                  // Restaurar el orden personalizado
+                  const reorderedCamisetas = [...filteredCamisetas].sort((a, b) => {
+                    return customOrder.indexOf(a.id) - customOrder.indexOf(b.id);
+                  });
+                  
+                  setFilteredCamisetas(reorderedCamisetas);
+                  setShowSort(false);
+                }}
+              >
+                Limpiar ordenamiento
               </button>
             </div>
           </div>
@@ -1235,13 +1278,6 @@ useEffect(() => {
               <div 
                 className="profile-image-container" 
                 ref={containerRef}
-                style={{ 
-                  cursor: isDragging ? 'grabbing' : 'grab',
-                  position: 'relative',
-                  overflow: 'hidden',
-                  width: '100%',
-                  height: '400px' // o el tamaño que prefieras
-                }}
               >
               {originalImage ? (
                 <>

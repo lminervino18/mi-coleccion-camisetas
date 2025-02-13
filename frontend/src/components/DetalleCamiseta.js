@@ -160,48 +160,48 @@ function DetalleCamiseta() {
           </div>
 
           <div className="detalle-info">
-            <div className="info-section">
-              <div className="info-item">
-                <span className="info-label">Tipo:</span>
-                <span className="info-value">{camiseta.tipoDeCamiseta}</span>
-              </div>
-              {camiseta.tipoDeCamiseta === 'Club' && (
-                <>
-                  <div className="info-item">
-                    <span className="info-label">Club:</span>
-                    <span className="info-value">{camiseta.club}</span>
-                  </div>
-                  <div className="info-item">
-                    <span className="info-label">Liga:</span>
-                    <span className="info-value">{camiseta.liga || 'No especificada'}</span>
-                  </div>
-                </>
-              )}
-              <div className="info-item">
-                <span className="info-label">País:</span>
-                <span className="info-value">{camiseta.pais}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Equipación:</span>
-                <span className="info-value">{camiseta.numeroEquipacion}</span>
-              </div>
-              <div className="info-item">
-                <span className="info-label">Talle:</span>
-                <span className="info-value">{camiseta.talle}</span>
-              </div>
-              {camiseta.nombre && (
-                <div className="info-item">
-                  <span className="info-label">Nombre:</span>
-                  <span className="info-value">{camiseta.nombre}</span>
-                </div>
-              )}
-              {camiseta.dorsal && (
-                <div className="info-item">
-                  <span className="info-label">Dorsal:</span>
-                  <span className="info-value">{camiseta.dorsal}</span>
-                </div>
-              )}
+          <div className="info-section">
+            <div className="info-item">
+              <span className="info-label">Tipo:</span>
+              <span className="info-value">{camiseta.tipoDeCamiseta}</span>
             </div>
+            <div className="info-item">
+              <span className="info-label">País:</span>
+              <span className="info-value">{camiseta.pais}</span>
+            </div>
+            {camiseta.tipoDeCamiseta === 'Club' && (
+              <div className="info-item">
+                <span className="info-label">Club:</span>
+                <span className="info-value">{camiseta.club}</span>
+              </div>
+            )}
+            {camiseta.liga && (
+              <div className="info-item">
+                <span className="info-label">Liga:</span>
+                <span className="info-value">{camiseta.liga}</span>
+              </div>
+            )}
+            <div className="info-item">
+              <span className="info-label">Equipación:</span>
+              <span className="info-value">{camiseta.numeroEquipacion}</span>
+            </div>
+            <div className="info-item">
+              <span className="info-label">Talle:</span>
+              <span className="info-value">{camiseta.talle}</span>
+            </div>
+            {camiseta.nombre && (
+              <div className="info-item">
+                <span className="info-label">Nombre:</span>
+                <span className="info-value">{camiseta.nombre}</span>
+              </div>
+            )}
+            {camiseta.dorsal && (
+              <div className="info-item">
+                <span className="info-label">Dorsal:</span>
+                <span className="info-value">{camiseta.dorsal}</span>
+              </div>
+            )}
+          </div>
 
             {camiseta.colores && camiseta.colores.length > 0 && (
               <div className="colores-section">

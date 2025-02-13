@@ -149,21 +149,20 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       return;
     }
 
-    // Intentar registrar al usuario
     try {
-      const response = await fetch("http://localhost:8080/api/usuarios", {
+      // Primero registramos al usuario
+      const registerResponse = await fetch("http://localhost:8080/api/usuarios", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
           password: formData.password,
-          role: "USER", // Asegúrate de enviar el rol si es requerido
+          role: "USER",
         }),
       });
 
-      if (response.status === 409) {
-        // Si el usuario ya existe, mostramos el error en el formulario
+      if (registerResponse.status === 409) {
         setErrors((prev) => ({
           ...prev,
           userExists: "El usuario ya esta registrado",
@@ -172,18 +171,44 @@ function RegisterForm({ onClose, onNavigateToHome }) {
         return;
       }
 
-      if (!response.ok) {
+      if (!registerResponse.ok) {
         throw new Error("Error en el registro");
       }
 
-      setSuccessMessage(true); // Mostrar mensaje de éxito
+      // Si el registro fue exitoso, hacemos login automáticamente
+      const loginResponse = await fetch('http://localhost:8080/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+
+      if (loginResponse.ok) {
+        const loginData = await loginResponse.json();
+        
+        // Limpiar localStorage antes de guardar nuevos datos
+        localStorage.clear();
+        
+        // Guardar token y usuarioId
+        localStorage.setItem('token', loginData.token);
+        localStorage.setItem('usuarioId', loginData.usuarioId.toString());
+        
+        // Redirigir directamente a camisetas
+        window.location.href = '/camisetas';
+      } else {
+        // Si hay error en el login, mostrar mensaje de éxito y redirigir al login
+        setSuccessMessage(true);
+      }
+
     } catch (error) {
       setErrors((prev) => ({
         ...prev,
         userExists: "Hubo un error al intentar registrar el usuario",
       }));
     }
-  };
+};
 
   const handleNavigateHome = () => {
     setSuccessMessage(false);

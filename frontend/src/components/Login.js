@@ -10,14 +10,23 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Solo limpiar si no hay un token válido
-    const token = localStorage.getItem('token');
-    if (!token) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('usuarioId');
-    }
-}, [navigate]);
+  // En Login.js
+    useEffect(() => {
+      // Limpiar todos los datos del usuario anterior
+      const token = localStorage.getItem('token');
+      if (!token) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('usuarioId');
+          
+          // Limpiar cualquier customOrder existente
+          const keys = Object.keys(localStorage);
+          keys.forEach(key => {
+              if (key.startsWith('customOrder_')) {
+                  localStorage.removeItem(key);
+              }
+          });
+      }
+    }, [navigate]);
 
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => setShowRegister(false);
@@ -40,44 +49,48 @@ function Login() {
     }
 };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Login.js
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    try {
+  try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials),
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(credentials),
       });
 
       console.log('Status:', response.status);
 
       if (!response.ok) {
-        setError('Usuario o contraseña incorrectos');
-        return;
+          setError('Usuario o contraseña incorrectos');
+          return;
       }
 
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
 
-      // Guardar directamente token y usuarioId de la respuesta
       if (data && data.token && data.usuarioId) {
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('usuarioId', data.usuarioId.toString());
-        
-        // Agregar log para verificar que se guardó correctamente
-        console.log('Token guardado:', localStorage.getItem('token'));
-        console.log('Usuario ID guardado:', localStorage.getItem('usuarioId'));
-        
-        navigate('/camisetas');
+          // Limpiar cualquier dato anterior
+          localStorage.clear();
+          
+          // Guardar los nuevos datos
+          localStorage.setItem('token', data.token);
+          localStorage.setItem('usuarioId', data.usuarioId.toString());
+          
+          console.log('Token guardado:', localStorage.getItem('token'));
+          console.log('Usuario ID guardado:', localStorage.getItem('usuarioId'));
+          
+          // Forzar la redirección
+          window.location.href = '/camisetas';
       } else {
-        setError('Error en la respuesta del servidor');
+          setError('Error en la respuesta del servidor');
       }
 
-    } catch (error) {
+  } catch (error) {
       console.error('Error completo:', error);
       setError('Error en la conexión al servidor');
-    }
+  }
 };
 
   return (

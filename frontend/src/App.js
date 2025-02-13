@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   BrowserRouter as Router, 
   Route, 
@@ -24,7 +24,44 @@ const PageTransition = React.memo(({ children }) => {
 PageTransition.displayName = 'PageTransition';
 
 function App() {
-  const isLoggedIn = localStorage.getItem('token');
+  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+
+  useEffect(() => {
+    // Función para verificar el estado de autenticación
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      setIsLoggedIn(!!token);
+    };
+
+    // Verificar autenticación inicial
+    checkAuth();
+
+    // Escuchar cambios en localStorage
+    window.addEventListener('storage', checkAuth);
+    
+    // Crear un intervalo para verificar el token periódicamente
+    const authInterval = setInterval(checkAuth, 1000);
+
+    // Cleanup: remover event listener y limpiar intervalo
+    return () => {
+      window.removeEventListener('storage', checkAuth);
+      clearInterval(authInterval);
+    };
+  }, []);
+
+  // Función para verificar si el token es válido (opcional)
+  const isTokenValid = () => {
+    const token = localStorage.getItem('token');
+    if (!token) return false;
+
+    try {
+      // Verificar si el token ha expirado
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp > Date.now() / 1000;
+    } catch {
+      return false;
+    }
+  };
 
   return (
     <Router>
@@ -32,15 +69,23 @@ function App() {
         <Routes>
           <Route 
             path="/" 
-            element={isLoggedIn ? <Navigate to="/camisetas" /> : <Navigate to="/login" />} 
+            element={
+              isLoggedIn ? 
+                <Navigate to="/camisetas" replace /> : 
+                <Navigate to="/login" replace />
+            } 
           />
 
           <Route 
             path="/login" 
             element={
-              <PageTransition>
-                <Login />
-              </PageTransition>
+              isLoggedIn ? (
+                <Navigate to="/camisetas" replace />
+              ) : (
+                <PageTransition>
+                  <Login />
+                </PageTransition>
+              )
             } 
           />
 
@@ -52,7 +97,7 @@ function App() {
                   <Camisetas />
                 </PageTransition>
               ) : (
-                <Navigate to="/login" />
+                <Navigate to="/login" replace />
               )
             } 
           />
@@ -65,14 +110,14 @@ function App() {
                   <DetalleCamiseta />
                 </PageTransition>
               ) : (
-                <Navigate to="/login" />
+                <Navigate to="/login" replace />
               )
             } 
           />
 
           <Route 
             path="*" 
-            element={<Navigate to="/" />} 
+            element={<Navigate to="/" replace />} 
           />
         </Routes>
       </div>
