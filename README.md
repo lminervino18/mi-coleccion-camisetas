@@ -3,7 +3,7 @@
 **Mi Colección de Camisetas** es una aplicación web diseñada para gestionar un inventario personalizado de camisetas de fútbol. La plataforma permite a los usuarios almacenar y organizar su colección personal, con características como subir imágenes, añadir información detallada de cada camiseta y realizar consultas de manera eficiente.
 
 ![Imagen de ejemplo de la aplicación](./frontend/public/sample.png)
-
+![Imagen de ejemplo de la aplicación](./frontend/public/sample2.png)
 ## Tecnologías utilizadas
 
 ### Frontend
