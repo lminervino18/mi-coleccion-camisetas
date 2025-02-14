@@ -31,7 +31,7 @@
   margin-bottom: 30px;
 }
 
-.back-button {
+.estadisticas-container .back-button {
   position: absolute;
   left: 20px;
   top: 20px;
@@ -45,7 +45,7 @@
   z-index: 10;
 }
 
-.back-button:hover {
+.estadisticas-container .back-button:hover {
   background-color: rgba(87, 85, 85, 0.4);
 }
 
@@ -73,7 +73,7 @@
   width: 100%;
 }
 
-.profile-photo {
+.estadisticas-container .profile-photo {
   width: 140px;
   height: 140px;
   border-radius: 50%;

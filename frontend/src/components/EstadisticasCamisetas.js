@@ -336,7 +336,7 @@ function EstadisticasCamisetas() {
             className="back-button" 
             onClick={() => navigate('/camisetas')}
           >
-            <FontAwesomeIcon icon={faArrowLeft} /> Volver
+            <FontAwesomeIcon icon={faArrowLeft} />
           </button>
           <h1 className="estadisticas-titulo">Estadísticas de tu Colección</h1>
         </div>
