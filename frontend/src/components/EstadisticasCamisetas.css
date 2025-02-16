@@ -1,112 +1,135 @@
-/* Base */
-.estadisticas-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
-  background-image: url("../assets/background.jpg");
-  background-size: cover;
-  background-position: center;
-  overflow-y: auto;
-  padding: 15px;
-}
+/* =========================================
+   1. BASE Y LAYOUT
+   ========================================= */
+   .estadisticas-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    background-image: url("../assets/background.jpg");
+    background-size: cover;
+    background-position: center;
+    overflow-y: auto;
+    padding: 15px;
+  }
+  
+  .estadisticas-container {
+    background-color: rgba(0, 0, 0, 0.85);
+    min-height: 100vh;
+    color: #fff;
+    padding: 15px;
+    max-width: 1600px;
+    margin: 0 auto;
+    overflow: visible;
+  }
+  
+  .graficos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    perspective: 1000px;
+    min-height: 400px;
+  }
+  
+  .graficos-grid.modal-abierto {
+    opacity: 0.1;
+    pointer-events: none;
+  }
+  
+  /* =========================================
+     2. COMPONENTES PRINCIPALES
+     ========================================= */
+  .header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin-bottom: 30px;
+  }
+  
+  .back-button {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    padding: 10px 20px;
+    background-color: rgba(87, 85, 85, 0.2);
+    border: 1px solid #666;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  
+  .back-button:hover {
+    background-color: rgba(87, 85, 85, 0.4);
+    transform: translateX(-5px);
+  }
+  
+  .estadisticas-titulo {
+    font-size: 1.5rem;
+    margin: 15px 0;
+    text-align: center;
+    background-color: rgba(87, 85, 85, 0.2);
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    max-width: 800px;
+  }
+  
+  /* Perfil de Usuario */
+  .resumen-container .user-profile-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 20px 0;
+    width: 100%;
+  }
+  
+  .resumen-container
+  .profile-photo,
+  .profile-photo-placeholder {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 4px solid #666;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .profile-photo {
+    object-fit: cover;
+  }
+  
+  .profile-photo-placeholder {
+    background-color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: #fff;
+  }
+  
+  .username {
+    font-size: 1.rem;
+    margin-top: 15px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    color: #fff;
+  }
 
-.estadisticas-container {
-  background-color: rgba(0, 0, 0, 0.85);
-  min-height: 100vh;
-  color: white;
-  padding: 15px;
-  max-width: 1600px;
-  margin: 0 auto;
-}
-
-/* Header y Navegación */
-.header-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  margin-bottom: 30px;
-}
-
-.estadisticas-container .back-button {
-  position: absolute;
-  left: 20px;
-  top: 20px;
-  padding: 10px 20px;
-  background-color: rgba(87, 85, 85, 0.2);
-  border: 1px solid #666;
-  border-radius: 5px;
-  color: white;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  z-index: 10;
-}
-
-.estadisticas-container .back-button:hover {
-  background-color: rgba(87, 85, 85, 0.4);
-}
-
-.estadisticas-titulo {
-  font-size: 1.5rem;
-  color: white;
-  margin: 15px 0;
-  text-align: center;
-  background-color: rgba(87, 85, 85, 0.2);
-  border: 1px solid #666;
-  border-radius: 8px;
-  padding: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  width: 100%;
-  max-width: 800px;
-}
-
-/* Perfil de Usuario */
-.user-profile-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin: 20px 0;
-  width: 100%;
-}
-
-.estadisticas-container .profile-photo {
-  width: 140px;
-  height: 140px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 4px solid #666;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.profile-photo-placeholder {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  background-color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 4rem;
-  color: white;
-  border: 4px solid #666;
-  margin-bottom: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-}
-
-.username {
-  font-size: rem;
-  color: white;
-  margin-top: 15px;
-  font-weight: bold;
-  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-/* Resumen de Estadísticas */
+  /* =========================================
+   3. RESUMEN Y TARJETAS
+   ========================================= */
 .resumen-container {
   display: flex;
   flex-direction: column;
@@ -141,9 +164,9 @@
   display: block;
   font-size: 2.5rem;
   font-weight: bold;
-  color: #ffffff;
   margin-bottom: 10px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #fff;
 }
 
 .resumen-label {
@@ -153,66 +176,159 @@
   letter-spacing: 1px;
 }
 
-/* Grid de Gráficos */
-.graficos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 25px;
-  padding: 20px;
-  max-width: 1400px;
-  margin: 0 auto;
-  position: relative;
-}
-
-/* Estilos para las tarjetas y el hover */
+/* Tarjetas de Gráficos */
 .grafico-card {
   background-color: rgba(87, 85, 85, 0.2);
   border: 1px solid #666;
   border-radius: 8px;
   padding: 15px;
-  transition: all 0.3s ease;
   min-height: 350px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   position: relative;
   cursor: pointer;
-  z-index: 1;
+  transform-origin: center center;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.4s ease-out;
+  animation-fill-mode: both;
 }
 
 .grafico-card:hover {
   transform: scale(1.1);
   z-index: 1000;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-  background-color: rgba(40, 40, 40, 0.95);  /* Mantener el hover oscuro */
+  background-color: rgba(40, 40, 40, 0.95);
 }
 
-/* Título de la tarjeta */
 .grafico-card h2 {
-  color: #fff;
   font-size: 1rem;
   margin-bottom: 15px;
   text-align: center;
   padding-bottom: 8px;
   border-bottom: 1px solid #666;
+  color: #fff;
 }
 
-/* Textos fuera de los gráficos (leyendas, ejes) */
-.recharts-legend-item-text,
-.recharts-cartesian-axis-tick-value {
-  fill: #fff !important;
-  color: #fff !important;
+.grafico-card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
 }
 
-.recharts-legend-item-text {
-  color: #fff !important;  /* Leyenda en blanco para contrastar con el fondo oscuro */
-  font-weight: 500 !important;
+/* Animación secuencial de las tarjetas */
+.grafico-card:nth-child(1) { animation-delay: 0.1s; }
+.grafico-card:nth-child(2) { animation-delay: 0.15s; }
+.grafico-card:nth-child(3) { animation-delay: 0.2s; }
+.grafico-card:nth-child(4) { animation-delay: 0.25s; }
+.grafico-card:nth-child(5) { animation-delay: 0.3s; }
+.grafico-card:nth-child(6) { animation-delay: 0.35s; }
+
+/* =========================================
+   4. MODAL
+   ========================================= */
+   .estadisticas-camisetas-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+  }
+  
+  .estadisticas-camisetas-modal-content {
+    background-color: #1a1a1a;
+    width: 90%;
+    max-width: 1200px;
+    height: 90vh;
+    border-radius: 12px;
+    position: relative;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+/* Continuación del Modal */
+.estadisticas-camisetas-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #666;
 }
 
-.recharts-cartesian-grid-horizontal line,
-.recharts-cartesian-grid-vertical line {
-  stroke: #ccc;
-  stroke-opacity: 0.5;
+.estadisticas-camisetas-modal-header h2 {
+  color: #fff;
+  font-size: 1.8rem;
+  margin: 0;
+  text-align: center;
+  width: 100%;
 }
 
-/* Lista de Ranking */
+.estadisticas-camisetas-modal-close {
+  position: absolute;
+  right: -15px;
+  top: -15px;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: #ff4444;
+  border: 2px solid #fff;
+  color: #fff;
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2001;
+  transition: all 0.2s ease;
+}
+
+.estadisticas-camisetas-modal-close:hover {
+  background-color: #ff6666;
+  transform: scale(1.1);
+}
+
+.estadisticas-camisetas-modal-body {
+  flex: 1;
+  overflow-y: auto;
+  margin-top: 20px;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 8px;
+}
+
+.estadisticas-camisetas-modal-content-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: #1a1a1a;
+}
+
+/* =========================================
+   5. RANKINGS Y LISTAS
+   ========================================= */
+.ranking-container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.estadisticas-modal-ranking {
+  padding: 20px;
+  max-height: 70vh;
+}
+
 .lista-ranking {
   padding: 15px;
   height: 100%;
@@ -228,11 +344,11 @@
   background-color: rgba(231, 220, 220, 0.9);
   margin-bottom: 8px;
   border-radius: 6px;
-  transition: all 0.2s ease;
+  transition: all 0.3s ease;
 }
 
 .ranking-item:hover {
-  background-color: rgba(255, 255, 255, 1);
+  background-color: #fff;
   transform: translateX(5px);
 }
 
@@ -256,7 +372,38 @@
   font-size: 1.1rem;
 }
 
+/* Estilos específicos para rankings en modal */
+.estadisticas-camisetas-modal-body .lista-ranking {
+  width: 100%;
+  max-height: 100%;
+  padding: 20px;
+  background-color: #1a1a1a;
+}
 
+.estadisticas-camisetas-modal-body .ranking-item {
+  margin-bottom: 15px;
+  padding: 15px;
+  font-size: 1.2rem;
+  background-color: #fff;
+}
+
+.estadisticas-camisetas-modal-body .ranking-position {
+  font-size: 1.4rem;
+  width: 50px;
+}
+
+.estadisticas-camisetas-modal-body .ranking-name {
+  font-size: 1.2rem;
+}
+
+.estadisticas-camisetas-modal-body .ranking-value {
+  font-size: 1.4rem;
+  width: 60px;
+}
+
+/* =========================================
+   6. ELEMENTOS AUXILIARES
+   ========================================= */
 /* Tooltips */
 .custom-tooltip {
   background-color: rgba(255, 255, 255, 0.95);
@@ -270,20 +417,57 @@
   font-weight: 500;
 }
 
-/* Leyendas con fondo oscuro */
-.recharts-legend-wrapper {
-  background-color: rgba(40, 40, 40, 0.95) !important;  /* Fondo oscuro */
-  border-radius: 6px;
-  padding: 8px !important;
+/* Mensaje sin datos */
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin: auto;
+  color: #fff;
 }
 
-/* Asegurar que los números en los ejes sean negros */
-.recharts-cartesian-axis-tick-value {
-  fill: #000 !important;  /* Números en negro */
-  font-weight: 600 !important;
+.no-data-message p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
-/* Scrollbar */
+.no-data-message p:first-child {
+  font-size: 1.1rem;
+  font-weight: 500;
+  opacity: 1;
+  margin-bottom: 10px;
+}
+
+/* Estados de carga y error */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #ff6b6b;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 20px;
+}
+
+/* Scrollbar Personalizada */
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -313,22 +497,32 @@
   }
 }
 
-.grafico-card {
-  animation: fadeIn 0.4s ease-out;
-  animation-fill-mode: both;
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.grafico-card:nth-child(1) { animation-delay: 0.1s; }
-.grafico-card:nth-child(2) { animation-delay: 0.15s; }
-.grafico-card:nth-child(3) { animation-delay: 0.2s; }
-.grafico-card:nth-child(4) { animation-delay: 0.25s; }
-.grafico-card:nth-child(5) { animation-delay: 0.3s; }
-.grafico-card:nth-child(6) { animation-delay: 0.35s; }
-
-/* Media Queries */
+/* =========================================
+   7. MEDIA QUERIES
+   ========================================= */
 @media (max-width: 1400px) {
   .graficos-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .estadisticas-camisetas-modal-content {
+    width: 95vw;
+    height: 95vh;
+  }
+
+  .estadisticas-camisetas-modal-header h2 {
+    font-size: 1.6rem;
   }
 }
 
@@ -336,19 +530,35 @@
   .graficos-grid {
     grid-template-columns: 1fr;
   }
-  
+
+  .estadisticas-camisetas-modal-content {
+    width: 95vw;
+    height: 90vh;
+    padding: 20px;
+  }
+
+  .estadisticas-camisetas-modal-header h2 {
+    font-size: 1.4rem;
+  }
+
+  .estadisticas-camisetas-modal-close {
+    width: 35px;
+    height: 35px;
+    font-size: 20px;
+  }
+
   .grafico-card:hover {
     transform: scale(1.02);
   }
 
   .profile-photo,
   .profile-photo-placeholder {
-    width: 150px;
-    height: 150px;
+    width: 120px;
+    height: 120px;
   }
 
   .username {
-    font-size: 1.5rem;
+    font-size: 1.3rem;
   }
 
   .back-button {
@@ -368,5 +578,88 @@
 
   .resumen-item:last-child {
     border-bottom: none;
+  }
+
+  .resumen-numero {
+    font-size: 2rem;
+  }
+
+  .resumen-label {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .estadisticas-titulo {
+    font-size: 1.2rem;
+  }
+
+  .estadisticas-camisetas-modal-content {
+    padding: 15px;
+  }
+
+  .estadisticas-camisetas-modal-close {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    right: -10px;
+    top: -10px;
+  }
+
+  .ranking-item {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .ranking-position {
+    width: 30px;
+    font-size: 1rem;
+  }
+
+  .ranking-value {
+    width: 40px;
+    font-size: 1rem;
+  }
+
+  .graficos-grid {
+    padding: 10px;
+    gap: 15px;
+  }
+
+  .grafico-card {
+    min-height: 300px;
+    padding: 10px;
+  }
+
+  .resumen-container {
+    padding: 15px;
+  }
+
+  .resumen-item {
+    padding: 10px;
+  }
+
+  .resumen-numero {
+    font-size: 1.8rem;
+  }
+
+  .resumen-label {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .estadisticas-camisetas-modal-content {
+    padding: 10px;
+  }
+
+  .graficos-grid {
+    padding: 5px;
+    gap: 10px;
+  }
+
+  .ranking-item {
+    padding: 8px;
+    font-size: 0.8rem;
   }
 }

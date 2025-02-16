@@ -9,37 +9,64 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 
-// Nueva paleta de grises
 const COLORS = [
-  '#F8F9FA', // Casi blanco
-  '#E9ECEF',
-  '#DEE2E6',
-  '#CED4DA',
-  '#ADB5BD',
-  '#6C757D',
-  '#495057',
-  '#343A40',
-  '#212529', // Casi negro
+  '#FFB3BA', // Rosa pastel
+  '#BAFFC9', // Verde menta
+  '#BAE1FF', // Azul cielo
+  '#FFFFBA', // Amarillo pastel
+  '#FFE4BA', // Melocotón
+  '#E0BBE4', // Lavanda
+  '#957DAD', // Púrpura suave
+  '#D4A5A5', // Rosa pálido
+  '#9E8B8E'  // Gris rosado
 ];
 
-
 const RADIAN = Math.PI / 180;
-const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent, name }) => {
-  const radius = innerRadius + (outerRadius - innerRadius) * 0.5;
+
+const NoDataMessage = () => (
+  <div className="no-data-message">
+    <p>No hay datos disponibles</p>
+    <p>Agrega más camisetas a tu colección para ver las estadísticas</p>
+  </div>
+);
+
+const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, percent }) => {
+  const radius = outerRadius * 1.2;
   const x = cx + radius * Math.cos(-midAngle * RADIAN);
   const y = cy + radius * Math.sin(-midAngle * RADIAN);
 
   return (
-    <text 
-      x={x} 
-      y={y} 
-      fill="#000" // Cambiado a negro
-      textAnchor={x > cx ? 'start' : 'end'} 
-      dominantBaseline="central"
-      style={{ fontWeight: 600 }} // Añadido para mejor legibilidad
-    >
-      {`${name} (${(percent * 100).toFixed(0)}%)`}
-    </text>
+    <g>
+      <text 
+        x={x} 
+        y={y} 
+        fill="black" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        style={{ 
+          fontSize: '16px',
+          fontWeight: '700',
+          paintOrder: 'stroke',
+          strokeWidth: '3px',
+          strokeLinejoin: 'miter'
+        }}
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+      <text 
+        x={x} 
+        y={y} 
+        fill="white" 
+        textAnchor={x > cx ? 'start' : 'end'} 
+        dominantBaseline="central"
+        style={{ 
+          fontSize: '16px',
+          fontWeight: '700'
+        }}
+      >
+        {`${(percent * 100).toFixed(0)}%`}
+      </text>
+    </g>
   );
 };
 
@@ -52,6 +79,167 @@ const CustomTooltip = ({ active, payload, label }) => {
     );
   }
   return null;
+};
+
+const PieChartComponent = ({ data, height = 300 }) => (
+  <ResponsiveContainer width="100%" height={height}>
+    <PieChart>
+      <Pie
+        data={data}
+        cx="50%"
+        cy="50%"
+        labelLine={false}
+        label={renderCustomizedLabel}
+        outerRadius={height * 0.25}
+        fill="#8884d8"
+        dataKey="value"
+      >
+        {data.map((entry, index) => (
+          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+        ))}
+      </Pie>
+      <Tooltip content={<CustomTooltip />} />
+      <Legend />
+    </PieChart>
+  </ResponsiveContainer>
+);
+
+const LineChartComponent = ({ data, height = 300 }) => (
+  <ResponsiveContainer width="100%" height={height}>
+    <LineChart data={data}>
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="name" />
+      <YAxis />
+      <Tooltip />
+      <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} />
+    </LineChart>
+  </ResponsiveContainer>
+);
+
+const RankingListComponent = ({ data, showAll = false, isColores = false }) => (
+  <div className="lista-ranking">
+    {(showAll ? data : data.slice(0, 5)).map((item, index) => (
+      <div key={item.name} className="ranking-item">
+        <span className="ranking-position">{index + 1}</span>
+        {isColores && (
+          <span 
+            className="color-indicator" 
+            style={{ 
+              backgroundColor: item.name.toLowerCase(),
+              width: '20px',
+              height: '20px',
+              borderRadius: '50%',
+              display: 'inline-block',
+              marginRight: '10px',
+              border: '1px solid #666'
+            }}
+          />
+        )}
+        <span className="ranking-name">{item.name}</span>
+        <span className="ranking-value">{item.value}</span>
+      </div>
+    ))}
+  </div>
+);
+
+const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo }) => {
+  if (!isOpen) return null;
+  
+  return (
+    <div className="estadisticas-camisetas-modal-overlay">
+      <div className="estadisticas-camisetas-modal-content" onClick={e => e.stopPropagation()}>
+        <div className="estadisticas-camisetas-modal-header">
+          <h2>{titulo}</h2>
+          <button 
+            className="estadisticas-camisetas-modal-close" 
+            onClick={onClose}
+          >
+            ×
+          </button>
+        </div>
+        <div className="estadisticas-camisetas-modal-body">
+          <div className="estadisticas-camisetas-modal-content-wrapper">
+            {children}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+
+
+const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModalAbierto }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => {
+    setIsModalOpen(true);
+    setModalAbierto(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setModalAbierto(false);
+  };
+
+  const renderContent = (isModal = false) => {
+    if (!data || data.length === 0) {
+      return <NoDataMessage />;
+    }
+
+    const height = isModal ? 600 : 300;
+
+    switch (tipo) {
+      case 'pie':
+        return (
+          <div className={`chart-container ${isModal ? 'modal-chart' : ''}`}>
+            <PieChartComponent data={data} height={height} />
+          </div>
+        );
+      case 'line':
+        return (
+          <div className={`chart-container ${isModal ? 'modal-chart' : ''}`}>
+            <LineChartComponent data={data} height={height} />
+          </div>
+        );
+      case 'ranking':
+        return (
+          <div className={`ranking-container ${isModal ? 'modal-ranking' : ''}`}>
+            <RankingListComponent 
+              data={data} 
+              showAll={isModal} 
+              isColores={titulo.includes('Colores')}
+            />
+          </div>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <>
+      <div 
+        className={`grafico-card ${isHovered ? 'hovered' : ''}`}
+        onMouseEnter={onHover}
+        onMouseLeave={onLeave}
+        onClick={handleOpenModal}
+      >
+        <h2>{titulo}</h2>
+        {renderContent(false)}
+      </div>
+  
+      <EstadisticasModalGrafico 
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        titulo={titulo}
+      >
+        <div className="modal-content-inner">
+          {renderContent(true)}
+        </div>
+      </EstadisticasModalGrafico>
+    </>
+  );
 };
 
 const ResumenColeccion = ({ camisetas, userData }) => {
@@ -93,25 +281,6 @@ const ResumenColeccion = ({ camisetas, userData }) => {
   );
 };
 
-const GraficoCard = ({ titulo, children, isHovered, onHover, onLeave }) => {
-  return (
-    <div 
-      className={`grafico-card ${isHovered ? 'hovered' : ''}`}
-      onMouseEnter={onHover}
-      onMouseLeave={onLeave}
-      style={{
-        transformOrigin: 'center center',
-        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-        transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-        zIndex: isHovered ? '1000' : '1'
-      }}
-    >
-      <h2>{titulo}</h2>
-      {children}
-    </div>
-  );
-};
-
 function EstadisticasCamisetas() {
   const navigate = useNavigate();
   const [camisetas, setCamisetas] = useState([]);
@@ -119,14 +288,17 @@ function EstadisticasCamisetas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [hoveredCard, setHoveredCard] = useState(null);
+  const [modalAbierto, setModalAbierto] = useState(false);
   const [stats, setStats] = useState({
     porTipo: [],
     porTalle: [],
     porLiga: [],
     porAnio: [],
     topClubes: [],
-    coloresMasUsados: [],
-    dorsalesMasComunes: []
+    topDorsales: [],
+    seleccionesPorPais: [],
+    clubesPorPais: [],
+    topColores: [] // Añade esta línea
   });
 
   useEffect(() => {
@@ -183,13 +355,15 @@ function EstadisticasCamisetas() {
   const procesarEstadisticas = (camisetas) => {
     if (!camisetas || camisetas.length === 0) {
       setStats({
-        porTipo: [{ name: 'Sin datos', value: 1 }],
-        porTalle: [{ name: 'Sin datos', value: 1 }],
-        porLiga: [{ name: 'Sin datos', value: 1 }],
-        porAnio: [{ name: 'Sin datos', value: 1 }],
-        topClubes: [{ name: 'Sin datos', value: 1 }],
-        coloresMasUsados: [{ name: 'Sin datos', value: 1 }],
-        dorsalesMasComunes: [{ name: 'Sin datos', value: 1 }]
+        porTipo: [],
+        porTalle: [],
+        porLiga: [],
+        porAnio: [],
+        topClubes: [],
+        topDorsales: [],
+        seleccionesPorPais: [],
+        clubesPorPais: [],
+        topColores : []
       });
       return;
     }
@@ -214,17 +388,28 @@ function EstadisticasCamisetas() {
         return acc;
       }, {});
 
+    const totalLigas = Object.values(ligaCount).reduce((a, b) => a + b, 0);
+
     const ligasSorted = Object.entries(ligaCount)
       .sort(([,a], [,b]) => b - a)
       .reduce((acc, [liga, count], index) => {
-        if (index < 6) {
-          acc.push({ name: liga, value: count });
+        if (index < 5) {
+          acc.push({ 
+            name: liga, 
+            value: count,
+            percentage: (count / totalLigas) * 100 
+          });
         } else {
-          const otrosIndex = acc.findIndex(item => item.name === 'Otras');
+          const otrosIndex = acc.findIndex(item => item.name === 'Otros');
           if (otrosIndex === -1) {
-            acc.push({ name: 'Otras', value: count });
+            acc.push({ 
+              name: 'Otros', 
+              value: count,
+              percentage: (count / totalLigas) * 100 
+            });
           } else {
             acc[otrosIndex].value += count;
+            acc[otrosIndex].percentage = (acc[otrosIndex].value / totalLigas) * 100;
           }
         }
         return acc;
@@ -265,23 +450,7 @@ function EstadisticasCamisetas() {
         value: count
       }));
 
-    // Colores más usados
-    const colorCount = camisetas.reduce((acc, camiseta) => {
-      camiseta.colores.forEach(color => {
-        acc[color] = (acc[color] || 0) + 1;
-      });
-      return acc;
-    }, {});
-
-    const coloresMasUsados = Object.entries(colorCount)
-      .sort(([,a], [,b]) => b - a)
-      .slice(0, 8)
-      .map(([color, count]) => ({
-        name: color,
-        value: count
-      }));
-
-    // Dorsales más comunes
+    // Top dorsales
     const dorsalesCount = camisetas
       .filter(c => c.dorsal)
       .reduce((acc, c) => {
@@ -289,13 +458,103 @@ function EstadisticasCamisetas() {
         return acc;
       }, {});
 
-    const dorsalesMasComunes = Object.entries(dorsalesCount)
+    const topDorsales = Object.entries(dorsalesCount)
       .sort(([,a], [,b]) => b - a)
-      .slice(0, 5)
+      .slice(0, 10)
       .map(([dorsal, count]) => ({
         name: `#${dorsal}`,
         value: count
       }));
+
+    // Selecciones por país
+    const seleccionesCount = camisetas
+      .filter(c => c.tipoDeCamiseta === 'Seleccion')
+      .reduce((acc, camiseta) => {
+        acc[camiseta.pais] = (acc[camiseta.pais] || 0) + 1;
+        return acc;
+      }, {});
+
+    const totalSelecciones = Object.values(seleccionesCount).reduce((a, b) => a + b, 0);
+
+    const seleccionesPorPais = Object.entries(seleccionesCount)
+      .sort(([,a], [,b]) => b - a)
+      .reduce((acc, [pais, count], index) => {
+        if (index < 5) {
+          acc.push({
+            name: pais,
+            value: count,
+            percentage: (count / totalSelecciones) * 100
+          });
+        } else {
+          const otrosIndex = acc.findIndex(item => item.name === 'Otros');
+          if (otrosIndex === -1) {
+            acc.push({
+              name: 'Otros',
+              value: count,
+              percentage: (count / totalSelecciones) * 100
+            });
+          } else {
+            acc[otrosIndex].value += count;
+            acc[otrosIndex].percentage = (acc[otrosIndex].value / totalSelecciones) * 100;
+          }
+        }
+        return acc;
+      }, []);
+
+    // Clubes por país
+    const clubesPorPaisCount = camisetas
+      .filter(c => c.tipoDeCamiseta === 'Club')
+      .reduce((acc, camiseta) => {
+        acc[camiseta.pais] = (acc[camiseta.pais] || 0) + 1;
+        return acc;
+      }, {});
+
+    const totalClubes = Object.values(clubesPorPaisCount).reduce((a, b) => a + b, 0);
+
+    const clubesPorPais = Object.entries(clubesPorPaisCount)
+      .sort(([,a], [,b]) => b - a)
+      .reduce((acc, [pais, count], index) => {
+        if (index < 5) {
+          acc.push({
+            name: pais,
+            value: count,
+            percentage: (count / totalClubes) * 100
+          });
+        } else {
+          const otrosIndex = acc.findIndex(item => item.name === 'Otros');
+          if (otrosIndex === -1) {
+            acc.push({
+              name: 'Otros',
+              value: count,
+              percentage: (count / totalClubes) * 100
+            });
+          } else {
+            acc[otrosIndex].value += count;
+            acc[otrosIndex].percentage = (acc[otrosIndex].value / totalClubes) * 100;
+          }
+        }
+        return acc;
+      }, []);
+      // Dentro de procesarEstadisticas, antes del setStats
+      const coloresCount = camisetas.reduce((acc, camiseta) => {
+        // Verifica si camiseta.colores existe y es un array
+        if (camiseta.colores && Array.isArray(camiseta.colores)) {
+          // Procesa cada color en la lista
+          camiseta.colores.forEach(color => {
+            acc[color] = (acc[color] || 0) + 1;
+          });
+        }
+        return acc;
+      }, {});
+
+      const topColores = Object.entries(coloresCount)
+        .sort(([,a], [,b]) => b - a)
+        .slice(0, 5)
+        .map(([color, count]) => ({
+          name: color,
+          value: count
+        }));
+
 
     setStats({
       porTipo: Object.entries(tipoCount).map(([name, value]) => ({ name, value })),
@@ -303,8 +562,10 @@ function EstadisticasCamisetas() {
       porLiga: ligasSorted,
       porAnio: aniosOrdenados,
       topClubes,
-      coloresMasUsados,
-      dorsalesMasComunes
+      topDorsales,
+      seleccionesPorPais,
+      clubesPorPais,
+      topColores
     });
   };
 
@@ -317,7 +578,7 @@ function EstadisticasCamisetas() {
       </div>
     );
   }
-
+  
   if (error) {
     return (
       <div className="estadisticas-overlay">
@@ -327,7 +588,7 @@ function EstadisticasCamisetas() {
       </div>
     );
   }
-
+  
   return (
     <div className="estadisticas-overlay">
       <div className="estadisticas-container">
@@ -343,180 +604,105 @@ function EstadisticasCamisetas() {
         
         <ResumenColeccion camisetas={camisetas} userData={userData} />
         
-        <div className="graficos-grid">
+        <div className={`graficos-grid ${modalAbierto ? 'modal-abierto' : ''}`}>
           {/* Club vs Selección */}
           <GraficoCard 
             titulo="Club vs Selección"
+            data={stats.porTipo}
+            tipo="pie"
             isHovered={hoveredCard === 'tipo'}
             onHover={() => setHoveredCard('tipo')}
             onLeave={() => setHoveredCard(null)}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={stats.porTipo}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {stats.porTipo.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </GraficoCard>
-
-          {/* Distribución por Talle */}
-          <GraficoCard 
-            titulo="Distribución por Talle"
-            isHovered={hoveredCard === 'talle'}
-            onHover={() => setHoveredCard('talle')}
-            onLeave={() => setHoveredCard(null)}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={stats.porTalle}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {stats.porTalle.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </GraficoCard>
+            setModalAbierto={setModalAbierto}
+          />
 
           {/* Top Ligas */}
           <GraficoCard 
-            titulo="Top Ligas"
+            titulo="Top 5 Ligas"
+            data={stats.porLiga}
+            tipo="pie"
             isHovered={hoveredCard === 'liga'}
             onHover={() => setHoveredCard('liga')}
             onLeave={() => setHoveredCard(null)}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={stats.porLiga}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {stats.porLiga.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </GraficoCard>
+            setModalAbierto={setModalAbierto}
+          />
 
-          {/* Evolución por Año */}
+          {/* Selecciones por País */}
           <GraficoCard 
-            titulo="Evolución por Año"
+            titulo="Top 5 Selecciones"
+            data={stats.seleccionesPorPais}
+            tipo="pie"
+            isHovered={hoveredCard === 'selecciones'}
+            onHover={() => setHoveredCard('selecciones')}
+            onLeave={() => setHoveredCard(null)}
+            setModalAbierto={setModalAbierto}
+          />
+
+          {/* Clubes por País */}
+          <GraficoCard 
+            titulo="Top 5 Países (Clubes)"
+            data={stats.clubesPorPais}
+            tipo="pie"
+            isHovered={hoveredCard === 'clubesPais'}
+            onHover={() => setHoveredCard('clubesPais')}
+            onLeave={() => setHoveredCard(null)}
+            setModalAbierto={setModalAbierto}
+          />
+
+                  {/* Evolución por Año */}
+                  <GraficoCard 
+            titulo="Cantidad por Año"
+            data={stats.porAnio}
+            tipo="line"
             isHovered={hoveredCard === 'anio'}
             onHover={() => setHoveredCard('anio')}
             onLeave={() => setHoveredCard(null)}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={stats.porAnio}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#8884d8" strokeWidth={2} />
-              </LineChart>
-            </ResponsiveContainer>
-          </GraficoCard>
+            setModalAbierto={setModalAbierto}
+          />
 
           {/* Top Clubes */}
           <GraficoCard 
             titulo="Top 10 Clubes"
+            data={stats.topClubes}
+            tipo="ranking"
             isHovered={hoveredCard === 'clubes'}
             onHover={() => setHoveredCard('clubes')}
             onLeave={() => setHoveredCard(null)}
-          >
-            <div className="lista-ranking">
-              {stats.topClubes.map((club, index) => (
-                <div key={club.name} className="ranking-item">
-                  <span className="ranking-position">{index + 1}</span>
-                  <span className="ranking-name">{club.name}</span>
-                  <span className="ranking-value">{club.value}</span>
-                </div>
-              ))}
-            </div>
-          </GraficoCard>
+            setModalAbierto={setModalAbierto}
+          />
 
-          {/* Colores más usados */}
+          {/* Distribución por Talle */}
           <GraficoCard 
-            titulo="Colores más Usados"
-            isHovered={hoveredCard === 'colores'}
-            onHover={() => setHoveredCard('colores')}
+            titulo="Distribución por Talle"
+            data={stats.porTalle}
+            tipo="ranking"
+            isHovered={hoveredCard === 'talle'}
+            onHover={() => setHoveredCard('talle')}
             onLeave={() => setHoveredCard(null)}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={stats.coloresMasUsados}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="value" fill="#8884d8">
-                  {stats.coloresMasUsados.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </GraficoCard>
+            setModalAbierto={setModalAbierto}
+          />
 
-          {/* Dorsales más comunes */}
+          {/* Top Dorsales */}
           <GraficoCard 
-            titulo="Dorsales más Comunes"
+            titulo="Top 10 Dorsales"
+            data={stats.topDorsales}
+            tipo="ranking"
             isHovered={hoveredCard === 'dorsales'}
             onHover={() => setHoveredCard('dorsales')}
             onLeave={() => setHoveredCard(null)}
-          >
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={stats.dorsalesMasComunes}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={renderCustomizedLabel}
-                  outerRadius={80}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {stats.dorsalesMasComunes.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltip />} />
-                <Legend />
-              </PieChart>
-            </ResponsiveContainer>
-          </GraficoCard>
+            setModalAbierto={setModalAbierto}
+          />
+
+          {/* Top Colores */}
+          <GraficoCard 
+            titulo="Top 5 Colores"
+            data={stats.topColores}
+            tipo="ranking"
+            isHovered={hoveredCard === 'colores'}
+            onHover={() => setHoveredCard('colores')}
+            onLeave={() => setHoveredCard(null)}
+            setModalAbierto={setModalAbierto}
+          />
         </div>
       </div>
     </div>
