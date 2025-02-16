@@ -143,36 +143,44 @@ const RankingListComponent = ({ data, showAll = false, isColores = false }) => (
 );
 
 const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo }) => {
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
   
   return (
-    <div className="estadisticas-camisetas-modal-overlay">
-      <div className="estadisticas-camisetas-modal-content" onClick={e => e.stopPropagation()}>
-        <div className="estadisticas-camisetas-modal-header">
-          <h2>{titulo}</h2>
-          <button 
-            className="estadisticas-camisetas-modal-close" 
-            onClick={onClose}
-          >
-            ×
-          </button>
-        </div>
-        <div className="estadisticas-camisetas-modal-body">
-          <div className="estadisticas-camisetas-modal-content-wrapper">
-            {children}
-          </div>
-        </div>
+    <div 
+      className="estadisticas-camisetas-modal-overlay"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div className="estadisticas-camisetas-modal-content-inner">
+        <button 
+          className="estadisticas-camisetas-modal-close" 
+          onClick={onClose}
+        >
+          ×
+        </button>
+        <h2 className="estadisticas-camisetas-modal-title">{titulo}</h2>
+        {children}
       </div>
     </div>
   );
 };
 
 
-
 const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModalAbierto }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (e) => {
+    e.stopPropagation();
     setIsModalOpen(true);
     setModalAbierto(true);
   };
@@ -204,7 +212,7 @@ const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModal
         );
       case 'ranking':
         return (
-          <div className={`ranking-container ${isModal ? 'modal-ranking' : ''}`}>
+          <div className={`chart-container ${isModal ? 'modal-ranking' : ''}`}>
             <RankingListComponent 
               data={data} 
               showAll={isModal} 
@@ -234,9 +242,7 @@ const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModal
         onClose={handleCloseModal}
         titulo={titulo}
       >
-        <div className="modal-content-inner">
-          {renderContent(true)}
-        </div>
+        {renderContent(true)}
       </EstadisticasModalGrafico>
     </>
   );
