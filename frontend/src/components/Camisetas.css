@@ -11,10 +11,35 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  position: relative; /* Añadido */
+  overflow-y: auto; /* Añadido */
+}
+
+/* Añadir un pseudo-elemento para el fondo */
+.camisetas-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-attachment: fixed;
+  z-index: -1;
+}
+
+/* Añadir overlay oscuro */
+.camisetas-container::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: -1;
 }
 
 /* Barra Superior */
@@ -27,7 +52,7 @@
   padding: 15px 25px;
   border-radius: 8px;
   min-height: 70px; /* Cambiado de height fijo a min-height */
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.88);
 }
 
 /* Búsqueda y Botón Agregar */
@@ -1140,6 +1165,13 @@
   transform: translateY(1px);
 }
 
+.camisetas-count {
+  text-align: initial;
+  padding: 0px;
+  color: #f7f0f0;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
 
 /* Media Queries */
 @media (max-width: 1200px) {

@@ -29,7 +29,7 @@
   .estadisticas-container.modal-abierto .graficos-grid,
   .estadisticas-container.modal-abierto .resumen-container,
   .estadisticas-container.modal-abierto .header-container {
-    opacity: 0.1;
+    opacity: 0.05 !important;
     pointer-events: none;
   }
   
@@ -214,67 +214,78 @@
   color: #fff;
 }
 
-/* =========================================
+/* /* =========================================
    4. MODAL
    ========================================= */
-/* Modificar en la sección de MODAL */
 .estadisticas-camisetas-modal-overlay {
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
-  width: 100vw !important;
-  height: 100vh !important;
-  background-color: rgba(0, 0, 0, 0.85) !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.95) !important;
   display: flex !important;
   justify-content: center !important;
   align-items: center !important;
   z-index: 99999 !important;
+  animation: modalFadeIn 0.3s ease-out;
 }
 
+.estadisticas-camisetas-modal-content-inner {
+  background-color: #1a1a1a !important;
+  position: relative !important;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  border-radius: 12px !important;
+  animation: modalSlideIn 0.3s ease-out;
+  margin-top: -5% !important;
+}
 
+/* Ajustes específicos para cada tipo de gráfico */
+.estadisticas-camisetas-modal-content-inner.modal-pie {
+  width: 50% !important;
+  height: 70% !important;
+}
+
+.estadisticas-camisetas-modal-content-inner.modal-line {
+  width: 70% !important;
+  height: 60% !important;
+}
+
+.estadisticas-camisetas-modal-content-inner.modal-ranking {
+  width: 60% !important;
+  height: 80% !important;
+  max-height: 800px !important;
+}
 
 .estadisticas-camisetas-modal-title {
   color: white !important;
-  font-size: 1.8rem !important;
-  margin: 0 0 20px 0 !important;
+  font-size: 1.5rem !important;
   text-align: center !important;
+  margin: 0 !important;
   padding-bottom: 15px !important;
   border-bottom: 1px solid #666 !important;
-  font-family: inherit !important;
 }
 
 .estadisticas-camisetas-modal-close {
   position: absolute !important;
   right: -15px !important;
   top: -15px !important;
-  width: 36px !important;
-  height: 36px !important;
+  width: 30px !important;
+  height: 30px !important;
   border-radius: 50% !important;
-  background-color: #ff4444 !important;
+  background-color: #797272 !important;
   border: 2px solid #fff !important;
   color: #fff !important;
-  font-size: 24px !important;
+  font-size: 20px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
   cursor: pointer !important;
-  z-index: 100001 !important;
-  transition: all 0.2s ease !important;
+  z-index: 1 !important;
   padding: 0 !important;
-  line-height: 1 !important;
-}
-
-.estadisticas-camisetas-modal-content-inner {
-  background-color: rgba(26, 26, 26, 0.95) !important;
-  width: 90% !important;
-  max-width: 1200px !important;
-  height: 90vh !important;
-  border-radius: 12px !important;
-  position: relative !important;
-  padding: 20px !important;
-  display: flex !important;
-  flex-direction: column !important;
-  box-shadow: 0 0 20px rgba(0, 0, 0, 0.5) !important;
 }
 
 .estadisticas-camisetas-modal-close:hover {
@@ -284,41 +295,98 @@
 
 .estadisticas-camisetas-modal-content-wrapper {
   flex: 1 !important;
-  overflow-y: auto !important;
-  padding: 20px !important;
-  background-color: transparent !important;
-  margin-top: 20px !important;
+  overflow: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
 }
 
-/* Contenedores de gráficos en el modal */
+/* Ajustes para los contenedores de gráficos */
 .estadisticas-camisetas-modal-content-wrapper .chart-container {
   width: 100% !important;
-  height: 600px !important;
-  background-color: #1a1a1a !important;
-  margin: 0 !important;
-  padding: 0 !important;
+  height: 100% !important;
+  min-height: 300px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
+/* Ajustes específicos para rankings */
 .estadisticas-camisetas-modal-content-wrapper .ranking-container {
   width: 100% !important;
   height: 100% !important;
   overflow-y: auto !important;
-  padding: 15px !important;
-  background-color: #1a1a1a !important;
+  padding: 20px !important;
 }
 
-/* Estilos específicos para elementos dentro del modal */
-.estadisticas-camisetas-modal-content-wrapper * {
-  color: white !important;
-  font-family: inherit !important;
-}
-
+/* Para gráficos específicos dentro del modal */
 .modal-chart {
   width: 100% !important;
-  height: 100% !important;
-  min-height: 400px !important;
+  height: 600px !important;
+  min-height: 600px !important;
 }
 
+/* Estilos para el contenido del ranking en el modal */
+.estadisticas-camisetas-modal-content-wrapper .lista-ranking {
+  padding: 20px !important;
+  height: auto !important;
+  max-height: none !important;
+  width: 100% !important;
+}
+
+.estadisticas-camisetas-modal-content-wrapper .ranking-item {
+  padding: 15px !important;
+  margin-bottom: 12px !important;
+  font-size: 1.1rem !important;
+}
+
+/* Media Queries específicas para el modal */
+@media (max-width: 1200px) {
+  .estadisticas-camisetas-modal-content-inner {
+    width: 70% !important;
+  }
+  
+  .estadisticas-camisetas-modal-content-inner.modal-line {
+    width: 80% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .estadisticas-camisetas-modal-content-inner {
+    width: 90% !important;
+    height: 80% !important;
+    margin-top: 0 !important;
+  }
+
+  .estadisticas-camisetas-modal-content-inner.modal-line,
+  .estadisticas-camisetas-modal-content-inner.modal-pie,
+  .estadisticas-camisetas-modal-content-inner.modal-ranking {
+    width: 90% !important;
+    height: 80% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .estadisticas-camisetas-modal-content-inner {
+    width: 95% !important;
+    padding: 15px !important;
+  }
+
+  .estadisticas-camisetas-modal-title {
+    font-size: 1.2rem !important;
+  }
+
+  .estadisticas-camisetas-modal-close {
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 16px !important;
+    right: -10px !important;
+    top: -10px !important;
+  }
+}
 /* =========================================
    5. RANKINGS Y LISTAS
    ========================================= */
@@ -434,6 +502,7 @@
   font-size: 1.5rem;
 }
 
+.estadisticas-container
 .error-message {
   display: flex;
   justify-content: center;
@@ -443,6 +512,19 @@
   font-size: 1.2rem;
   text-align: center;
   padding: 20px;
+}
+
+.color-circle {
+  transition: transform 0.2s ease;
+}
+
+.ranking-item:hover .color-circle {
+  transform: scale(1.2);
+}
+
+/* Para colores claros como blanco */
+.color-circle {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
 }
 
 /* Scrollbar Personalizada */

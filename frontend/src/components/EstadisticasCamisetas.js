@@ -21,6 +21,24 @@ const COLORS = [
   '#9E8B8E'  // Gris rosado
 ];
 
+const COLOR_MAPPING = {
+  'rojo': '#FF0000',
+  'azul': '#0000FF',
+  'verde': '#008000',
+  'amarillo': '#FFD700',
+  'negro': '#000000',
+  'blanco': '#FFFFFF',
+  'gris': '#808080',
+  'naranja': '#FFA500',
+  'violeta': '#8A2BE2',
+  'celeste': '#87CEEB',
+  'bordó': '#800000',
+  'rosa': '#FF69B4',
+  'dorado': 'linear-gradient(45deg, #FFD700, #B8860B)',
+  'plateado': 'linear-gradient(45deg, #C0C0C0, #E8E8E8)',
+  'marrón': '#8B4513'
+};
+
 const RADIAN = Math.PI / 180;
 
 const NoDataMessage = () => (
@@ -122,16 +140,18 @@ const RankingListComponent = ({ data, showAll = false, isColores = false }) => (
       <div key={item.name} className="ranking-item">
         <span className="ranking-position">{index + 1}</span>
         {isColores && (
-          <span 
-            className="color-indicator" 
+          <div 
+            className="color-circle"
             style={{ 
-              backgroundColor: item.name.toLowerCase(),
-              width: '20px',
-              height: '20px',
+              background: COLOR_MAPPING[item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")] || '#CCCCCC',
+              width: '24px',
+              height: '24px',
               borderRadius: '50%',
-              display: 'inline-block',
               marginRight: '10px',
-              border: '1px solid #666'
+              border: '2px solid #666',
+              display: 'inline-block',
+              verticalAlign: 'middle',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
             }}
           />
         )}
@@ -142,18 +162,22 @@ const RankingListComponent = ({ data, showAll = false, isColores = false }) => (
   </div>
 );
 
-const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo }) => {
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isOpen]);
-
+const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo, tipo }) => {
   if (!isOpen) return null;
   
+  const getModalClass = () => {
+    switch (tipo) {
+      case 'pie':
+        return 'modal-pie';
+      case 'line':
+        return 'modal-line';
+      case 'ranking':
+        return 'modal-ranking';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div 
       className="estadisticas-camisetas-modal-overlay"
@@ -161,7 +185,7 @@ const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo }) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div className="estadisticas-camisetas-modal-content-inner">
+      <div className={`estadisticas-camisetas-modal-content-inner ${getModalClass()}`}>
         <button 
           className="estadisticas-camisetas-modal-close" 
           onClick={onClose}
@@ -169,7 +193,9 @@ const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo }) => {
           ×
         </button>
         <h2 className="estadisticas-camisetas-modal-title">{titulo}</h2>
-        {children}
+        <div className="estadisticas-camisetas-modal-content-wrapper">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -241,6 +267,7 @@ const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModal
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         titulo={titulo}
+        tipo={tipo}
       >
         {renderContent(true)}
       </EstadisticasModalGrafico>
@@ -304,6 +331,7 @@ function EstadisticasCamisetas() {
     topDorsales: [],
     seleccionesPorPais: [],
     clubesPorPais: [],
+    topNombres: [],
     topColores: [] // Añade esta línea
   });
 
@@ -369,7 +397,8 @@ function EstadisticasCamisetas() {
         topDorsales: [],
         seleccionesPorPais: [],
         clubesPorPais: [],
-        topColores : []
+        topColores : [],
+        topNombres: []
       });
       return;
     }
@@ -456,6 +485,24 @@ function EstadisticasCamisetas() {
         value: count
       }));
 
+
+    // Agregar dentro de procesarEstadisticas, antes del setStats
+    const nombresCount = camisetas
+    .filter(c => c.nombre && c.nombre !== 'null' && c.nombre.trim() !== '') // Filtrar nombres nulos o vacíos
+    .reduce((acc, camiseta) => {
+      acc[camiseta.nombre] = (acc[camiseta.nombre] || 0) + 1;
+      return acc;
+    }, {});
+
+    const topNombres = Object.entries(nombresCount)
+    .sort(([,a], [,b]) => b - a)
+    .slice(0, 5)
+    .map(([nombre, count]) => ({
+      name: nombre,
+      value: count
+    }));
+
+    
     // Top dorsales
     const dorsalesCount = camisetas
       .filter(c => c.dorsal)
@@ -622,9 +669,20 @@ function EstadisticasCamisetas() {
             setModalAbierto={setModalAbierto}
           />
 
+          {/* Top Clubes */}
+          <GraficoCard 
+            titulo="Clubes"
+            data={stats.topClubes}
+            tipo="ranking"
+            isHovered={hoveredCard === 'clubes'}
+            onHover={() => setHoveredCard('clubes')}
+            onLeave={() => setHoveredCard(null)}
+            setModalAbierto={setModalAbierto}
+          />
+
           {/* Top Ligas */}
           <GraficoCard 
-            titulo="Top 5 Ligas"
+            titulo="Ligas"
             data={stats.porLiga}
             tipo="pie"
             isHovered={hoveredCard === 'liga'}
@@ -635,7 +693,7 @@ function EstadisticasCamisetas() {
 
           {/* Selecciones por País */}
           <GraficoCard 
-            titulo="Top 5 Selecciones"
+            titulo="Selecciones"
             data={stats.seleccionesPorPais}
             tipo="pie"
             isHovered={hoveredCard === 'selecciones'}
@@ -643,20 +701,9 @@ function EstadisticasCamisetas() {
             onLeave={() => setHoveredCard(null)}
             setModalAbierto={setModalAbierto}
           />
-
-          {/* Clubes por País */}
-          <GraficoCard 
-            titulo="Top 5 Países (Clubes)"
-            data={stats.clubesPorPais}
-            tipo="pie"
-            isHovered={hoveredCard === 'clubesPais'}
-            onHover={() => setHoveredCard('clubesPais')}
-            onLeave={() => setHoveredCard(null)}
-            setModalAbierto={setModalAbierto}
-          />
-
-                  {/* Evolución por Año */}
-                  <GraficoCard 
+          
+                 {/* Evolución por Año */}
+                 <GraficoCard 
             titulo="Cantidad por Año"
             data={stats.porAnio}
             tipo="line"
@@ -666,31 +713,31 @@ function EstadisticasCamisetas() {
             setModalAbierto={setModalAbierto}
           />
 
-          {/* Top Clubes */}
+          {/* Top Colores */}
           <GraficoCard 
-            titulo="Top 10 Clubes"
-            data={stats.topClubes}
+            titulo="Colores"
+            data={stats.topColores}
             tipo="ranking"
-            isHovered={hoveredCard === 'clubes'}
-            onHover={() => setHoveredCard('clubes')}
+            isHovered={hoveredCard === 'colores'}
+            onHover={() => setHoveredCard('colores')}
             onLeave={() => setHoveredCard(null)}
             setModalAbierto={setModalAbierto}
           />
 
-          {/* Distribución por Talle */}
+
           <GraficoCard 
-            titulo="Distribución por Talle"
-            data={stats.porTalle}
+            titulo="Jugadores"
+            data={stats.topNombres}
             tipo="ranking"
-            isHovered={hoveredCard === 'talle'}
-            onHover={() => setHoveredCard('talle')}
+            isHovered={hoveredCard === 'nombres'}
+            onHover={() => setHoveredCard('nombres')}
             onLeave={() => setHoveredCard(null)}
             setModalAbierto={setModalAbierto}
           />
 
           {/* Top Dorsales */}
           <GraficoCard 
-            titulo="Top 10 Dorsales"
+            titulo="Dorsales"
             data={stats.topDorsales}
             tipo="ranking"
             isHovered={hoveredCard === 'dorsales'}
@@ -699,16 +746,18 @@ function EstadisticasCamisetas() {
             setModalAbierto={setModalAbierto}
           />
 
-          {/* Top Colores */}
+
+          {/* Distribución por Talle */}
           <GraficoCard 
-            titulo="Top 5 Colores"
-            data={stats.topColores}
+            titulo="Talles"
+            data={stats.porTalle}
             tipo="ranking"
-            isHovered={hoveredCard === 'colores'}
-            onHover={() => setHoveredCard('colores')}
+            isHovered={hoveredCard === 'talle'}
+            onHover={() => setHoveredCard('talle')}
             onLeave={() => setHoveredCard(null)}
             setModalAbierto={setModalAbierto}
           />
+          
         </div>
       </div>
     </div>

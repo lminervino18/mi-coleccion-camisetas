@@ -143,26 +143,29 @@ function Camisetas() {
   ];
 
 
-     
+     // Agregar este useEffect después de los otros useEffect
+useEffect(() => {
+  const fetchUserData = async () => {
+    try {
+      const usuarioId = localStorage.getItem('usuarioId');
+      const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserData(data);
+      }
+    } catch (error) {
+      console.error('Error al obtener datos del usuario', error);
+    }
+  };
+
+  fetchUserData();
+}, []);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data);
-        }
-      } catch (error) {
-        console.error('Error al obtener datos del usuario', error);
-      }
-    };
-
     const fetchCamisetas = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
@@ -174,7 +177,31 @@ function Camisetas() {
         if (response.ok) {
           const data = await response.json();
           setCamisetas(data);
-          setFilteredCamisetas(data);
+          
+          // Aplicar filtros guardados
+          const savedFilters = getFromLocalStorage('activeFilters');
+          const savedQuickFilter = getFromLocalStorage('quickFilter');
+          const savedSortBy = getFromLocalStorage('sortBy');
+          const savedSortDirection = getFromLocalStorage('sortDirection');
+          
+          let filteredData = [...data];
+          
+          // Aplicar filtros guardados
+          if (savedFilters) {
+            filteredData = applyStoredFilters(filteredData, savedFilters);
+          }
+          
+          // Aplicar quick filter guardado
+          if (savedQuickFilter) {
+            filteredData = applyQuickFilter(filteredData, savedQuickFilter);
+          }
+          
+          // Aplicar ordenamiento guardado
+          if (savedSortBy) {
+            filteredData = applySorting(filteredData, savedSortBy, savedSortDirection);
+          }
+          
+          setFilteredCamisetas(filteredData);
           
           const savedOrder = localStorage.getItem(`customOrder_${usuarioId}`);
           if (savedOrder) {
@@ -189,8 +216,7 @@ function Camisetas() {
         console.error('Error al obtener camisetas', error);
       }
     };
-
-    fetchUserData();
+  
     fetchCamisetas();
   }, []);
 
@@ -509,6 +535,114 @@ function Camisetas() {
     setShowSort(false);
 };
 
+// Agregar estas funciones después de tus useState
+
+// Función para aplicar los filtros guardados
+const applyStoredFilters = (data, filters) => {
+  let filtered = [...data];
+  
+  if (filters.talle.length > 0) {
+    filtered = filtered.filter(camiseta => 
+      filters.talle.includes(camiseta.talle)
+    );
+  }
+
+  if (filters.dorsal !== null) {
+    filtered = filtered.filter(camiseta => 
+      filters.dorsal ? camiseta.dorsal : !camiseta.dorsal
+    );
+  }
+
+  if (filters.colores.length > 0) {
+    filtered = filtered.filter(camiseta => 
+      camiseta.colores.some(color => filters.colores.includes(color))
+    );
+  }
+
+  if (filters.temporada.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.temporada.includes(camiseta.temporada)
+    );
+  }
+
+  if (filters.pais.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.pais.includes(camiseta.pais)
+    );
+  }
+
+  if (filters.club.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.club.includes(camiseta.club)
+    );
+  }
+
+  if (filters.numeroEquipacion.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.numeroEquipacion.includes(camiseta.numeroEquipacion)
+    );
+  }
+
+  return filtered;
+};
+
+// Función para aplicar el filtro rápido
+const applyQuickFilter = (data, quickFilter) => {
+  if (quickFilter === 'Club' || quickFilter === 'Seleccion') {
+    return data.filter(camiseta => camiseta.tipoDeCamiseta === quickFilter);
+  } else {
+    return data.filter(camiseta => camiseta.liga === quickFilter);
+  }
+};
+
+// Función para aplicar el ordenamiento
+const applySorting = (data, sortBy, sortDirection) => {
+  if (!sortBy) return data;
+
+  return [...data].sort((a, b) => {
+    let comparison = 0;
+    
+    const compareWithNull = (valA, valB) => {
+      if (valA === null && valB === null) return 0;
+      if (valA === null) return 1;
+      if (valB === null) return -1;
+      return 0;
+    };
+
+    switch (sortBy) {
+      case 'talle':
+        const talleOrder = { 'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5, 'XXL': 6, 'Otro': 7 };
+        const nullCheck = compareWithNull(a.talle, b.talle);
+        if (nullCheck !== 0) return nullCheck;
+        comparison = talleOrder[a.talle] - talleOrder[b.talle];
+        break;
+      
+      case 'temporada':
+        const nullCheckTemp = compareWithNull(a.temporada, b.temporada);
+        if (nullCheckTemp !== 0) return nullCheckTemp;
+        const getYear = (temp) => {
+          const year = temp.split('/')[0];
+          return parseInt(year);
+        };
+        comparison = getYear(a.temporada) - getYear(b.temporada);
+        break;
+      
+      case 'liga':
+        const nullCheckLiga = compareWithNull(a.liga, b.liga);
+        if (nullCheckLiga !== 0) return nullCheckLiga;
+        comparison = a.liga.localeCompare(b.liga);
+        break;
+
+      default:
+        const nullCheckDefault = compareWithNull(a[sortBy], b[sortBy]);
+        if (nullCheckDefault !== 0) return nullCheckDefault;
+        comparison = a[sortBy].localeCompare(b[sortBy]);
+    }
+    
+    return sortDirection === 'asc' ? comparison : -comparison;
+  });
+};
+
   const handleCamisetaMouseDown = (e, camisetaId) => {
     e.preventDefault();
     const timeout = setTimeout(() => {
@@ -795,6 +929,9 @@ useEffect(() => {
         >
           {liga}
         </button>
+
+        
+        
       ))}
     </div>
   </div>
