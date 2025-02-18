@@ -346,7 +346,8 @@ function EstadisticasCamisetas() {
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+            },
+            credentials: 'include',
           }
         );
 
@@ -363,7 +364,8 @@ function EstadisticasCamisetas() {
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
-            }
+            },
+            credentials: 'include',
           }
         );
 

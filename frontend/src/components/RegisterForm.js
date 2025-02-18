@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./RegisterForm.css";
 
-
 function RegisterForm({ onClose, onNavigateToHome }) {
   const [formData, setFormData] = useState({
     username: "",
@@ -26,7 +25,6 @@ function RegisterForm({ onClose, onNavigateToHome }) {
   };
 
   const validatePasswordStrength = (password) => {
-    // Verifica si la contraseña tiene al menos 8 caracteres, 1 número y 1 letra
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
     return passwordRegex.test(password);
   };
@@ -76,7 +74,14 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(true);
       try {
         const response = await fetch(
-          `http://localhost:8080/api/usuarios/?nombre=${value.trim()}`
+          `http://localhost:8080/api/usuarios/?nombre=${encodeURIComponent(value.trim())}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+          }
         );
         if (response.ok) {
           setErrors((prev) => ({
@@ -101,7 +106,14 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(true);
       try {
         const response = await fetch(
-          `http://localhost:8080/api/usuarios/?email=${value.trim()}`
+          `http://localhost:8080/api/usuarios/?email=${encodeURIComponent(value.trim())}`,
+          {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            credentials: 'include'
+          }
         );
         if (response.ok) {
           setErrors((prev) => ({
@@ -153,7 +165,10 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       // Primero registramos al usuario
       const registerResponse = await fetch("http://localhost:8080/api/usuarios", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json" 
+        },
+        credentials: 'include',
         body: JSON.stringify({
           username: formData.username,
           email: formData.email,
@@ -178,7 +193,10 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       // Si el registro fue exitoso, hacemos login automáticamente
       const loginResponse = await fetch('http://localhost:8080/api/auth/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json' 
+        },
+        credentials: 'include',
         body: JSON.stringify({
           username: formData.username,
           password: formData.password,
@@ -208,14 +226,14 @@ function RegisterForm({ onClose, onNavigateToHome }) {
         userExists: "Hubo un error al intentar registrar el usuario",
       }));
     }
-};
+  };
 
   const handleNavigateHome = () => {
     setSuccessMessage(false);
     window.location.href = "/login";  // Esto redirige a la página principal
   };
 
-  return (
+    return (
     <div className="register-form-container">
       <div className="register-overlay" onClick={onClose}></div>
       <div className="register-form">

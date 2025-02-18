@@ -390,3 +390,87 @@
     padding: 4px 10px;
   }
 }
+
+/* Estilos para navegación de camisetas */
+.detalle-imagen-container {
+  position: relative; /* Asegura que los botones de navegación se posicionen relativamente */
+}
+
+.btn-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  z-index: 10;
+}
+
+.btn-nav:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.btn-prev {
+  left: 10px;
+}
+
+.btn-next {
+  right: 10px;
+}
+
+/* Estilos para el botón de descarga */
+.btn-download {
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn-download:hover {
+  background-color: #f0f0f0;
+}
+
+/* Ajustes para dispositivos más pequeños */
+@media (max-width: 768px) {
+  .btn-nav {
+    width: 40px;
+    height: 40px;
+  }
+
+  .btn-prev {
+    left: 5px;
+  }
+
+  .btn-next {
+    right: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .btn-nav {
+    width: 35px;
+    height: 35px;
+  }
+
+  .btn-prev {
+    left: 2px;
+  }
+
+  .btn-next {
+    right: 2px;
+  }
+}

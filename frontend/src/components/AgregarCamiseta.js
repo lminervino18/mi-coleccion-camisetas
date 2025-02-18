@@ -324,6 +324,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
+        credentials: 'include',
         body: submitFormData,
       });
 

@@ -143,7 +143,7 @@ function Camisetas() {
   ];
 
 
-     // Agregar este useEffect después de los otros useEffect
+// Agregar este useEffect después de los otros useEffect
 useEffect(() => {
   const fetchUserData = async () => {
     try {
@@ -152,6 +152,7 @@ useEffect(() => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
+        credentials: 'include',
       });
       if (response.ok) {
         const data = await response.json();
@@ -173,6 +174,7 @@ useEffect(() => {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
         });
         if (response.ok) {
           const data = await response.json();
@@ -199,6 +201,8 @@ useEffect(() => {
           // Aplicar ordenamiento guardado
           if (savedSortBy) {
             filteredData = applySorting(filteredData, savedSortBy, savedSortDirection);
+            setTempSortBy(savedSortBy);
+            setTempSortDirection(savedSortDirection);
           }
           
           setFilteredCamisetas(filteredData);
@@ -221,8 +225,12 @@ useEffect(() => {
   }, []);
 
   useEffect(() => {
-    const clubs = [...new Set(camisetas.map(c => c.club))].sort();
-    const paises = [...new Set(camisetas.map(c => c.pais))].sort();
+    const clubs = [...new Set(camisetas.map(c => c.club))]
+      .filter(club => club !== null && club !== '') // Filtrar null y strings vacíos
+      .sort();
+    const paises = [...new Set(camisetas.map(c => c.pais))]
+      .filter(pais => pais !== null && pais !== '') // También para países
+      .sort();
     
     setAvailableClubs(clubs);
     setAvailablePaises(paises);
@@ -348,8 +356,23 @@ useEffect(() => {
   const handleQuickFilterClick = (filter) => {
     if (quickFilter === filter) {
       setQuickFilter(null);
+      // Forzar actualización de la grilla
+      setFilteredCamisetas([...camisetas]);
+      
+      const usuarioId = localStorage.getItem('usuarioId');
+      localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(camisetas.map(c => c.id)));
     } else {
       setQuickFilter(filter);
+      
+      // Filtrar camisetas según el quick filter
+      const filtered = filter === 'Club' || filter === 'Seleccion'
+        ? camisetas.filter(camiseta => camiseta.tipoDeCamiseta === filter)
+        : camisetas.filter(camiseta => camiseta.liga === filter);
+      
+      setFilteredCamisetas(filtered);
+      
+      const usuarioId = localStorage.getItem('usuarioId');
+      localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(filtered.map(c => c.id)));
     }
   };
 
@@ -396,12 +419,11 @@ useEffect(() => {
     setSelectedPais('');
     setSelectedColor('');
     setSelectedEquipacion('');
-  };
-
-  const clearAllFilters = () => {
-    const usuarioId = localStorage.getItem('usuarioId');
     
-    clearFilters();
+    // Restaurar todos los IDs y la lista completa de camisetas
+    setFilteredCamisetas([...camisetas]);
+    localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(camisetas.map(c => c.id)));
+  
     setQuickFilter(null);
     setSortBy(null);
     setSortDirection('asc');
@@ -425,7 +447,6 @@ useEffect(() => {
         );
       }
     }
-
 
     if (activeFilters.talle.length > 0) {
       filtered = filtered.filter(camiseta => 
@@ -471,7 +492,11 @@ useEffect(() => {
 
     setFilteredCamisetas(filtered);
     setShowFilters(false);
-  };
+
+    // Guardar IDs de camisetas filtradas en localStorage
+    const usuarioId = localStorage.getItem('usuarioId');
+    localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(filtered.map(c => c.id)));
+    };
 
   const handleSortChange = (value) => {
     setTempSortBy(value);
@@ -533,6 +558,9 @@ useEffect(() => {
   
     setFilteredCamisetas(sorted);
     setShowSort(false);
+
+    const usuarioId = localStorage.getItem('usuarioId');
+    localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(sorted.map(c => c.id)));
 };
 
 // Agregar estas funciones después de tus useState
@@ -779,6 +807,7 @@ useEffect(() => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ fotoDePerfil: base64Image }),
       });
   
@@ -987,25 +1016,62 @@ useEffect(() => {
     </div>
       </div>
       {showFilters && (
-        <div 
-          className="modal-overlay"
-          onClick={(e) => {
-            if (e.target.className === 'modal-overlay') {
-              setShowFilters(false);
-              // Restaurar estado anterior de los filtros
-              setActiveFilters(prev => ({ ...prev }));
-              setSelectedClub('');
-              setSelectedPais('');
-              setSelectedColor('');
-              setSelectedEquipacion('');
-            }
-          }}
-        >
+          <div 
+            className="modal-overlay"
+            onClick={(e) => {
+              if (e.target.className === 'modal-overlay') {
+                setShowFilters(false);
+                // Restaurar los filtros originales guardados en localStorage
+                const savedFilters = getFromLocalStorage('activeFilters') || {
+                  talle: [],
+                  dorsal: null,
+                  colores: [],
+                  temporada: [],
+                  pais: [],
+                  club: [],
+                  numeroEquipacion: []
+                };
+                
+                // Restaurar los estados de selección
+                setActiveFilters(savedFilters);
+                
+                // Resetear los estados de selección
+                setSelectedClub('');
+                setSelectedPais('');
+                setSelectedColor('');
+                setSelectedEquipacion('');
+              }
+            }}
+          >
           <div className="modal-content filters-modal" onClick={e => e.stopPropagation()}>
             <div className="filters-header">
-              <button className="back-button" onClick={() => setShowFilters(false)}>
-                <FontAwesomeIcon icon={faArrowLeft} />
-              </button>
+            <button 
+              className="back-button" 
+              onClick={() => {
+                setShowFilters(false);
+                // Restaurar los filtros originales guardados en localStorage
+                const savedFilters = getFromLocalStorage('activeFilters') || {
+                  talle: [],
+                  dorsal: null,
+                  colores: [],
+                  temporada: [],
+                  pais: [],
+                  club: [],
+                  numeroEquipacion: []
+                };
+                
+                // Restaurar los estados de selección
+                setActiveFilters(savedFilters);
+                
+                // Resetear los estados de selección
+                setSelectedClub('');
+                setSelectedPais('');
+                setSelectedColor('');
+                setSelectedEquipacion('');
+              }}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
               <h3>Filtros</h3>
             </div>
             
@@ -1498,6 +1564,7 @@ useEffect(() => {
                           'Content-Type': 'application/json',
                           'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         },
+                        credentials: 'include',
                         body: JSON.stringify({ password }),
                       });
                       
