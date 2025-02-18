@@ -11,7 +11,9 @@ import {
   faSortAmountUp, 
   faSortAmountDown,
   faArrowLeft,
-  faExclamation  
+  faExclamation,
+  faChartSimple,  // Añade este ícono
+  faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 // Componente para cada camiseta individual
@@ -127,6 +129,8 @@ function Camisetas() {
   const [tipoCamisetaFilter, setTipoCamisetaFilter] = useState(null);
   const [ligaFilter, setLigaFilter] = useState(null);
   const [availableLigas, setAvailableLigas] = useState([]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareLink, setShareLink] = useState('');
   const navigate = useNavigate();
 
   const SELECTOR_SIZE = 200;
@@ -142,26 +146,30 @@ function Camisetas() {
   ];
 
 
-     
+// Agregar este useEffect después de los otros useEffect
+useEffect(() => {
+  const fetchUserData = async () => {
+    try {
+      const usuarioId = localStorage.getItem('usuarioId');
+      const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+        credentials: 'include',
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setUserData(data);
+      }
+    } catch (error) {
+      console.error('Error al obtener datos del usuario', error);
+    }
+  };
+
+  fetchUserData();
+}, []);
 
   useEffect(() => {
-    const fetchUserData = async () => {
-      try {
-        const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          setUserData(data);
-        }
-      } catch (error) {
-        console.error('Error al obtener datos del usuario', error);
-      }
-    };
-
     const fetchCamisetas = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
@@ -169,11 +177,38 @@ function Camisetas() {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
+          credentials: 'include',
         });
         if (response.ok) {
           const data = await response.json();
           setCamisetas(data);
-          setFilteredCamisetas(data);
+          
+          // Aplicar filtros guardados
+          const savedFilters = getFromLocalStorage('activeFilters');
+          const savedQuickFilter = getFromLocalStorage('quickFilter');
+          const savedSortBy = getFromLocalStorage('sortBy');
+          const savedSortDirection = getFromLocalStorage('sortDirection');
+          
+          let filteredData = [...data];
+          
+          // Aplicar filtros guardados
+          if (savedFilters) {
+            filteredData = applyStoredFilters(filteredData, savedFilters);
+          }
+          
+          // Aplicar quick filter guardado
+          if (savedQuickFilter) {
+            filteredData = applyQuickFilter(filteredData, savedQuickFilter);
+          }
+          
+          // Aplicar ordenamiento guardado
+          if (savedSortBy) {
+            filteredData = applySorting(filteredData, savedSortBy, savedSortDirection);
+            setTempSortBy(savedSortBy);
+            setTempSortDirection(savedSortDirection);
+          }
+          
+          setFilteredCamisetas(filteredData);
           
           const savedOrder = localStorage.getItem(`customOrder_${usuarioId}`);
           if (savedOrder) {
@@ -188,14 +223,17 @@ function Camisetas() {
         console.error('Error al obtener camisetas', error);
       }
     };
-
-    fetchUserData();
+  
     fetchCamisetas();
   }, []);
 
   useEffect(() => {
-    const clubs = [...new Set(camisetas.map(c => c.club))].sort();
-    const paises = [...new Set(camisetas.map(c => c.pais))].sort();
+    const clubs = [...new Set(camisetas.map(c => c.club))]
+      .filter(club => club !== null && club !== '') // Filtrar null y strings vacíos
+      .sort();
+    const paises = [...new Set(camisetas.map(c => c.pais))]
+      .filter(pais => pais !== null && pais !== '') // También para países
+      .sort();
     
     setAvailableClubs(clubs);
     setAvailablePaises(paises);
@@ -287,6 +325,49 @@ function Camisetas() {
       }
     };
 
+    const generateShareLink = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/shared/generar-link', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+    
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || 'Error generando link compartido');
+        }
+    
+        const data = await response.json();
+        
+        // Asegúrate de que la respuesta tenga la URL completa
+        if (data.urlCompleta) {
+          setShareLink(data.urlCompleta);
+          setShowShareModal(true);
+        } else {
+          throw new Error('Respuesta inválida del servidor');
+        }
+      } catch (error) {
+        console.error('Error generando link compartido:', error);
+        alert(error.message);
+      }
+    };
+
+
+    const copyShareLink = () => {
+      navigator.clipboard.writeText(shareLink)
+        .then(() => {
+          alert('Link copiado al portapapeles');
+        })
+        .catch(err => {
+          console.error('Error copiando link:', err);
+          alert('No se pudo copiar el link');
+        });
+    };
+
     // Modifica el filtrado de camisetas para incluir estos nuevos filtros
     const filteredCamisetasWithType = filteredCamisetas.filter(camiseta => {
       if (tipoCamisetaFilter) {
@@ -321,8 +402,23 @@ function Camisetas() {
   const handleQuickFilterClick = (filter) => {
     if (quickFilter === filter) {
       setQuickFilter(null);
+      // Forzar actualización de la grilla
+      setFilteredCamisetas([...camisetas]);
+      
+      const usuarioId = localStorage.getItem('usuarioId');
+      localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(camisetas.map(c => c.id)));
     } else {
       setQuickFilter(filter);
+      
+      // Filtrar camisetas según el quick filter
+      const filtered = filter === 'Club' || filter === 'Seleccion'
+        ? camisetas.filter(camiseta => camiseta.tipoDeCamiseta === filter)
+        : camisetas.filter(camiseta => camiseta.liga === filter);
+      
+      setFilteredCamisetas(filtered);
+      
+      const usuarioId = localStorage.getItem('usuarioId');
+      localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(filtered.map(c => c.id)));
     }
   };
 
@@ -369,12 +465,11 @@ function Camisetas() {
     setSelectedPais('');
     setSelectedColor('');
     setSelectedEquipacion('');
-  };
-
-  const clearAllFilters = () => {
-    const usuarioId = localStorage.getItem('usuarioId');
     
-    clearFilters();
+    // Restaurar todos los IDs y la lista completa de camisetas
+    setFilteredCamisetas([...camisetas]);
+    localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(camisetas.map(c => c.id)));
+  
     setQuickFilter(null);
     setSortBy(null);
     setSortDirection('asc');
@@ -398,7 +493,6 @@ function Camisetas() {
         );
       }
     }
-
 
     if (activeFilters.talle.length > 0) {
       filtered = filtered.filter(camiseta => 
@@ -444,7 +538,11 @@ function Camisetas() {
 
     setFilteredCamisetas(filtered);
     setShowFilters(false);
-  };
+
+    // Guardar IDs de camisetas filtradas en localStorage
+    const usuarioId = localStorage.getItem('usuarioId');
+    localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(filtered.map(c => c.id)));
+    };
 
   const handleSortChange = (value) => {
     setTempSortBy(value);
@@ -506,6 +604,117 @@ function Camisetas() {
   
     setFilteredCamisetas(sorted);
     setShowSort(false);
+
+    const usuarioId = localStorage.getItem('usuarioId');
+    localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(sorted.map(c => c.id)));
+};
+
+// Agregar estas funciones después de tus useState
+
+// Función para aplicar los filtros guardados
+const applyStoredFilters = (data, filters) => {
+  let filtered = [...data];
+  
+  if (filters.talle.length > 0) {
+    filtered = filtered.filter(camiseta => 
+      filters.talle.includes(camiseta.talle)
+    );
+  }
+
+  if (filters.dorsal !== null) {
+    filtered = filtered.filter(camiseta => 
+      filters.dorsal ? camiseta.dorsal : !camiseta.dorsal
+    );
+  }
+
+  if (filters.colores.length > 0) {
+    filtered = filtered.filter(camiseta => 
+      camiseta.colores.some(color => filters.colores.includes(color))
+    );
+  }
+
+  if (filters.temporada.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.temporada.includes(camiseta.temporada)
+    );
+  }
+
+  if (filters.pais.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.pais.includes(camiseta.pais)
+    );
+  }
+
+  if (filters.club.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.club.includes(camiseta.club)
+    );
+  }
+
+  if (filters.numeroEquipacion.length > 0) {
+    filtered = filtered.filter(camiseta =>
+      filters.numeroEquipacion.includes(camiseta.numeroEquipacion)
+    );
+  }
+
+  return filtered;
+};
+
+// Función para aplicar el filtro rápido
+const applyQuickFilter = (data, quickFilter) => {
+  if (quickFilter === 'Club' || quickFilter === 'Seleccion') {
+    return data.filter(camiseta => camiseta.tipoDeCamiseta === quickFilter);
+  } else {
+    return data.filter(camiseta => camiseta.liga === quickFilter);
+  }
+};
+
+// Función para aplicar el ordenamiento
+const applySorting = (data, sortBy, sortDirection) => {
+  if (!sortBy) return data;
+
+  return [...data].sort((a, b) => {
+    let comparison = 0;
+    
+    const compareWithNull = (valA, valB) => {
+      if (valA === null && valB === null) return 0;
+      if (valA === null) return 1;
+      if (valB === null) return -1;
+      return 0;
+    };
+
+    switch (sortBy) {
+      case 'talle':
+        const talleOrder = { 'XS': 1, 'S': 2, 'M': 3, 'L': 4, 'XL': 5, 'XXL': 6, 'Otro': 7 };
+        const nullCheck = compareWithNull(a.talle, b.talle);
+        if (nullCheck !== 0) return nullCheck;
+        comparison = talleOrder[a.talle] - talleOrder[b.talle];
+        break;
+      
+      case 'temporada':
+        const nullCheckTemp = compareWithNull(a.temporada, b.temporada);
+        if (nullCheckTemp !== 0) return nullCheckTemp;
+        const getYear = (temp) => {
+          const year = temp.split('/')[0];
+          return parseInt(year);
+        };
+        comparison = getYear(a.temporada) - getYear(b.temporada);
+        break;
+      
+      case 'liga':
+        const nullCheckLiga = compareWithNull(a.liga, b.liga);
+        if (nullCheckLiga !== 0) return nullCheckLiga;
+        comparison = a.liga.localeCompare(b.liga);
+        break;
+
+      default:
+        const nullCheckDefault = compareWithNull(a[sortBy], b[sortBy]);
+        if (nullCheckDefault !== 0) return nullCheckDefault;
+        comparison = a[sortBy].localeCompare(b[sortBy]);
+    }
+    
+    return sortDirection === 'asc' ? comparison : -comparison;
+  });
 };
 
   const handleCamisetaMouseDown = (e, camisetaId) => {
@@ -644,6 +853,7 @@ useEffect(() => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${localStorage.getItem('token')}`,
         },
+        credentials: 'include',
         body: JSON.stringify({ fotoDePerfil: base64Image }),
       });
   
@@ -794,71 +1004,164 @@ useEffect(() => {
         >
           {liga}
         </button>
+
+        
+        
       ))}
     </div>
   </div>
 
-        <div className="user-profile">
-          <span className="username">{userData?.username}</span>
-          <div className="profile-photo-container">
-            <div 
-              className="profile-photo" 
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-            >
-              {userData?.fotoDePerfil ? (
-                <img src={userData.fotoDePerfil} alt="Perfil" />
-              ) : (
-                <div className="initials">
-                  {userData?.username && getInitials(userData.username)}
-                </div>
-              )}
+      <div className="user-profile">
+      <span className="username">{userData?.username}</span>
+      <div className="profile-photo-container">
+        <div 
+          className="profile-photo" 
+          onClick={() => setShowProfileMenu(!showProfileMenu)}
+        >
+          {userData?.fotoDePerfil ? (
+            <img src={userData.fotoDePerfil} alt="Perfil" />
+          ) : (
+            <div className="initials">
+              {userData?.username && getInitials(userData.username)}
             </div>
-            
-            {showProfileMenu && (
-              <div className="profile-menu">
-              <button onClick={() => {
-                setShowProfileModal(true);
-                setShowProfileMenu(false);
-              }}>
-                Cambiar foto
-              </button>
-              <button onClick={() => {
-                setShowDeleteConfirm(true);
-                setShowProfileMenu(false);
-              }}>
-                Eliminar cuenta
-              </button>
-            </div>
-            )}
-          </div>
-          <FontAwesomeIcon 
-            icon={faSignOutAlt} 
-            className="logout-icon"
-            onClick={handleLogout}
-            title="Cerrar sesión"
-          />
+          )}
         </div>
+        
+        {showShareModal && (
+          <div className="share-modal-overlay">
+            <div className="share-modal-content">
+              <h2>Compartir Colección</h2>
+              <input 
+                type="text" 
+                value={shareLink} 
+                readOnly 
+                className="share-link-input"
+              />
+              <div className="share-modal-actions">
+                <button onClick={copyShareLink}>Copiar Link</button>
+                <button onClick={() => setShowShareModal(false)}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {showProfileMenu && (
+          <div className="profile-menu">
+            <button onClick={() => {
+              setShowProfileModal(true);
+              setShowProfileMenu(false);
+            }}>
+              Cambiar foto
+            </button>
+            <button onClick={() => {
+              setShowDeleteConfirm(true);
+              setShowProfileMenu(false);
+            }}>
+              Eliminar cuenta
+            </button>
+          </div>
+        )}
+      </div>
+      
+      
+
+      {/* Nuevo botón de estadísticas */}
+      <FontAwesomeIcon 
+        icon={faChartSimple} 
+        className="stats-icon"
+        onClick={() => navigate('/estadisticas-camisetas')}
+        title="Estadísticas"
+      />
+      
+      <FontAwesomeIcon 
+          icon={faExternalLinkAlt} 
+          className="share-icon"
+          onClick={generateShareLink}
+          title="Compartir colección"
+        />
+      {showShareModal && (
+        <div className="share-modal-overlay">
+          <div className="share-modal-content">
+            <h2>Compartir Colección</h2>
+            <input 
+              type="text" 
+              value={shareLink} 
+              readOnly 
+              className="share-link-input"
+            />
+            <div className="share-modal-actions">
+              <button onClick={copyShareLink}>Copiar Link</button>
+              <button onClick={() => setShowShareModal(false)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      <FontAwesomeIcon 
+        icon={faSignOutAlt} 
+        className="logout-icon"
+        onClick={handleLogout}
+        title="Cerrar sesión"
+      />
+    </div>
       </div>
       {showFilters && (
-        <div 
-          className="modal-overlay"
-          onClick={(e) => {
-            if (e.target.className === 'modal-overlay') {
-              setShowFilters(false);
-              // Restaurar estado anterior de los filtros
-              setActiveFilters(prev => ({ ...prev }));
-              setSelectedClub('');
-              setSelectedPais('');
-              setSelectedColor('');
-              setSelectedEquipacion('');
-            }
-          }}
-        >
+          <div 
+            className="modal-overlay"
+            onClick={(e) => {
+              if (e.target.className === 'modal-overlay') {
+                setShowFilters(false);
+                // Restaurar los filtros originales guardados en localStorage
+                const savedFilters = getFromLocalStorage('activeFilters') || {
+                  talle: [],
+                  dorsal: null,
+                  colores: [],
+                  temporada: [],
+                  pais: [],
+                  club: [],
+                  numeroEquipacion: []
+                };
+                
+                // Restaurar los estados de selección
+                setActiveFilters(savedFilters);
+                
+                // Resetear los estados de selección
+                setSelectedClub('');
+                setSelectedPais('');
+                setSelectedColor('');
+                setSelectedEquipacion('');
+              }
+            }}
+          >
           <div className="modal-content filters-modal" onClick={e => e.stopPropagation()}>
             <div className="filters-header">
-              <button className="back-button" onClick={() => setShowFilters(false)}>
-                <FontAwesomeIcon icon={faArrowLeft} />
-              </button>
+            <button 
+              className="back-button" 
+              onClick={() => {
+                setShowFilters(false);
+                // Restaurar los filtros originales guardados en localStorage
+                const savedFilters = getFromLocalStorage('activeFilters') || {
+                  talle: [],
+                  dorsal: null,
+                  colores: [],
+                  temporada: [],
+                  pais: [],
+                  club: [],
+                  numeroEquipacion: []
+                };
+                
+                // Restaurar los estados de selección
+                setActiveFilters(savedFilters);
+                
+                // Resetear los estados de selección
+                setSelectedClub('');
+                setSelectedPais('');
+                setSelectedColor('');
+                setSelectedEquipacion('');
+              }}
+            >
+              <FontAwesomeIcon icon={faArrowLeft} />
+            </button>
               <h3>Filtros</h3>
             </div>
             
@@ -1351,6 +1654,7 @@ useEffect(() => {
                           'Content-Type': 'application/json',
                           'Authorization': `Bearer ${localStorage.getItem('token')}`,
                         },
+                        credentials: 'include',
                         body: JSON.stringify({ password }),
                       });
                       

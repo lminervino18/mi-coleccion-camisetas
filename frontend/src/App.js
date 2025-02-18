@@ -10,6 +10,8 @@ import {
 import Login from './components/Login';
 import Camisetas from './components/Camisetas';
 import DetalleCamiseta from './components/DetalleCamiseta';
+import EstadisticasCamisetas from './components/EstadisticasCamisetas';
+import SharedCollection from './components/SharedCollection';
 
 // Componente de transición simple usando React.memo para evitar re-renders innecesarios
 const PageTransition = React.memo(({ children }) => {
@@ -113,6 +115,25 @@ function App() {
                 <Navigate to="/login" replace />
               )
             } 
+          />
+
+          <Route 
+            path="/estadisticas-camisetas" 
+            element={
+              isLoggedIn ? (
+                <PageTransition>
+                  <EstadisticasCamisetas />
+                </PageTransition>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            } 
+          />
+
+          {/* Ruta para colección compartida (sin autenticación) */}
+          <Route 
+            path="/shared/:token" 
+            element={<SharedCollection />} 
           />
 
           <Route 

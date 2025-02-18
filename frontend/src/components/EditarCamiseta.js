@@ -429,6 +429,7 @@ function EditarCamiseta({
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
+        credentials: 'include',
         body: submitFormData,
       });
 

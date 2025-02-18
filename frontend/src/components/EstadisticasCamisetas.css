@@ -1,0 +1,686 @@
+/* =========================================
+   1. BASE Y LAYOUT
+   ========================================= */
+   .estadisticas-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    background-image: url("../assets/background.jpg");
+    background-size: cover;
+    background-position: center;
+    overflow-y: auto;
+    padding: 15px;
+  }
+  
+  .estadisticas-container {
+    background-color: rgba(0, 0, 0, 0.85);
+    min-height: 100vh;
+    color: #fff;
+    padding: 15px;
+    max-width: 1600px;
+    margin: 0 auto;
+    overflow: visible;
+    position: relative;
+  }
+  
+  .estadisticas-container.modal-abierto .graficos-grid,
+  .estadisticas-container.modal-abierto .resumen-container,
+  .estadisticas-container.modal-abierto .header-container {
+    opacity: 0.05 !important;
+    pointer-events: none;
+  }
+  
+  .graficos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+    position: relative;
+    perspective: 1000px;
+    min-height: 400px;
+  }
+  
+  /* =========================================
+     2. COMPONENTES PRINCIPALES
+     ========================================= */
+  .header-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    margin-bottom: 30px;
+  }
+  
+  .header-container
+  .back-button {
+    position: absolute;
+    left: 20px;
+    top: 20px;
+    padding: 10px 20px;
+    background-color: rgba(87, 85, 85, 0.2);
+    border: 1px solid #666;
+    border-radius: 5px;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+  }
+  
+  .back-button:hover {
+    background-color: rgba(87, 85, 85, 0.4);
+    transform: translateX(-5px);
+  }
+  
+  .estadisticas-titulo {
+    font-size: 1.5rem;
+    margin: 15px 0;
+    text-align: center;
+    background-color: rgba(87, 85, 85, 0.2);
+    border: 1px solid #666;
+    border-radius: 8px;
+    padding: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  /* =========================================
+   3. RESUMEN Y TARJETAS
+   ========================================= */
+.resumen-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 8px;
+  max-width: 1000px;
+}
+
+
+.user-profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px 0;
+  width: 100%;
+}
+
+.resumen-container
+.profile-photo,
+.profile-photo-placeholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 4px solid #666;
+  margin-bottom: 15px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.profile-photo {
+  object-fit: cover;
+}
+
+.profile-photo-placeholder {
+  background-color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem;
+  color: #fff;
+}
+
+.username {
+  font-size: 1.2rem;
+  margin-top: 15px;
+  font-weight: bold;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+
+.resumen-stats {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.resumen-item {
+  text-align: center;
+  padding: 15px 25px;
+  border-right: 1px solid #666;
+  flex: 1;
+}
+
+.resumen-item:last-child {
+  border-right: none;
+}
+
+.resumen-numero {
+  display: block;
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+  color: #fff;
+}
+
+.resumen-label {
+  font-size: 1rem;
+  color: #bbb;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Tarjetas de Gráficos */
+.grafico-card {
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 8px;
+  padding: 15px;
+  min-height: 350px;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  cursor: pointer;
+  transform-origin: center center;
+  transition: all 0.3s ease;
+  animation: fadeIn 0.4s ease-out;
+  animation-fill-mode: both;
+}
+
+.grafico-card:hover {
+  transform: scale(1.1);
+  z-index: 1000;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  background-color: rgba(40, 40, 40, 0.95);
+}
+
+.grafico-card h2 {
+  font-size: 1rem;
+  margin-bottom: 15px;
+  text-align: center;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #666;
+  color: #fff;
+}
+
+/* /* =========================================
+   4. MODAL
+   ========================================= */
+.estadisticas-camisetas-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-color: rgba(0, 0, 0, 0.95) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  z-index: 99999 !important;
+  animation: modalFadeIn 0.3s ease-out;
+}
+
+.estadisticas-camisetas-modal-content-inner {
+  background-color: #1a1a1a !important;
+  position: relative !important;
+  padding: 20px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 20px !important;
+  border-radius: 12px !important;
+  animation: modalSlideIn 0.3s ease-out;
+  margin-top: -5% !important;
+}
+
+/* Ajustes específicos para cada tipo de gráfico */
+.estadisticas-camisetas-modal-content-inner.modal-pie {
+  width: 50% !important;
+  height: 70% !important;
+}
+
+.estadisticas-camisetas-modal-content-inner.modal-line {
+  width: 70% !important;
+  height: 60% !important;
+}
+
+.estadisticas-camisetas-modal-content-inner.modal-ranking {
+  width: 60% !important;
+  height: 80% !important;
+  max-height: 800px !important;
+}
+
+.estadisticas-camisetas-modal-title {
+  color: white !important;
+  font-size: 1.5rem !important;
+  text-align: center !important;
+  margin: 0 !important;
+  padding-bottom: 15px !important;
+  border-bottom: 1px solid #666 !important;
+}
+
+.estadisticas-camisetas-modal-close {
+  position: absolute !important;
+  right: -15px !important;
+  top: -15px !important;
+  width: 30px !important;
+  height: 30px !important;
+  border-radius: 50% !important;
+  background-color: #797272 !important;
+  border: 2px solid #fff !important;
+  color: #fff !important;
+  font-size: 20px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  z-index: 1 !important;
+  padding: 0 !important;
+}
+
+.estadisticas-camisetas-modal-close:hover {
+  background-color: #ff6666 !important;
+  transform: scale(1.1) !important;
+}
+
+.estadisticas-camisetas-modal-content-wrapper {
+  flex: 1 !important;
+  overflow: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ajustes para los contenedores de gráficos */
+.estadisticas-camisetas-modal-content-wrapper .chart-container {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 300px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Ajustes específicos para rankings */
+.estadisticas-camisetas-modal-content-wrapper .ranking-container {
+  width: 100% !important;
+  height: 100% !important;
+  overflow-y: auto !important;
+  padding: 20px !important;
+}
+
+/* Para gráficos específicos dentro del modal */
+.modal-chart {
+  width: 100% !important;
+  height: 600px !important;
+  min-height: 600px !important;
+}
+
+/* Estilos para el contenido del ranking en el modal */
+.estadisticas-camisetas-modal-content-wrapper .lista-ranking {
+  padding: 20px !important;
+  height: auto !important;
+  max-height: none !important;
+  width: 100% !important;
+}
+
+.estadisticas-camisetas-modal-content-wrapper .ranking-item {
+  padding: 15px !important;
+  margin-bottom: 12px !important;
+  font-size: 1.1rem !important;
+}
+
+/* Media Queries específicas para el modal */
+@media (max-width: 1200px) {
+  .estadisticas-camisetas-modal-content-inner {
+    width: 70% !important;
+  }
+  
+  .estadisticas-camisetas-modal-content-inner.modal-line {
+    width: 80% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .estadisticas-camisetas-modal-content-inner {
+    width: 90% !important;
+    height: 80% !important;
+    margin-top: 0 !important;
+  }
+
+  .estadisticas-camisetas-modal-content-inner.modal-line,
+  .estadisticas-camisetas-modal-content-inner.modal-pie,
+  .estadisticas-camisetas-modal-content-inner.modal-ranking {
+    width: 90% !important;
+    height: 80% !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .estadisticas-camisetas-modal-content-inner {
+    width: 95% !important;
+    padding: 15px !important;
+  }
+
+  .estadisticas-camisetas-modal-title {
+    font-size: 1.2rem !important;
+  }
+
+  .estadisticas-camisetas-modal-close {
+    width: 25px !important;
+    height: 25px !important;
+    font-size: 16px !important;
+    right: -10px !important;
+    top: -10px !important;
+  }
+}
+/* =========================================
+   5. RANKINGS Y LISTAS
+   ========================================= */
+   .chart-container {
+    width: 100%;
+    height: auto; /* Cambiar height: 100% por auto */
+    min-height: 300px;
+    background-color: transparent;
+    overflow: visible; /* Cambiar overflow-y: auto por overflow: visible */
+  }
+  
+  .ranking-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  .lista-ranking {
+    padding: 15px;
+    height: 100%;
+    overflow-y: auto;
+  }
+  
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+    color: #333;
+    background-color: rgba(231, 220, 220, 0.9);
+    margin-bottom: 8px;
+    border-radius: 6px;
+    transition: all 0.3s ease;
+  }
+  
+  .ranking-item:hover {
+    background-color: #fff;
+    transform: translateX(5px);
+  }
+  
+  .ranking-position {
+    width: 40px;
+    font-weight: bold;
+    text-align: center;
+    font-size: 1.1rem;
+  }
+  
+  .ranking-name {
+    flex: 1;
+    margin: 0 15px;
+    font-size: 1rem;
+  }
+  
+  .ranking-value {
+    width: 50px;
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.1rem;
+  }
+
+  /* =========================================
+   6. ELEMENTOS AUXILIARES
+   ========================================= */
+/* Tooltips */
+.custom-tooltip {
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #666;
+  padding: 10px;
+  border-radius: 4px;
+}
+
+.custom-tooltip .label {
+  color: #000;
+  font-weight: 500;
+}
+
+/* Mensaje sin datos */
+.no-data-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+  padding: 20px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  margin: auto;
+  color: #fff;
+}
+
+.no-data-message p {
+  margin: 5px 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.no-data-message p:first-child {
+  font-size: 1.1rem;
+  font-weight: 500;
+  opacity: 1;
+  margin-bottom: 10px;
+}
+
+/* Estados de carga y error */
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #fff;
+  font-size: 1.5rem;
+}
+
+.estadisticas-container
+.error-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  color: #ff6b6b;
+  font-size: 1.2rem;
+  text-align: center;
+  padding: 20px;
+}
+
+.color-circle {
+  transition: transform 0.2s ease;
+}
+
+.ranking-item:hover .color-circle {
+  transform: scale(1.2);
+}
+
+/* Para colores claros como blanco */
+.color-circle {
+  box-shadow: inset 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+/* Scrollbar Personalizada */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+/* =========================================
+   7. ANIMACIONES
+   ========================================= */
+   @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  @keyframes modalFadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  
+  @keyframes modalSlideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  /* Aplicación de animaciones */
+  .estadisticas-camisetas-modal-overlay {
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  
+  .estadisticas-camisetas-modal-content-inner {
+    animation: modalSlideIn 0.3s ease-out;
+  }
+  
+  /* =========================================
+     8. MEDIA QUERIES
+     ========================================= */
+  @media (max-width: 1400px) {
+    .graficos-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  
+    .estadisticas-camisetas-modal-content-inner {
+      width: 95% !important;
+    }
+  }
+  
+  @media (max-width: 900px) {
+    .graficos-grid {
+      grid-template-columns: 1fr;
+    }
+  
+    .estadisticas-camisetas-modal-content-inner {
+      height: 95vh !important;
+      padding: 15px !important;
+    }
+  
+    .estadisticas-camisetas-modal-close {
+      width: 35px !important;
+      height: 35px !important;
+      font-size: 20px !important;
+    }
+  
+    .grafico-card:hover {
+      transform: scale(1.02);
+    }
+  
+    .resumen-stats {
+      flex-direction: column;
+    }
+  
+    .resumen-item {
+      border-right: none;
+      border-bottom: 1px solid #666;
+      padding: 15px;
+    }
+  
+    .resumen-item:last-child {
+      border-bottom: none;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .estadisticas-titulo {
+      font-size: 1.2rem;
+    }
+  
+    .estadisticas-camisetas-modal-content-inner {
+      padding: 10px !important;
+    }
+  
+    .estadisticas-camisetas-modal-close {
+      width: 30px !important;
+      height: 30px !important;
+      font-size: 18px !important;
+      right: -10px !important;
+      top: -10px !important;
+    }
+  
+    .ranking-item {
+      padding: 10px;
+      font-size: 0.9rem;
+    }
+  
+    .graficos-grid {
+      padding: 10px;
+      gap: 15px;
+    }
+  
+    .grafico-card {
+      min-height: 300px;
+      padding: 10px;
+    }
+  }
+  
+  @media (max-width: 320px) {
+    .estadisticas-camisetas-modal-content-inner {
+      padding: 10px !important;
+    }
+  
+    .graficos-grid {
+      padding: 5px;
+      gap: 10px;
+    }
+  
+    .ranking-item {
+      padding: 8px;
+      font-size: 0.8rem;
+    }
+  }

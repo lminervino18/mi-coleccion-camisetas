@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -78,6 +79,11 @@ public class UsuarioService {
         return usuarioRepository.existsByUsername(username.trim());
     }
 
+    public Usuario findByUsername(String username) {
+        return usuarioRepository.findByUsername(username.trim())
+            .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con username: " + username));
+    }
+    
     public Optional<UsuarioDTO> getUsuarioById(Long id) {
         return usuarioRepository.findById(id).map(UsuarioDTO::new);
     }

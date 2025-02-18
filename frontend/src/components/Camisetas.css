@@ -11,10 +11,36 @@
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
+  position: relative; /* Añadido */
+  overflow-y: auto; /* Añadido */
+}
+
+/* Añadir un pseudo-elemento para el fondo */
+.camisetas-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
   background-image: url("../assets/background.jpg");
   background-size: cover;
   background-position: center;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-attachment: fixed;
+  z-index: -1;
+}
+
+/* Añadir overlay oscuro */
+.camisetas-container::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: -1;
 }
 
 /* Barra Superior */
@@ -27,7 +53,7 @@
   padding: 15px 25px;
   border-radius: 8px;
   min-height: 70px; /* Cambiado de height fijo a min-height */
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgba(0, 0, 0, 0.88);
 }
 
 /* Búsqueda y Botón Agregar */
@@ -118,7 +144,20 @@
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 15px;
+}
+
+.stats-icon {
+  cursor: pointer;
+  font-size: 1.8rem;
+  margin: 0 5px;
+  color: #666;
+  transition: all 0.3s ease; /* Cambiado de 'color' a 'all' para animar tanto el color como el tamaño */
+}
+
+.stats-icon:hover {
+  color: white;
+  transform: scale(1.2); /* Esto hace que el ícono se agrande un 20% */
 }
 
 .profile-photo {
@@ -1127,6 +1166,13 @@
   transform: translateY(1px);
 }
 
+.camisetas-count {
+  text-align: initial;
+  padding: 0px;
+  color: #f7f0f0;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
 
 /* Media Queries */
 @media (max-width: 1200px) {
@@ -1374,4 +1420,99 @@
 .filter-select-container select option {
   background-color: #333;
   color: white;
+}
+
+.share-icon {
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 1.5rem;
+  color: #666;
+  transition: all 0.3s ease; /* Cambiado de 'color' a 'all' para incluir transformación */
+}
+
+.share-icon:hover {
+  color: #f4f7fa;
+  transform: scale(1.2); /* Esto hace que el ícono se agrande un 20% */
+}
+
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.share-modal-content {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.share-modal-content h2 {
+  margin-bottom: 20px;
+  color: #e0e0e0;
+}
+
+.share-link-input {
+  width: 100%;
+  margin: 15px 0;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.share-link-input:focus {
+  outline: none;
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.share-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.share-modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.share-modal-actions button:first-child {
+  background-color: #a8aaac;
+  color: rgb(20, 20, 20);
+}
+
+.share-modal-actions button:last-child {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.share-modal-actions button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.share-modal-actions button:active {
+  transform: translateY(0);
 }

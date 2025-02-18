@@ -49,27 +49,42 @@ function Login() {
     }
 };
 
-  // Login.js
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(credentials),
+          headers: { 
+              'Content-Type': 'application/json' 
+          },
+          body: JSON.stringify({
+              username: credentials.username,
+              password: credentials.password
+          }),
+          credentials: 'include',
       });
 
-      console.log('Status:', response.status);
+      // Loguear el status de la respuesta
+      console.log('Status de respuesta:', response.status);
+
+      // Manejar diferentes códigos de estado
+      if (response.status === 401) {
+          const errorText = await response.text();
+          setError(errorText || 'Credenciales inválidas');
+          return;
+      }
 
       if (!response.ok) {
-          setError('Usuario o contraseña incorrectos');
+          const errorText = await response.text();
+          setError(errorText || 'Error en el inicio de sesión');
           return;
       }
 
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
 
+      // Validar la estructura de la respuesta
       if (data && data.token && data.usuarioId) {
           // Limpiar cualquier dato anterior
           localStorage.clear();
@@ -78,18 +93,15 @@ const handleSubmit = async (e) => {
           localStorage.setItem('token', data.token);
           localStorage.setItem('usuarioId', data.usuarioId.toString());
           
-          console.log('Token guardado:', localStorage.getItem('token'));
-          console.log('Usuario ID guardado:', localStorage.getItem('usuarioId'));
-          
-          // Forzar la redirección
+          // Redirigir a la página de camisetas
           window.location.href = '/camisetas';
       } else {
-          setError('Error en la respuesta del servidor');
+          setError('Respuesta del servidor inválida');
       }
 
   } catch (error) {
-      console.error('Error completo:', error);
-      setError('Error en la conexión al servidor');
+      console.error('Error de conexión:', error);
+      setError('No se pudo conectar con el servidor');
   }
 };
 
