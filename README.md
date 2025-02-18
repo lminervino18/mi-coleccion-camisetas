@@ -22,7 +22,7 @@
 
 El siguiente diagrama muestra la estructura de la base de datos:
 
-![Modelo de la base de datos](./frontend/public/bdd.png))
+![Modelo de la base de datos](./frontend/public/bdd.png)
 
 ### Estructura de Tablas
 
