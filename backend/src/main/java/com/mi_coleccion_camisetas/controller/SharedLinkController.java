@@ -1,5 +1,6 @@
 package com.mi_coleccion_camisetas.controller;
 
+import com.mi_coleccion_camisetas.dto.CamisetaDTO;
 import com.mi_coleccion_camisetas.dto.SharedLinkDTO;
 import com.mi_coleccion_camisetas.model.Camiseta;
 import com.mi_coleccion_camisetas.model.SharedLink;
@@ -7,8 +8,10 @@ import com.mi_coleccion_camisetas.model.Usuario;
 import com.mi_coleccion_camisetas.repository.CamisetaRepository;
 import com.mi_coleccion_camisetas.repository.UsuarioRepository;
 import com.mi_coleccion_camisetas.service.SharedLinkService;
+import java.util.HashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,9 +48,6 @@ public class SharedLinkController {
         // Generar SIEMPRE un nuevo link
         String token = sharedLinkService.generarLinkCompartido(usuario.getId());
         
-        SharedLink sharedLink = sharedLinkService.validarToken(token)
-            .orElseThrow(() -> new RuntimeException("Error al generar link"));
-    
         // Construir URL completa
         String urlCompleta = "http://localhost:3000/shared/" + token;
     
@@ -57,26 +57,51 @@ public class SharedLinkController {
         return ResponseEntity.ok(linkDTO);
     }
 
-    /**
-     * Obtener camisetas de un link compartido
-     */
-    @GetMapping("/camisetas/{token}")
-    public ResponseEntity<List<Camiseta>> getCamisetasCompartidas(@PathVariable String token) {
-        // Validar token
-        SharedLink sharedLink = sharedLinkService.validarToken(token)
-            .orElseThrow(() -> new RuntimeException("Link inválido o expirado"));
+    @GetMapping("/user/{token}")
+    public ResponseEntity<?> getUserInfo(@PathVariable String token) {
+        try {
+            // Validar token
+            SharedLink sharedLink = sharedLinkService.validarToken(token)
+                .orElseThrow(() -> new RuntimeException("Link inválido o expirado"));
 
-        // Obtener camisetas del usuario
-        List<Camiseta> camisetas = camisetaRepository.findByUsuarioId(sharedLink.getUsuarioId());
-        
-        // Limpiar datos sensibles
-        camisetas.forEach(c -> {
-            c.setImagenCompleta(null);
-            // Puedes agregar más limpieza si es necesario
-        });
-        
-        return ResponseEntity.ok(camisetas);
+            // Obtener usuario
+            Usuario usuario = usuarioRepository.findById(sharedLink.getUsuarioId())
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+            // Crear un objeto con solo la información necesaria
+            var userInfo = new HashMap<String, String>();
+            userInfo.put("username", usuario.getUsername());
+            userInfo.put("photoUrl", usuario.getFotoDePerfil());
+            
+            return ResponseEntity.ok(userInfo);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body("Error al obtener información del usuario: " + e.getMessage());
+        }
     }
+
+    
+    @GetMapping("/camisetas/{token}")
+        public ResponseEntity<?> getCamisetasCompartidas(@PathVariable String token) {
+            try {
+                // Validar token
+                SharedLink sharedLink = sharedLinkService.validarToken(token)
+                    .orElseThrow(() -> new RuntimeException("Link inválido o expirado"));
+
+                // Obtener camisetas del usuario
+                List<Camiseta> camisetas = camisetaRepository.findByUsuarioId(sharedLink.getUsuarioId());
+                
+                // Convertir a DTOs
+                List<CamisetaDTO> camisetasDTO = camisetas.stream()
+                    .map(CamisetaDTO::new)
+                    .collect(Collectors.toList());
+                
+                return ResponseEntity.ok(camisetasDTO);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Error al obtener camisetas: " + e.getMessage());
+            }
+        }
 
     /**
      * Obtener todos los links compartidos del usuario

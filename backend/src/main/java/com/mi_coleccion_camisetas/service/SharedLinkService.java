@@ -45,16 +45,10 @@ public class SharedLinkService {
         return token;
     }
 
-    /**
-     * Valida un token de link compartido
-     * @param token Token a validar
-     * @return Optional con el SharedLink si es válido
-     */
     @Transactional(readOnly = true)
     public Optional<SharedLink> validarToken(String token) {
         Optional<SharedLink> sharedLink = sharedLinkRepository.findByToken(token);
         
-        // Verificar si el link existe y no ha expirado
         return sharedLink.filter(link -> 
             link != null && 
             LocalDateTime.now().isBefore(link.getFechaExpiracion())

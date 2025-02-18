@@ -9,10 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -28,9 +25,6 @@ public class AuthController {
 
     @Autowired
     private JwtUtil jwtUtil;
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
 
     // Endpoint de prueba para verificar que el controlador funciona
     @GetMapping("/test")
@@ -58,11 +52,6 @@ public class AuthController {
                 logger.warn("Login attempt with empty password");
                 return ResponseEntity.badRequest().body("Password es requerida");
             }
-
-            // Intentar autenticar
-            Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(username, password)
-            );
 
             // Buscar el usuario en la base de datos
             Usuario usuario = usuarioService.findByUsername(username);
