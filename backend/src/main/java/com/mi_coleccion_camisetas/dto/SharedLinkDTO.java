@@ -1,5 +1,6 @@
 package com.mi_coleccion_camisetas.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.mi_coleccion_camisetas.model.SharedLink;
 import java.time.LocalDateTime;
 
@@ -7,35 +8,57 @@ public class SharedLinkDTO {
     private Long id;
     private String token;
     private Long usuarioId;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fechaCreacion;
+    
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime fechaExpiracion;
+    
     private long tiempoRestante; // En minutos
+    private String urlCompleta;
 
     // Constructor vacío
     public SharedLinkDTO() {}
 
     // Constructor desde entidad
     public SharedLinkDTO(SharedLink sharedLink) {
-        this.id = sharedLink.getId();
-        this.token = sharedLink.getToken();
-        this.usuarioId = sharedLink.getUsuarioId();
-        this.fechaCreacion = sharedLink.getFechaCreacion();
-        this.fechaExpiracion = sharedLink.getFechaExpiracion();
-        
-        // Calcular tiempo restante
-        this.tiempoRestante = calcularTiempoRestante();
+        if (sharedLink != null) {
+            this.id = sharedLink.getId();
+            this.token = sharedLink.getToken();
+            this.usuarioId = sharedLink.getUsuarioId();
+            this.fechaCreacion = sharedLink.getFechaCreacion();
+            this.fechaExpiracion = sharedLink.getFechaExpiracion();
+            
+            // Calcular tiempo restante solo si fechaExpiracion no es nulo
+            this.tiempoRestante = calcularTiempoRestante();
+        }
     }
 
     // Método para calcular tiempo restante
     private long calcularTiempoRestante() {
         LocalDateTime now = LocalDateTime.now();
-        if (fechaExpiracion.isAfter(now)) {
+        if (fechaExpiracion != null && fechaExpiracion.isAfter(now)) {
             return java.time.Duration.between(now, fechaExpiracion).toMinutes();
         }
         return 0;
     }
 
-    // Getters y Setters
+    // Método para generar URL completa del link
+    public String generarUrlCompleta(String baseUrl) {
+        return baseUrl + "/shared/" + token;
+    }
+
+    // Método de fábrica para crear un DTO con URL base
+    public static SharedLinkDTO crear(SharedLink sharedLink, String baseUrl) {
+        SharedLinkDTO dto = new SharedLinkDTO(sharedLink);
+        if (dto.getToken() != null) {
+            dto.setUrlCompleta(dto.generarUrlCompleta(baseUrl));
+        }
+        return dto;
+    }
+
+    // Getters y Setters con validaciones nulas
     public Long getId() {
         return id;
     }
@@ -84,14 +107,17 @@ public class SharedLinkDTO {
         this.tiempoRestante = tiempoRestante;
     }
 
-    // Método para verificar si el link está expirado
-    public boolean isExpirado() {
-        return LocalDateTime.now().isAfter(fechaExpiracion);
+    public String getUrlCompleta() {
+        return urlCompleta;
     }
 
-    // Método para generar URL completa del link
-    public String getUrlCompleta(String baseUrl) {
-        return baseUrl + "/shared/" + token;
+    public void setUrlCompleta(String urlCompleta) {
+        this.urlCompleta = urlCompleta;
+    }
+
+    // Método para verificar si el link está expirado
+    public boolean isExpirado() {
+        return fechaExpiracion != null && LocalDateTime.now().isAfter(fechaExpiracion);
     }
 
     // toString para depuración
@@ -104,13 +130,7 @@ public class SharedLinkDTO {
                 ", fechaCreacion=" + fechaCreacion +
                 ", fechaExpiracion=" + fechaExpiracion +
                 ", tiempoRestante=" + tiempoRestante +
+                ", urlCompleta='" + urlCompleta + '\'' +
                 '}';
-    }
-
-    // Método de fábrica para crear un DTO con URL base
-    public static SharedLinkDTO crear(SharedLink sharedLink, String baseUrl) {
-        SharedLinkDTO dto = new SharedLinkDTO(sharedLink);
-        dto.setToken(dto.getUrlCompleta(baseUrl));
-        return dto;
     }
 }

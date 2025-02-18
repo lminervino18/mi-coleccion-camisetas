@@ -35,25 +35,24 @@ public class SharedLinkController {
         this.camisetaRepository = camisetaRepository;
     }
 
-    /**
-     * Generar un nuevo link compartido
-     */
     @PostMapping("/generar-link")
     public ResponseEntity<SharedLinkDTO> generarLinkCompartido(Principal principal) {
         // Obtener el usuario actual
         String username = principal.getName();
         Usuario usuario = usuarioRepository.findByUsername(username)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
-        // Generar link compartido
+    
+        // Generar SIEMPRE un nuevo link
         String token = sharedLinkService.generarLinkCompartido(usuario.getId());
         
-        // Buscar el link generado
         SharedLink sharedLink = sharedLinkService.validarToken(token)
             .orElseThrow(() -> new RuntimeException("Error al generar link"));
-
-        // Crear DTO con URL completa
-        SharedLinkDTO linkDTO = SharedLinkDTO.crear(sharedLink, "http://localhost:3000");
+    
+        // Construir URL completa
+        String urlCompleta = "http://localhost:3000/shared/" + token;
+    
+        SharedLinkDTO linkDTO = new SharedLinkDTO();
+        linkDTO.setUrlCompleta(urlCompleta);
         
         return ResponseEntity.ok(linkDTO);
     }

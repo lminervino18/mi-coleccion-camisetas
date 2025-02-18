@@ -22,17 +22,15 @@ public class SharedLinkService {
         this.sharedLinkRepository = sharedLinkRepository;
     }
 
-    /**
-     * Genera un nuevo link compartido para un usuario
-     * @param usuarioId ID del usuario que genera el link
-     * @return Token del link generado
-     */
     @Transactional
     public String generarLinkCompartido(Long usuarioId) {
+        // Eliminar links anteriores del usuario
+        sharedLinkRepository.deleteByUsuarioId(usuarioId);
+        
         // Generar un token único
         String token;
         do {
-            token = UUID.randomUUID().toString();
+            token = UUID.randomUUID().toString().substring(0, 8); // Token más corto
         } while (sharedLinkRepository.existsByToken(token));
         
         // Crear y guardar el link compartido
@@ -40,7 +38,7 @@ public class SharedLinkService {
         sharedLink.setToken(token);
         sharedLink.setUsuarioId(usuarioId);
         sharedLink.setFechaCreacion(LocalDateTime.now());
-        sharedLink.setFechaExpiracion(LocalDateTime.now().plusDays(7));
+        sharedLink.setFechaExpiracion(LocalDateTime.now().plusDays(30)); // 30 días de validez
         
         sharedLinkRepository.save(sharedLink);
         

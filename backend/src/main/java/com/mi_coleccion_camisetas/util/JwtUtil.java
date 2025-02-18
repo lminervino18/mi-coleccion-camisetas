@@ -1,54 +1,77 @@
 package com.mi_coleccion_camisetas.util;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import java.util.Date;
-
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+
+import java.security.Key;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 @Component
 public class JwtUtil {
 
-    private String secretKey = "mi_secreto_super_seguro";
+    // Valor por defecto si no se encuentra en properties
+    @Value("${jwt.secret:defaultSecretKeyThatIsSuperLongAndSecure123456789}")
+    private String SECRET_KEY;
+
+    @Value("${jwt.expiration:86400000}")
+    private long EXPIRATION_TIME;
+
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public Date extractExpiration(String token) {
+        return extractClaim(token, Claims::getExpiration);
+    }
+
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+    }
+
+    private Key getSigningKey() {
+        // Convierte la clave secreta en un objeto Key para firmar
+        return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    }
+
+    private Boolean isTokenExpired(String token) {
+        return extractExpiration(token).before(new Date());
+    }
 
     public String generateToken(String username, Long usuarioId) {
-        Algorithm algorithm = Algorithm.HMAC256(secretKey);
-        return JWT.create()
-                .withSubject(username)
-                .withClaim("usuarioId", usuarioId)
-                .withIssuedAt(new Date())
-                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60)) // Expira en 1 hora
-                .sign(algorithm);
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("usuarioId", usuarioId);
+        return createToken(claims, username);
     }
 
-    // Extraer el nombre de usuario del token
-    public String extractUsername(String token) {
-        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secretKey))
-                .build()
-                .verify(token);
-        return decodedJWT.getSubject();
+    private String createToken(Map<String, Object> claims, String subject) {
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
     }
 
-    public Long extractUsuarioId(String token) {
-        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secretKey))
-                .build()
-                .verify(token);
-        return decodedJWT.getClaim("usuarioId").asLong();
-    }
-
-    // Verificar si el token ha expirado
-    public boolean isTokenExpired(String token) {
-        DecodedJWT decodedJWT = JWT.require(Algorithm.HMAC256(secretKey))
-                .build()
-                .verify(token);
-        return decodedJWT.getExpiresAt().before(new Date());
-    }
-
-    // Extraer todos los claims del token
-    public DecodedJWT extractAllClaims(String token) {
-        return JWT.require(Algorithm.HMAC256(secretKey))
-                .build()
-                .verify(token);
+    public Boolean validateToken(String token, UserDetails userDetails) {
+        final String username = extractUsername(token);
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 }

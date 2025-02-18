@@ -1,5 +1,4 @@
 com/mi_coleccion_camisetas/model/AuthResponse.class
-com/mi_coleccion_camisetas/config/CorsConfig$1.class
 com/mi_coleccion_camisetas/config/AppConfig.class
 com/mi_coleccion_camisetas/model/Usuario$Role.class
 com/mi_coleccion_camisetas/controller/AuthController.class

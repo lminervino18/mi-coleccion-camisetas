@@ -1421,3 +1421,98 @@
   background-color: #333;
   color: white;
 }
+
+.share-icon {
+  cursor: pointer;
+  margin-left: 10px;
+  font-size: 1.5rem;
+  color: #666;
+  transition: all 0.3s ease; /* Cambiado de 'color' a 'all' para incluir transformación */
+}
+
+.share-icon:hover {
+  color: #f4f7fa;
+  transform: scale(1.2); /* Esto hace que el ícono se agrande un 20% */
+}
+
+.share-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.share-modal-content {
+  background: rgba(0, 0, 0, 0.9);
+  padding: 25px;
+  border-radius: 12px;
+  width: 400px;
+  max-width: 90%;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.share-modal-content h2 {
+  margin-bottom: 20px;
+  color: #e0e0e0;
+}
+
+.share-link-input {
+  width: 100%;
+  margin: 15px 0;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  color: white;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.share-link-input:focus {
+  outline: none;
+  border-color: #ffffff;
+  background-color: rgba(255, 255, 255, 0.15);
+}
+
+.share-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.share-modal-actions button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.share-modal-actions button:first-child {
+  background-color: #a8aaac;
+  color: rgb(20, 20, 20);
+}
+
+.share-modal-actions button:last-child {
+  background-color: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.share-modal-actions button:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.share-modal-actions button:active {
+  transform: translateY(0);
+}

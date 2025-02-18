@@ -14,23 +14,15 @@ import java.util.List;
 @Repository
 public interface SharedLinkRepository extends JpaRepository<SharedLink, Long> {
     
-    // Buscar un link compartido por su token
     Optional<SharedLink> findByToken(String token);
-
-    // Eliminar un link compartido por su token
+    boolean existsByToken(String token);
     void deleteByToken(String token);
-
+    void deleteByUsuarioId(Long usuarioId);
+    List<SharedLink> findByUsuarioId(Long usuarioId);
     // Eliminar links expirados
     @Modifying
     @Query("DELETE FROM SharedLink sl WHERE sl.fechaExpiracion < :fechaActual")
     void deleteExpiredLinks(@Param("fechaActual") LocalDateTime fechaActual);
-
-    // Buscar links por usuario
-    List<SharedLink> findByUsuarioId(Long usuarioId);
-
-    // Verificar si existe un token
-    boolean existsByToken(String token);
-
     // Buscar links cercanos a expirar
     @Query("SELECT sl FROM SharedLink sl WHERE sl.fechaExpiracion BETWEEN :fechaInicio AND :fechaFin")
     List<SharedLink> findLinksProximosAExpirar(

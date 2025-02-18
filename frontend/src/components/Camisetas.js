@@ -12,7 +12,8 @@ import {
   faSortAmountDown,
   faArrowLeft,
   faExclamation,
-  faChartSimple  // Añade este ícono
+  faChartSimple,  // Añade este ícono
+  faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 
 // Componente para cada camiseta individual
@@ -128,6 +129,8 @@ function Camisetas() {
   const [tipoCamisetaFilter, setTipoCamisetaFilter] = useState(null);
   const [ligaFilter, setLigaFilter] = useState(null);
   const [availableLigas, setAvailableLigas] = useState([]);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareLink, setShareLink] = useState('');
   const navigate = useNavigate();
 
   const SELECTOR_SIZE = 200;
@@ -320,6 +323,49 @@ useEffect(() => {
         setLigaFilter(ligaFilter === liga ? null : liga);
         setTipoCamisetaFilter(null);
       }
+    };
+
+    const generateShareLink = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/api/shared/generar-link', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+            'Content-Type': 'application/json'
+          },
+          credentials: 'include'
+        });
+    
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(errorText || 'Error generando link compartido');
+        }
+    
+        const data = await response.json();
+        
+        // Asegúrate de que la respuesta tenga la URL completa
+        if (data.urlCompleta) {
+          setShareLink(data.urlCompleta);
+          setShowShareModal(true);
+        } else {
+          throw new Error('Respuesta inválida del servidor');
+        }
+      } catch (error) {
+        console.error('Error generando link compartido:', error);
+        alert(error.message);
+      }
+    };
+
+
+    const copyShareLink = () => {
+      navigator.clipboard.writeText(shareLink)
+        .then(() => {
+          alert('Link copiado al portapapeles');
+        })
+        .catch(err => {
+          console.error('Error copiando link:', err);
+          alert('No se pudo copiar el link');
+        });
     };
 
     // Modifica el filtrado de camisetas para incluir estos nuevos filtros
@@ -981,6 +1027,24 @@ useEffect(() => {
           )}
         </div>
         
+        {showShareModal && (
+          <div className="share-modal-overlay">
+            <div className="share-modal-content">
+              <h2>Compartir Colección</h2>
+              <input 
+                type="text" 
+                value={shareLink} 
+                readOnly 
+                className="share-link-input"
+              />
+              <div className="share-modal-actions">
+                <button onClick={copyShareLink}>Copiar Link</button>
+                <button onClick={() => setShowShareModal(false)}>Cerrar</button>
+              </div>
+            </div>
+          </div>
+        )}
+
         {showProfileMenu && (
           <div className="profile-menu">
             <button onClick={() => {
@@ -999,6 +1063,8 @@ useEffect(() => {
         )}
       </div>
       
+      
+
       {/* Nuevo botón de estadísticas */}
       <FontAwesomeIcon 
         icon={faChartSimple} 
@@ -1006,6 +1072,30 @@ useEffect(() => {
         onClick={() => navigate('/estadisticas-camisetas')}
         title="Estadísticas"
       />
+      
+      <FontAwesomeIcon 
+          icon={faExternalLinkAlt} 
+          className="share-icon"
+          onClick={generateShareLink}
+          title="Compartir colección"
+        />
+      {showShareModal && (
+        <div className="share-modal-overlay">
+          <div className="share-modal-content">
+            <h2>Compartir Colección</h2>
+            <input 
+              type="text" 
+              value={shareLink} 
+              readOnly 
+              className="share-link-input"
+            />
+            <div className="share-modal-actions">
+              <button onClick={copyShareLink}>Copiar Link</button>
+              <button onClick={() => setShowShareModal(false)}>Cerrar</button>
+            </div>
+          </div>
+        </div>
+      )}
       
       <FontAwesomeIcon 
         icon={faSignOutAlt} 
