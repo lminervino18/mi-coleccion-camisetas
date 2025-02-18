@@ -4,6 +4,7 @@
 
 ![Imagen de ejemplo de la aplicación](./frontend/public/sample.png)
 ![Imagen de ejemplo de la aplicación](./frontend/public/sample2.png)
+![Imagen de ejemplo de la aplicación](./frontend/public/sample3.png)
 ## Tecnologías utilizadas
 
 ### Frontend
@@ -51,9 +52,13 @@ El siguiente diagrama muestra la estructura de la base de datos:
 - `temporada`: Temporada de la camiseta
 - `comentarios`: Comentarios adicionales
 
-#### Camiseta_Colores
-- `camiseta_id`: ID de la camiseta
-- `color`: Color de la camiseta
+#### Enlaces Compartidos
+- `id`: Identificador único
+- `token`: Token único para compartir
+- `usuario_id`: ID del usuario que comparte
+- `fecha_creacion`: Fecha de creación del enlace
+- `fecha_expiracion`: Fecha de expiración del enlace
+
 
 ## Funcionalidades principales
 
@@ -68,6 +73,17 @@ El siguiente diagrama muestra la estructura de la base de datos:
 - Eliminar camisetas
 - Filtrar y ordenar camisetas
 - Visualización en formato grilla
+
+### Estadísticas y Análisis
+
+La funcionalidad estrella de la aplicación es su sección de estadísticas, que proporciona:
+
+- Distribución de camisetas por liga/país
+- Análisis temporal de la colección
+- Gráficos interactivos de composición de la colección
+- Tendencias de colores y equipaciones
+
+Esta sección permite a los usuarios obtener insights valiosos sobre su colección y comprender mejor sus preferencias y patrones de coleccionismo.
 
 ## Configuración y Ejecución
 

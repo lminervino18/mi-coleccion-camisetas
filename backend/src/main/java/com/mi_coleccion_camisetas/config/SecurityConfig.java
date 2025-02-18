@@ -61,6 +61,15 @@ public class SecurityConfig {
                     "/api/usuarios/**"
                 ).authenticated()
                 
+                .requestMatchers(
+        "/manifest.json",
+                    "/*.png",
+                    "/static/**",
+                    "/favicon.ico",
+                    "/icono-chico.png",
+                    "/icono-mediano.png",
+                    "/icono-grande.png"
+                ).permitAll()
                 // Cualquier otro endpoint requiere autenticación
                 .anyRequest().authenticated()
             )

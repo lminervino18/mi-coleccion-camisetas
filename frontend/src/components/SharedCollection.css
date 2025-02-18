@@ -1,349 +1,323 @@
-/* Layout Principal */
-.camisetas-container {
-    padding: 20px;
-    min-height: 100vh;
-    display: flex;
+
+.shared-collection .camisetas-container {
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  position: relative;
+  overflow-y: auto;
+}
+
+.shared-collection .top-bar {
+  width: 80%;
+  margin-bottom: 20px;
+  padding: 15px 25px;
+  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.88);
+}
+
+.shared-collection .user-info-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.shared-collection .user-info-left {
+  display: flex;
+  flex-direction: column;
+}
+
+.shared-collection .user-photo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.shared-collection .user-photo,
+.shared-collection .user-photo-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid white;
+}
+
+.shared-collection .user-photo {
+  object-fit: cover;
+}
+
+.shared-collection .user-photo-placeholder {
+  background-color: #4a4c4e;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.shared-collection .collection-title {
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.shared-collection .collection-stats {
+  color: white;
+  font-size: 1.1rem;
+  margin-top: 19px;
+  padding: 6px 12px;
+  background-color: rgba(87, 85, 85, 0.2);
+  border: 1px solid #666;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  min-width: min-content;
+  white-space: nowrap;
+  transition: all 0.3s ease;
+}
+
+.shared-collection .create-collection-btn {
+  background-color: #1e201e;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.shared-collection .create-collection-btn:hover {
+  background-color: #f1faf2;
+  color: black;
+  transform: translateY(-2px);
+}
+
+.shared-collection .detalle-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.95);
+  z-index: 1000;
+  overflow-y: auto;
+}
+
+.shared-collection .detalle-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+  color: white;
+}
+
+.shared-collection .detalle-header {
+  margin-bottom: 20px;
+}
+
+.shared-collection .header-buttons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+}
+
+.shared-collection .detalle-titulo {
+  font-size: 2rem;
+  text-align: center;
+  margin: 20px 0;
+  padding: 10px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.shared-collection .detalle-content {
+  display: flex;
+  gap: 30px;
+  margin: 0 auto;
+}
+
+.shared-collection .detalle-imagen-container {
+  flex: 1.5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 10px;
+  padding: 20px;
+}
+
+.shared-collection .camiseta-imagen-completa {
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.shared-collection .btn-nav {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.shared-collection .btn-prev {
+  left: 10px;
+}
+
+.shared-collection .btn-next {
+  right: 10px;
+}
+
+.shared-collection .btn-nav:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.shared-collection .btn-back,
+.shared-collection .btn-download {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.shared-collection .btn-back {
+  background-color: #444;
+  color: white;
+}
+
+.shared-collection .btn-download {
+  background-color: #e8eee9;
+  color: rgb(20, 19, 19);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shared-collection .btn-back:hover,
+.shared-collection .btn-download:hover {
+  transform: translateY(-2px);
+  opacity: 0.9;
+}
+
+.shared-collection .detalle-info {
+  flex: 0.8;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.shared-collection .info-section,
+.shared-collection .colores-section,
+.shared-collection .comentarios-section {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.shared-collection .info-item {
+  margin-bottom: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.shared-collection .info-label {
+  color: #888;
+}
+
+.shared-collection .info-value {
+  color: white;
+  font-weight: 500;
+}
+
+.shared-collection .colores-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.shared-collection .color-tag {
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.9rem;
+  border: 1px solid;
+}
+
+/* Media Queries */
+@media (max-width: 1024px) {
+  .shared-collection .detalle-content {
     flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    position: relative;
-    overflow-y: auto;
   }
-  
-  /* Barra Superior y Contenedor de Usuario */
-  .top-bar {
-    width: 80%;
-    margin-bottom: 20px;
-    padding: 15px 25px;
-    border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.88);
+
+  .shared-collection .detalle-imagen-container {
+    max-height: 50vh;
   }
-  
-  .user-info-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    margin-bottom: 15px;
-  }
-  
-  .user-info-left {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .user-photo-section {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  
-  /* Estilos de Usuario y Foto */
-  .user-photo,
-  .user-photo-placeholder {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid white;
-  }
-  
-  .user-photo {
-    object-fit: cover;
-  }
-  
-  .user-photo-placeholder {
-    background-color: #4a4c4e;
-    color: white;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-  
-  .collection-title {
-    color: white;
-    font-size: 1.2rem;
-    font-weight: 500;
-  }
-  
-  .collection-stats {
-    color: white;
-    font-size: 1.1rem;
-    margin-top: 19px;
-    padding: 6px 12px;
-    background-color: rgba(87, 85, 85, 0.2);
-    border: 1px solid #666;
-    border-radius: 8px;
-    display: inline-flex; /* Cambiado a inline-flex */
-    align-items: center;
-    justify-content: center;
-    width: fit-content; /* Se ajusta al contenido */
-    min-width: min-content; /* Asegura que no se rompa el texto */
-    white-space: nowrap; /* Evita que el texto se rompa en múltiples líneas */
-    transition: all 0.3s ease;
-  }
-  
-  /* Botón de Crear Colección */
-  .create-collection-btn {
-    background-color: #1e201e;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    font-weight: 500;
-  }
-  
-  .create-collection-btn:hover {
-    background-color: #f1faf2;
-    color: black;
-    transform: translateY(-2px);
-  }
-  
-  /* Modal de Detalle */
-  .detalle-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.95);
-    z-index: 1000;
-    overflow-y: auto;
-  }
-  
-  .detalle-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 20px;
-    color: white;
-  }
-  
-  .detalle-header {
-    margin-bottom: 20px;
-  }
-  
-  .header-buttons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 15px;
-  }
-  
-  .detalle-titulo {
-    font-size: 2rem;
-    text-align: center;
-    margin: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .shared-collection .top-bar {
+    width: 95%;
     padding: 10px;
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
   }
-  
-  /* Contenido del Detalle */
-  .detalle-content {
-    display: flex;
-    gap: 30px;
-    margin: 0 auto;
-  }
-  
-  .detalle-imagen-container {
-    flex: 1.5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background-color: rgba(0, 0, 0, 0.5);
-    border-radius: 10px;
-    padding: 20px;
-  }
-  
-  .camiseta-imagen-completa {
-    max-width: 100%;
-    max-height: 70vh;
-    object-fit: contain;
-  }
-  
-  /* Navegación entre Camisetas */
-  .btn-nav {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: none;
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    z-index: 2;
-  }
-  
-  .btn-prev {
-    left: 10px;
-  }
-  
-  .btn-next {
-    right: 10px;
-  }
-  
-  .btn-nav:hover {
-    background-color: rgba(255, 255, 255, 0.3);
-  }
-  
-  /* Botones de Acción */
-  .btn-back,
-  .btn-download {
-    padding: 8px 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-  
-  .btn-back {
-    background-color: #444;
-    color: white;
-  }
-  
-  .btn-download {
-    background-color: #e8eee9;
-    color: rgb(20, 19, 19);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  
-  .btn-back:hover,
-  .btn-download:hover {
-    transform: translateY(-2px);
-    opacity: 0.9;
-  }
-  
-  /* Información Detallada */
-  .detalle-info {
-    flex: 0.8;
-    display: flex;
+
+  .shared-collection .user-info-container {
     flex-direction: column;
-    gap: 20px;
+    gap: 10px;
   }
-  
-  .info-section,
-  .colores-section,
-  .comentarios-section {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 20px;
-  }
-  
-  .info-item {
-    margin-bottom: 10px;
-    display: flex;
-    justify-content: space-between;
-  }
-  
-  .info-label {
-    color: #888;
-  }
-  
-  .info-value {
-    color: white;
-    font-weight: 500;
-  }
-  
-  /* Sección de Colores */
-  .colores-container {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+
+  .shared-collection .create-collection-btn {
+    width: 100%;
     margin-top: 10px;
   }
-  
-  .color-tag {
-    padding: 5px 12px;
-    border-radius: 15px;
-    font-size: 0.9rem;
-    border: 1px solid;
+
+  .shared-collection .user-photo,
+  .shared-collection .user-photo-placeholder {
+    width: 32px;
+    height: 32px;
   }
-  
-  /* Animaciones */
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+
+  .shared-collection .collection-title {
+    font-size: 1rem;
   }
-  
-  @keyframes slideIn {
-    from {
-      transform: translateY(-20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+
+  .shared-collection .btn-nav {
+    width: 35px;
+    height: 35px;
   }
-  
-  /* Media Queries */
-  @media (max-width: 1024px) {
-    .detalle-content {
-      flex-direction: column;
-    }
-  
-    .detalle-imagen-container {
-      max-height: 50vh;
-    }
+}
+
+@media (max-width: 480px) {
+  .shared-collection .detalle-titulo {
+    font-size: 1.5rem;
   }
-  
-  @media (max-width: 768px) {
-    .top-bar {
-      width: 95%;
-      padding: 10px;
-    }
-  
-    .user-info-container {
-      flex-direction: column;
-      gap: 10px;
-    }
-  
-    .create-collection-btn {
-      width: 100%;
-      margin-top: 10px;
-    }
-  
-    .user-photo,
-    .user-photo-placeholder {
-      width: 32px;
-      height: 32px;
-    }
-  
-    .collection-title {
-      font-size: 1rem;
-    }
-  
-    .btn-nav {
-      width: 35px;
-      height: 35px;
-    }
+
+  .shared-collection .header-buttons {
+    flex-wrap: wrap;
+    justify-content: center;
   }
-  
-  @media (max-width: 480px) {
-    .detalle-titulo {
-      font-size: 1.5rem;
-    }
-  
-    .header-buttons {
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-  
-    .btn-back,
-    .btn-download {
-      width: 100%;
-      margin: 5px 0;
-    }
+
+  .shared-collection .btn-back,
+  .shared-collection .btn-download {
+    width: 100%;
+    margin: 5px 0;
   }
+}

@@ -39,10 +39,23 @@ const CamisetaItem = React.memo(({ camiseta, camisetas, currentIndex, onNavigate
   
     const handleDownloadImage = () => {
       if (camiseta.imagenCompletaBase64) {
-        const link = document.createElement('a');
-        link.href = `data:image/jpeg;base64,${camiseta.imagenCompletaBase64}`;
-        link.download = `${camiseta.club || camiseta.pais}_${camiseta.temporada}.jpg`;
-        link.click();
+        try {
+          let base64Data = camiseta.imagenCompletaBase64;
+          
+          // Si ya incluye el prefijo data:image, usar directamente
+          if (!base64Data.startsWith('data:image')) {
+            base64Data = `data:image/jpeg;base64,${base64Data}`;
+          }
+    
+          const link = document.createElement('a');
+          link.href = base64Data;
+          link.download = `${camiseta.club || camiseta.pais}_${camiseta.temporada}.jpg`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        } catch (error) {
+          console.error('Error al descargar la imagen:', error);
+        }
       }
     };
 
@@ -123,17 +136,17 @@ const CamisetaItem = React.memo(({ camiseta, camisetas, currentIndex, onNavigate
                 </h1>
               </div>
               <div className="detalle-content">
-                <div className="detalle-imagen-container">
-                  {camiseta.imagenCompletaBase64 ? (
-                    <img
-                      src={`data:image/jpeg;base64,${camiseta.imagenCompletaBase64}`}
-                      alt={camiseta.club || camiseta.pais}
-                      className="camiseta-imagen-completa"
-                    />
-                  ) : (
-                    <div className="no-image">Sin imagen completa disponible</div>
-                  )}
-                </div>
+              <div className="detalle-imagen-container">
+                {camiseta.imagenCompletaBase64 ? (
+                  <img
+                    src={`data:image/jpeg;base64,${camiseta.imagenCompletaBase64.replace(/^data:image\/\w+;base64,/, '')}`}
+                    alt={camiseta.club || camiseta.pais}
+                    className="camiseta-imagen-completa"
+                  />
+                ) : (
+                  <div className="no-image">Sin imagen completa disponible</div>
+                )}
+              </div>
   
                 <div className="detalle-info">
                   <div className="info-section">
@@ -489,6 +502,7 @@ function SharedCollection() {
       
       // Comienzo del renderizado
       return (
+        <div className="shared-collection">
         <div className="camisetas-container">
           <div className="top-bar">
             <div className="search-container">
@@ -848,6 +862,7 @@ function SharedCollection() {
             />
           ))}
       </div>
+    </div>
     </div>
   );
 }

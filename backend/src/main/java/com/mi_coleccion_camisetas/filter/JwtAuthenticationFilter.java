@@ -1,6 +1,8 @@
 package com.mi_coleccion_camisetas.filter;
 
 import com.mi_coleccion_camisetas.util.JwtUtil;
+
+import org.springframework.lang.NonNull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -30,9 +32,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(
-        HttpServletRequest request, 
-        HttpServletResponse response, 
-        FilterChain filterChain
+        @NonNull HttpServletRequest request,
+        @NonNull HttpServletResponse response,
+        @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
         try {
             final String authorizationHeader = request.getHeader("Authorization");
