@@ -1,3 +1,4 @@
+com/mi_coleccion_camisetas/service/CustomUserDetailsService.class
 com/mi_coleccion_camisetas/model/AuthResponse.class
 com/mi_coleccion_camisetas/config/AppConfig.class
 com/mi_coleccion_camisetas/model/Usuario$Role.class
@@ -8,11 +9,18 @@ com/mi_coleccion_camisetas/repository/CamisetaRepository.class
 com/mi_coleccion_camisetas/service/CamisetaService.class
 com/mi_coleccion_camisetas/config/CorsConfig.class
 com/mi_coleccion_camisetas/controller/HomeController.class
+com/mi_coleccion_camisetas/config/SecurityConfig.class
+com/mi_coleccion_camisetas/dto/SharedLinkDTO.class
 com/mi_coleccion_camisetas/util/JwtUtil.class
 com/mi_coleccion_camisetas/service/UsuarioService.class
+com/mi_coleccion_camisetas/model/SharedLink.class
 com/mi_coleccion_camisetas/model/Camiseta.class
 com/mi_coleccion_camisetas/BackendColeccionCamisetasApplication.class
+com/mi_coleccion_camisetas/service/SharedLinkService.class
 com/mi_coleccion_camisetas/model/Usuario.class
+com/mi_coleccion_camisetas/controller/SharedLinkController.class
 com/mi_coleccion_camisetas/controller/CamisetaController.class
+com/mi_coleccion_camisetas/filter/JwtAuthenticationFilter.class
+com/mi_coleccion_camisetas/repository/SharedLinkRepository.class
 com/mi_coleccion_camisetas/controller/UsuarioController.class
 com/mi_coleccion_camisetas/dto/CamisetaDTO.class

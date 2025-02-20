@@ -9,6 +9,10 @@ import {
 import './DetalleCamiseta.css';
 import EditarCamiseta from './EditarCamiseta';
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 function DetalleCamiseta() {
   const [camiseta, setCamiseta] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -54,7 +58,7 @@ function DetalleCamiseta() {
     const fetchCamiseta = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, {
+        const response = await fetch(`${API_URL}/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
           },
@@ -111,7 +115,7 @@ function DetalleCamiseta() {
     try {
       const usuarioId = localStorage.getItem('usuarioId');
       const response = await fetch(
-        `http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, 
+        `${API_URL}/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, 
         {
           method: 'DELETE',
           headers: {

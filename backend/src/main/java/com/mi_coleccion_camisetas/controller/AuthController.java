@@ -16,7 +16,11 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "http://localhost:3000", methods = {RequestMethod.POST, RequestMethod.OPTIONS})
+@CrossOrigin(origins = {
+    "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app",
+    "http://localhost:3000"
+}, methods = {RequestMethod.POST, RequestMethod.OPTIONS})
+
 public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 

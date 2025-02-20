@@ -2,6 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import './AgregarCamiseta.css';
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 function AgregarCamiseta({ onClose, onAgregar }) {
   const [formData, setFormData] = useState({
     tipoDeCamiseta: '', // Nuevo campo
@@ -319,7 +323,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
     submitFormData.append('comentarios', formData.comentarios || '');
 
     try {
-      const response = await fetch('http://localhost:8080/api/camisetas', {
+      const response = await fetch(`${API_URL}/api/camisetas`, {
         method: 'POST',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

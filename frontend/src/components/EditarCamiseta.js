@@ -2,6 +2,10 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Rnd } from 'react-rnd';
 import './EditarCamiseta.css';
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 function EditarCamiseta({ 
   camisetaSeleccionada, 
   onClose, 
@@ -424,7 +428,7 @@ function EditarCamiseta({
 
 
     try {
-      const response = await fetch(`http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${formData.id}`, {
+      const response = await fetch(`${API_URL}/api/camisetas/usuario/${usuarioId}/camiseta/${formData.id}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

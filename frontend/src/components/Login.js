@@ -4,6 +4,10 @@ import './Login.css';
 import logo from '../assets/logo.png';
 import RegisterForm from './RegisterForm';
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 function Login() {
   const [showRegister, setShowRegister] = useState(false);
   const [credentials, setCredentials] = useState({ username: '', password: '' });
@@ -39,21 +43,11 @@ function Login() {
     });
   };
 
-  const decodeToken = (token) => {
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.usuarioId || null;
-    } catch (error) {
-        console.error('Error al decodificar el token:', error);
-        return null;
-    }
-};
-
 const handleSubmit = async (e) => {
   e.preventDefault();
 
   try {
-      const response = await fetch('http://localhost:8080/api/auth/login', {
+      const response = await fetch(`${API_URL}/api/auth/login`, {
           method: 'POST',
           headers: { 
               'Content-Type': 'application/json' 

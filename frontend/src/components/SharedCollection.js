@@ -15,6 +15,10 @@ import {
 import './Camisetas.css';
 import './SharedCollection.css';
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 const CamisetaItem = React.memo(({ camiseta, camisetas, currentIndex, onNavigate }) => {
     const [showModal, setShowModal] = useState(false);
     
@@ -277,7 +281,7 @@ function SharedCollection() {
     const fetchCollectionData = async () => {
       try {
         // Obtener datos de las camisetas
-        const camisetasResponse = await fetch(`http://localhost:8080/api/shared/camisetas/${token}`);
+        const camisetasResponse = await fetch(`${API_URL}/api/shared/camisetas/${token}`);
         if (!camisetasResponse.ok) {
           throw new Error('No se pudieron cargar las camisetas');
         }
@@ -286,7 +290,7 @@ function SharedCollection() {
         setFilteredCamisetas(camisetasData);
   
         // Obtener datos del usuario usando el nuevo endpoint
-        const userResponse = await fetch(`http://localhost:8080/api/shared/user/${token}`);
+        const userResponse = await fetch(`${API_URL}/api/shared/user/${token}`);
         if (!userResponse.ok) {
           throw new Error('No se pudieron cargar los datos del usuario');
         }
@@ -533,7 +537,8 @@ function SharedCollection() {
                 </div>
                 <button 
                   className="create-collection-btn"
-                  onClick={() => window.location.href = 'http://localhost:3000/login'}
+                  onClick={() => window.location.href = 'https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app/login'}
+
                 >
                   ¡Crea tu propia colección!
                 </button>

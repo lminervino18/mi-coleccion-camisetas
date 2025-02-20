@@ -7,7 +7,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.Collections;
 
 @Configuration
 public class CorsConfig {
@@ -15,10 +14,19 @@ public class CorsConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Collections.singletonList("http://localhost:3000"));
+
+        // Permitir el frontend en Vercel y también localhost para pruebas locales
+        configuration.setAllowedOrigins(Arrays.asList(
+            "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app",
+            "http://localhost:3000"
+        ));
+        
+        // Métodos permitidos
         configuration.setAllowedMethods(Arrays.asList(
             "GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"
         ));
+        
+        // Headers permitidos
         configuration.setAllowedHeaders(Arrays.asList(
             "Authorization", 
             "Content-Type", 
@@ -28,7 +36,11 @@ public class CorsConfig {
             "Access-Control-Request-Method", 
             "Access-Control-Request-Headers"
         ));
+
+        // Permitir credenciales (cookies, tokens, etc.)
         configuration.setAllowCredentials(true);
+        
+        // Duración máxima en caché del CORS
         configuration.setMaxAge(3600L);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

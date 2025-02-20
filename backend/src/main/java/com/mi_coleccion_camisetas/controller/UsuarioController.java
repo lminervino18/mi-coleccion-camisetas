@@ -13,7 +13,10 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = {
+    "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app",
+    "http://localhost:3000"
+})
 public class UsuarioController {
 
     private final UsuarioService usuarioService;

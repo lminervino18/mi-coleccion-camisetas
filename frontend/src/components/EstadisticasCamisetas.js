@@ -2,12 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EstadisticasCamisetas.css';
 import {
-  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
+  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,XAxis, YAxis, CartesianGrid,
   LineChart, Line
 } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+
+
+const API_URL = process.env.REACT_APP_API_URL;
+
 
 const COLORS = [
   '#FFB3BA', // Rosa pastel
@@ -342,7 +345,7 @@ function EstadisticasCamisetas() {
         
         // Fetch usuario
         const userResponse = await fetch(
-          `http://localhost:8080/api/usuarios/${usuarioId}`,
+          `${API_URL}/api/usuarios/${usuarioId}`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -360,7 +363,7 @@ function EstadisticasCamisetas() {
 
         // Fetch camisetas
         const camisetasResponse = await fetch(
-          `http://localhost:8080/api/camisetas/${usuarioId}`,
+          `${API_URL}/api/camisetas/${usuarioId}`,
           {
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -486,25 +489,7 @@ function EstadisticasCamisetas() {
         name: club,
         value: count
       }));
-
-
-    // Agregar dentro de procesarEstadisticas, antes del setStats
-    const nombresCount = camisetas
-    .filter(c => c.nombre && c.nombre !== 'null' && c.nombre.trim() !== '') // Filtrar nombres nulos o vacíos
-    .reduce((acc, camiseta) => {
-      acc[camiseta.nombre] = (acc[camiseta.nombre] || 0) + 1;
-      return acc;
-    }, {});
-
-    const topNombres = Object.entries(nombresCount)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 5)
-    .map(([nombre, count]) => ({
-      name: nombre,
-      value: count
-    }));
-
-    
+   
     // Top dorsales
     const dorsalesCount = camisetas
       .filter(c => c.dorsal)

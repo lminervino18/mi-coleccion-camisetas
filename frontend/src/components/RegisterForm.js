@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import "./RegisterForm.css";
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+
 function RegisterForm({ onClose, onNavigateToHome }) {
   const [formData, setFormData] = useState({
     username: "",
@@ -74,7 +78,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(true);
       try {
         const response = await fetch(
-          `http://localhost:8080/api/usuarios/?nombre=${encodeURIComponent(value.trim())}`,
+          `${API_URL}/api/usuarios/?nombre=${encodeURIComponent(value.trim())}`,
           {
             method: 'GET',
             headers: {
@@ -106,7 +110,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(true);
       try {
         const response = await fetch(
-          `http://localhost:8080/api/usuarios/?email=${encodeURIComponent(value.trim())}`,
+          `${API_URL}/api/usuarios/?email=${encodeURIComponent(value.trim())}`,
           {
             method: 'GET',
             headers: {
@@ -163,7 +167,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
 
     try {
       // Primero registramos al usuario
-      const registerResponse = await fetch("http://localhost:8080/api/usuarios", {
+      const registerResponse = await fetch(`${API_URL}/api/usuarios`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json" 
@@ -191,7 +195,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       }
 
       // Si el registro fue exitoso, hacemos login automáticamente
-      const loginResponse = await fetch('http://localhost:8080/api/auth/login', {
+      const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json' 

@@ -16,6 +16,11 @@ import {
   faExternalLinkAlt
 } from '@fortawesome/free-solid-svg-icons';
 
+
+const API_URL = process.env.REACT_APP_API_URL;
+
+
+
 // Componente para cada camiseta individual
 const CamisetaItem = React.memo(({ 
   camiseta, 
@@ -126,8 +131,7 @@ function Camisetas() {
   const [password, setPassword] = useState('');
   const imageRef = useRef(null);
   const containerRef = useRef(null);
-  const [tipoCamisetaFilter, setTipoCamisetaFilter] = useState(null);
-  const [ligaFilter, setLigaFilter] = useState(null);
+
   const [availableLigas, setAvailableLigas] = useState([]);
   const [showShareModal, setShowShareModal] = useState(false);
   const [shareLink, setShareLink] = useState('');
@@ -151,7 +155,7 @@ useEffect(() => {
   const fetchUserData = async () => {
     try {
       const usuarioId = localStorage.getItem('usuarioId');
-      const response = await fetch(`http://localhost:8080/api/usuarios/${usuarioId}`, {
+      const response = await fetch(`${API_URL}/api/usuarios/${usuarioId}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
@@ -173,7 +177,7 @@ useEffect(() => {
     const fetchCamisetas = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/camisetas/${usuarioId}`, {
+        const response = await fetch(`${API_URL}/api/camisetas/${usuarioId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -314,20 +318,9 @@ useEffect(() => {
       saveToLocalStorage('quickFilter', quickFilter);
     }, [quickFilter]);
 
-    // Agrega esta función para manejar el filtrado por tipo y liga
-    const handleFilterButtonClick = (tipo, liga = null) => {
-      if (tipo) {
-        setTipoCamisetaFilter(tipoCamisetaFilter === tipo ? null : tipo);
-        setLigaFilter(null);
-      } else if (liga) {
-        setLigaFilter(ligaFilter === liga ? null : liga);
-        setTipoCamisetaFilter(null);
-      }
-    };
-
     const generateShareLink = async () => {
       try {
-        const response = await fetch('http://localhost:8080/api/shared/generar-link', {
+        const response = await fetch(`${API_URL}/api/shared/generar-link`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`,
@@ -367,17 +360,6 @@ useEffect(() => {
           alert('No se pudo copiar el link');
         });
     };
-
-    // Modifica el filtrado de camisetas para incluir estos nuevos filtros
-    const filteredCamisetasWithType = filteredCamisetas.filter(camiseta => {
-      if (tipoCamisetaFilter) {
-        return camiseta.tipoDeCamiseta === tipoCamisetaFilter;
-      }
-      if (ligaFilter) {
-        return camiseta.liga === ligaFilter;
-      }
-      return true;
-    });
 
   const handleFilterChange = (filterType, value, isChecked = null) => {
     setActiveFilters(prev => {
@@ -847,7 +829,7 @@ useEffect(() => {
   
       const base64Image = canvas.toDataURL('image/jpeg', 0.8);
       
-      const response = await fetch(`http://localhost:8080/api/usuarios/${localStorage.getItem('usuarioId')}/foto-perfil`, {
+      const response = await fetch(`${API_URL}/api/usuarios/${localStorage.getItem('usuarioId')}/foto-perfil`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -1648,7 +1630,7 @@ useEffect(() => {
                   className="delete-btn"
                   onClick={async () => {
                     try {
-                      const response = await fetch(`http://localhost:8080/api/usuarios/${userData.id}`, {
+                      const response = await fetch(`${API_URL}/api/usuarios/${userData.id}`, {
                         method: 'DELETE',
                         headers: {
                           'Content-Type': 'application/json',
