@@ -49,7 +49,7 @@ public class SharedLinkController {
         String token = sharedLinkService.generarLinkCompartido(usuario.getId());
         
         // Construir URL completa
-        String urlCompleta = "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app/shared/" + token;
+        String urlCompleta = "https://micoleccioncamisetas.com\"" + token;
 
     
         SharedLinkDTO linkDTO = new SharedLinkDTO();
@@ -119,7 +119,7 @@ public class SharedLinkController {
         
         // Convertir a DTOs
         List<SharedLinkDTO> linksDTO = links.stream()
-            .map(link -> SharedLinkDTO.crear(link, "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app"))
+            .map(link -> SharedLinkDTO.crear(link, ""))
             .collect(Collectors.toList());
         
         return ResponseEntity.ok(linksDTO);
@@ -139,7 +139,7 @@ public class SharedLinkController {
             .orElseThrow(() -> new RuntimeException("Error al renovar link"));
 
         // Crear DTO con URL completa
-        SharedLinkDTO linkDTO = SharedLinkDTO.crear(sharedLink, "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app");
+        SharedLinkDTO linkDTO = SharedLinkDTO.crear(sharedLink, "https://micoleccioncamisetas.com");
         
         return ResponseEntity.ok(linkDTO);
     }

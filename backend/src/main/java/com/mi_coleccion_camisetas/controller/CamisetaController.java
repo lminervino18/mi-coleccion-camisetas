@@ -16,7 +16,9 @@ import java.util.Optional;
 @RequestMapping("/api/camisetas")
 @CrossOrigin(origins = {
     "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app",
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "https://micoleccioncamisetas.com",                  // Agregar este
+    "https://www.micoleccioncamisetas.com",             // Agregar este
 })
 
 public class CamisetaController {

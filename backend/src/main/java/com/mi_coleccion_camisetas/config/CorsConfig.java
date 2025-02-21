@@ -18,7 +18,9 @@ public class CorsConfig {
         // Permitir el frontend en Vercel y también localhost para pruebas locales
         configuration.setAllowedOrigins(Arrays.asList(
             "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app",
-            "http://localhost:3000"
+            "http://localhost:3000",
+            "https://micoleccioncamisetas.com",                  // Agregar este
+            "https://www.micoleccioncamisetas.com"               // Agregar este
         ));
         
         // Métodos permitidos
