@@ -13,8 +13,12 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.http.HttpMethod;
+
+import java.util.Arrays;
 
 @Configuration
 @EnableWebSecurity
@@ -24,16 +28,13 @@ public class SecurityConfig {
     private CustomUserDetailsService userDetailsService;
 
     @Autowired
-    private CorsConfigurationSource corsConfigurationSource;
-
-    @Autowired
     private JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())
-            .cors(cors -> cors.configurationSource(corsConfigurationSource))
+            .csrf(csrf -> csrf.disable())  // 🔥 Deshabilitar CSRF para evitar problemas con APIs
+            .cors(cors -> cors.configurationSource(corsConfigurationSource()))  // 🔥 Aplicar configuración CORS
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(authz -> authz
                 // Endpoints públicos de autenticación y registro
@@ -45,15 +46,16 @@ public class SecurityConfig {
                 
                 // Endpoint público para camisetas compartidas
                 .requestMatchers("/api/shared/camisetas/{token}").permitAll()
-                
-                 // Endpoint público para camisetas compartidas
-                 .requestMatchers("/api/shared/user/{token}").permitAll()
+                .requestMatchers("/api/shared/user/{token}").permitAll()
 
                 // Endpoints públicos para verificación de usuarios
                 .requestMatchers("/api/usuarios").permitAll()
                 
                 // Endpoints de registro público
                 .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll()
+
+                // Permitir solicitudes `OPTIONS` (preflight requests para CORS)
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 
                 // Endpoints que requieren autenticación
                 .requestMatchers(
@@ -61,8 +63,9 @@ public class SecurityConfig {
                     "/api/usuarios/**"
                 ).authenticated()
                 
+                // Permitir archivos estáticos
                 .requestMatchers(
-        "/manifest.json",
+                    "/manifest.json",
                     "/*.png",
                     "/static/**",
                     "/favicon.ico",
@@ -70,6 +73,7 @@ public class SecurityConfig {
                     "/icono-mediano.png",
                     "/icono-grande.png"
                 ).permitAll()
+
                 // Cualquier otro endpoint requiere autenticación
                 .anyRequest().authenticated()
             )
@@ -82,5 +86,44 @@ public class SecurityConfig {
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        // 🔥 Permitir el frontend en Vercel y tu dominio principal
+        configuration.setAllowedOrigins(Arrays.asList(
+            "https://micoleccioncamisetas.com",
+            "https://www.micoleccioncamisetas.com",
+            "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app",
+            "http://localhost:3000"  // Para pruebas locales
+        ));
+
+        // 🔥 Métodos permitidos en CORS
+        configuration.setAllowedMethods(Arrays.asList(
+            "GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"
+        ));
+
+        // 🔥 Headers permitidos en las solicitudes
+        configuration.setAllowedHeaders(Arrays.asList(
+            "Authorization", 
+            "Content-Type", 
+            "X-Requested-With", 
+            "Accept", 
+            "Origin", 
+            "Access-Control-Request-Method", 
+            "Access-Control-Request-Headers"
+        ));
+
+        // 🔥 Permitir credenciales (cookies, tokens, etc.)
+        configuration.setAllowCredentials(true);
+
+        // 🔥 Duración máxima en caché del CORS
+        configuration.setMaxAge(3600L);
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
