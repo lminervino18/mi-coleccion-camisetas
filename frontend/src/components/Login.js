@@ -4,9 +4,7 @@ import './Login.css';
 import logo from '../assets/logo.png';
 import RegisterForm from './RegisterForm';
 
-
 const API_URL = process.env.REACT_APP_API_URL;
-
 
 function Login() {
   const [showRegister, setShowRegister] = useState(false);
@@ -14,23 +12,18 @@ function Login() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
-  // En Login.js
-    useEffect(() => {
-      // Limpiar todos los datos del usuario anterior
-      const token = localStorage.getItem('token');
-      if (!token) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('usuarioId');
-          
-          // Limpiar cualquier customOrder existente
-          const keys = Object.keys(localStorage);
-          keys.forEach(key => {
-              if (key.startsWith('customOrder_')) {
-                  localStorage.removeItem(key);
-              }
-          });
+  useEffect(() => {
+    // Limpiar todos los datos del usuario anterior
+    localStorage.removeItem('token');
+    localStorage.removeItem('usuarioId');
+
+    // Limpiar cualquier customOrder existente
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('customOrder_')) {
+        localStorage.removeItem(key);
       }
-    }, [navigate]);
+    });
+  }, [navigate]);
 
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => setShowRegister(false);
@@ -43,61 +36,64 @@ function Login() {
     });
   };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
+    try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { 
-              'Content-Type': 'application/json' 
-          },
-          body: JSON.stringify({
-              username: credentials.username,
-              password: credentials.password
-          }),
-          credentials: 'include',
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password
+        }),
+        credentials: 'include',  // 🔥 IMPORTANTE para cookies/sesiones (depende del backend)
       });
 
-      // Loguear el status de la respuesta
       console.log('Status de respuesta:', response.status);
 
-      // Manejar diferentes códigos de estado
-      if (response.status === 401) {
-          const errorText = await response.text();
-          setError(errorText || 'Credenciales inválidas');
-          return;
+      // 🔥 Revisar si CORS bloqueó la solicitud
+      if (response.type === 'opaque') {
+        throw new Error('Error de CORS: El servidor no permite solicitudes desde este origen.');
       }
 
+      // 🔥 Manejar errores de autenticación
+      if (response.status === 401) {
+        const errorText = await response.text();
+        setError(errorText || 'Credenciales inválidas');
+        return;
+      }
+
+      // 🔥 Manejar cualquier otro error del backend
       if (!response.ok) {
-          const errorText = await response.text();
-          setError(errorText || 'Error en el inicio de sesión');
-          return;
+        const errorText = await response.text();
+        setError(errorText || 'Error en el inicio de sesión');
+        return;
       }
 
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
 
-      // Validar la estructura de la respuesta
-      if (data && data.token && data.usuarioId) {
-          // Limpiar cualquier dato anterior
-          localStorage.clear();
-          
-          // Guardar los nuevos datos
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('usuarioId', data.usuarioId.toString());
-          
-          // Redirigir a la página de camisetas
-          window.location.href = '/camisetas';
+      // 🔥 Validar la estructura de la respuesta
+      if (data?.token && data?.usuarioId) {
+        // Guardar los datos del usuario
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuarioId', data.usuarioId.toString());
+
+        // Redirigir a la página de camisetas
+        window.location.href = '/camisetas';
       } else {
-          setError('Respuesta del servidor inválida');
+        setError('Respuesta del servidor inválida');
       }
 
-  } catch (error) {
+    } catch (error) {
       console.error('Error de conexión:', error);
       setError('No se pudo conectar con el servidor');
-  }
-};
+    }
+  };
 
   return (
     <>
