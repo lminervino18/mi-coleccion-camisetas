@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
 Test set: com.mi_coleccion_camisetas.backend_coleccion_camisetas.BackendColeccionCamisetasApplicationTests
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.761 s -- in com.mi_coleccion_camisetas.backend_coleccion_camisetas.BackendColeccionCamisetasApplicationTests
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 5.912 s -- in com.mi_coleccion_camisetas.backend_coleccion_camisetas.BackendColeccionCamisetasApplicationTests

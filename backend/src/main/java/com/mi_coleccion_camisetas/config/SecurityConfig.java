@@ -91,39 +91,23 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-
-        // 🔥 Permitir el frontend en Vercel y tu dominio principal
-        configuration.setAllowedOrigins(Arrays.asList(
-            "https://micoleccioncamisetas.com",
-            "https://www.micoleccioncamisetas.com",
-            "https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app",
-            "http://localhost:3000"  // Para pruebas locales
-        ));
-
-        // 🔥 Métodos permitidos en CORS
-        configuration.setAllowedMethods(Arrays.asList(
-            "GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"
-        ));
-
-        // 🔥 Headers permitidos en las solicitudes
-        configuration.setAllowedHeaders(Arrays.asList(
-            "Authorization", 
-            "Content-Type", 
-            "X-Requested-With", 
-            "Accept", 
-            "Origin", 
-            "Access-Control-Request-Method", 
-            "Access-Control-Request-Headers"
-        ));
-
-        // 🔥 Permitir credenciales (cookies, tokens, etc.)
+        
+        // 🔥 PERMITIR TODOS LOS ORÍGENES TEMPORALMENTE PARA PROBAR (luego restringimos)
+        configuration.setAllowedOrigins(Arrays.asList("*")); 
+        
+        // 🔥 MÉTODOS PERMITIDOS
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        
+        // 🔥 HEADERS PERMITIDOS
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
+        
+        // 🔥 PERMITIR ENVÍO DE CREDENCIALES (COOKIES, JWT)
         configuration.setAllowCredentials(true);
-
-        // 🔥 Duración máxima en caché del CORS
-        configuration.setMaxAge(3600L);
-
+        
+        // 🔥 REGISTRAR CORS PARA TODAS LAS RUTAS
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 }
