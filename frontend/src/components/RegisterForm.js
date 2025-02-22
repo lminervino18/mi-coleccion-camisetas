@@ -1,9 +1,8 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./RegisterForm.css";
 
-
 const API_URL = process.env.REACT_APP_API_URL;
-
 
 function RegisterForm({ onClose, onNavigateToHome }) {
   const [formData, setFormData] = useState({
@@ -22,6 +21,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
 
   const [isCheckingUser, setIsCheckingUser] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
+  const navigate = useNavigate(); // 🔥 Hook para la navegación
 
   const validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -36,32 +36,36 @@ function RegisterForm({ onClose, onNavigateToHome }) {
   const handleChange = async (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  
+
     setErrors((prevErrors) => ({
       ...prevErrors,
       [name]: "",
     }));
-  
-    if (!value.trim()) return; // Evita hacer la petición si el valor está vacío
-  
-    if ((name === "username" || name === "email") && API_URL) {
+
+    if (!value.trim()) return;
+
+    if (name === "username" || name === "email") {
       setIsCheckingUser(true);
       try {
-        const queryParam = name === "username" ? `nombre=${encodeURIComponent(value.trim())}` : `email=${encodeURIComponent(value.trim())}`;
+        const queryParam = name === "username"
+          ? `nombre=${encodeURIComponent(value.trim())}`
+          : `email=${encodeURIComponent(value.trim())}`;
         const response = await fetch(`${API_URL}/api/usuarios?${queryParam}`, {
           method: "GET",
           headers: { "Content-Type": "application/json" },
         });
-  
-        if (response.status === 409) { // 🔥 Solo marca error si el backend devuelve 409
+
+        if (response.status === 409) {
           const errorMessage = await response.text();
           setErrors((prev) => ({
             ...prev,
             [name === "username" ? "userExists" : "emailExists"]: errorMessage,
           }));
         } else if (response.ok) {
-          // 🔥 Si el usuario NO existe, limpiamos el error
-          setErrors((prev) => ({ ...prev, [name === "username" ? "userExists" : "emailExists"]: "" }));
+          setErrors((prev) => ({
+            ...prev,
+            [name === "username" ? "userExists" : "emailExists"]: "",
+          }));
         }
       } catch (error) {
         console.error(`Error verificando ${name}:`, error);
@@ -69,95 +73,92 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       setIsCheckingUser(false);
     }
   };
-  
 
-    const handleSubmit = async (e) => {
-      e.preventDefault();
-    
-      let validationErrors = {};
-    
-      if (!validateEmail(formData.email)) {
-        validationErrors.email = "El correo no tiene un formato válido";
-      }
-    
-      if (formData.password !== formData.confirmPassword) {
-        validationErrors.passwordMatch = "Las contraseñas no coinciden";
-      }
-    
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        return;
-      }
-    
-      try {
-        // Intentar registrar el usuario
-        const registerResponse = await fetch(`${API_URL}/api/usuarios`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: 'include',
-          body: JSON.stringify({
-            username: formData.username,
-            email: formData.email,
-            password: formData.password,
-            role: "USER",
-          }),
-        });
-    
-        if (registerResponse.status === 409) { 
-          const errorMessage = await registerResponse.text();
-          setErrors((prev) => ({
-            ...prev,
-            userExists: errorMessage.includes("usuario") ? "El usuario ya está registrado" : "",
-            emailExists: errorMessage.includes("correo") ? "El email ya está en uso" : "",
-          }));
-          return;
-        }
-    
-        if (!registerResponse.ok) {
-          throw new Error("Error en el registro");
-        }
-    
-        // 🔥 Si el registro fue exitoso, hacer login automáticamente
-        const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
-          method: 'POST',
-          headers: { "Content-Type": "application/json" },
-          credentials: 'include',
-          body: JSON.stringify({
-            username: formData.username,
-            password: formData.password,
-          }),
-        });
-    
-        if (loginResponse.ok) {
-          const loginData = await loginResponse.json();
-    
-          localStorage.clear(); // Limpiar localStorage antes de guardar nuevos datos
-          localStorage.setItem('token', loginData.token);
-          localStorage.setItem('usuarioId', loginData.usuarioId.toString());
-    
-          // Añadir un pequeño retraso para asegurar que el estado esté listo antes de redirigir
-          setTimeout(() => {
-            navigate('/camisetas');
-          }, 100);  // 100 ms de espera
-          } else {
-            setError('Respuesta del servidor inválida');
-          }
-    
-      } catch (error) {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    let validationErrors = {};
+
+    if (!validateEmail(formData.email)) {
+      validationErrors.email = "El correo no tiene un formato válido";
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      validationErrors.passwordMatch = "Las contraseñas no coinciden";
+    }
+
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    try {
+      const registerResponse = await fetch(`${API_URL}/api/usuarios`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+          role: "USER",
+        }),
+      });
+
+      if (registerResponse.status === 409) {
+        const errorMessage = await registerResponse.text();
         setErrors((prev) => ({
           ...prev,
-          userExists: "Hubo un error al intentar registrar el usuario",
+          userExists: errorMessage.includes("usuario") ? "El usuario ya está registrado" : "",
+          emailExists: errorMessage.includes("correo") ? "El email ya está en uso" : "",
         }));
+        return;
       }
-    };
-  
+
+      if (!registerResponse.ok) {
+        throw new Error("Error en el registro");
+      }
+
+      // 🔥 Si el registro fue exitoso, hacemos login automáticamente
+      const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        credentials: 'include',
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password,
+        }),
+      });
+
+      if (loginResponse.ok) {
+        const loginData = await loginResponse.json();
+
+        localStorage.clear(); // Limpiar localStorage antes de guardar nuevos datos
+        localStorage.setItem('token', loginData.token);
+        localStorage.setItem('usuarioId', loginData.usuarioId.toString());
+
+        // 🔥 Esperar 100ms y redirigir a camisetas con navigate
+        setTimeout(() => {
+          navigate("/camisetas");
+        }, 100);
+      } else {
+        setSuccessMessage(true);
+      }
+
+    } catch (error) {
+      setErrors((prev) => ({
+        ...prev,
+        userExists: "Hubo un error al intentar registrar el usuario",
+      }));
+    }
+  };
 
   const handleNavigateHome = () => {
     setSuccessMessage(false);
-    window.location.href = "/login";  // Esto redirige a la página principal
+    navigate("/login"); // 🔥 Usamos navigate para la redirección
   };
 
-    return (
+  return (
     <div className="register-form-container">
       <div className="register-overlay" onClick={onClose}></div>
       <div className="register-form">
