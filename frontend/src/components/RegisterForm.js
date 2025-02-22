@@ -83,6 +83,11 @@ function RegisterForm({ onClose, onNavigateToHome }) {
       validationErrors.email = "El correo no tiene un formato válido";
     }
 
+    if (!validatePasswordStrength(formData.password)) {
+      validationErrors.passwordStrength =
+        "La contraseña debe tener al menos 8 caracteres, una letra y un número.";
+    }
+
     if (formData.password !== formData.confirmPassword) {
       validationErrors.passwordMatch = "Las contraseñas no coinciden";
     }
@@ -235,9 +240,8 @@ function RegisterForm({ onClose, onNavigateToHome }) {
             </button>
           </>
         ) : (
-          <div className="success-message" style={{ border: "2px solid #4CAF50", padding: "20px", borderRadius: "8px" }}>
+          <div className="success-message">
             <h2>Usuario creado correctamente</h2>
-            <p>Bienvenido. Haz clic en el botón para continuar.</p>
             <button className="btn btn-primary" onClick={handleNavigateHome}>
               Loguearse
             </button>
