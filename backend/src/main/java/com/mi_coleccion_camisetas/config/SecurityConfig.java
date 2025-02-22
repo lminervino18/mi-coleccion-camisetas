@@ -93,7 +93,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         
         // 🔥 PERMITIR TODOS LOS ORÍGENES TEMPORALMENTE PARA PROBAR (luego restringimos)
-        configuration.setAllowedOrigins(Arrays.asList("*")); 
+        configuration.setAllowedOrigins(Arrays.asList("https://micoleccioncamisetas.com"));
         
         // 🔥 MÉTODOS PERMITIDOS
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
