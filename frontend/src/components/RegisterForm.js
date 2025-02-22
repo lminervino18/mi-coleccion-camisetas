@@ -135,10 +135,13 @@ function RegisterForm({ onClose, onNavigateToHome }) {
           localStorage.setItem('token', loginData.token);
           localStorage.setItem('usuarioId', loginData.usuarioId.toString());
     
-          window.location.href = '/camisetas'; // Redirigir al usuario
-        } else {
-          setSuccessMessage(true); // Si el login falla, redirigir manualmente
-        }
+          // Añadir un pequeño retraso para asegurar que el estado esté listo antes de redirigir
+          setTimeout(() => {
+            navigate('/camisetas');
+          }, 100);  // 100 ms de espera
+          } else {
+            setError('Respuesta del servidor inválida');
+          }
     
       } catch (error) {
         setErrors((prev) => ({
