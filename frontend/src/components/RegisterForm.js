@@ -36,201 +36,118 @@ function RegisterForm({ onClose, onNavigateToHome }) {
   const handleChange = async (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-
-    // Limpiar errores antes de realizar la validación
+  
     setErrors((prevErrors) => ({
       ...prevErrors,
-      [name]: "", // Limpiar el error del campo específico
+      [name]: "",
     }));
-
-    // Validaciones dinámicas
-    if (name === "email") {
-      if (!validateEmail(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          email: "El correo no tiene un formato válido",
-        }));
-      }
-    }
-
-    if (name === "password" || name === "confirmPassword") {
-      if (!validatePasswordStrength(value)) {
-        setErrors((prev) => ({
-          ...prev,
-          passwordStrength: "La contraseña debe tener al menos 8 caracteres, una letra y un número.",
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, passwordStrength: "" }));
-      }
-
-      if (name === "confirmPassword" && formData.password !== value) {
-        setErrors((prev) => ({
-          ...prev,
-          passwordMatch: "Las contraseñas no coinciden",
-        }));
-      } else {
-        setErrors((prev) => ({ ...prev, passwordMatch: "" }));
-      }
-    }
-
-    if (name === "username" && value.trim() !== "") {
-      // Validación en tiempo real para verificar si el nombre de usuario existe
+  
+    if (!value.trim()) return; // Evita hacer la petición si el valor está vacío
+  
+    if ((name === "username" || name === "email") && API_URL) {
       setIsCheckingUser(true);
       try {
-        const response = await fetch(
-          `${API_URL}/api/usuarios/?nombre=${encodeURIComponent(value.trim())}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-          }
-        );
-        if (response.ok) {
+        const queryParam = name === "username" ? `nombre=${encodeURIComponent(value.trim())}` : `email=${encodeURIComponent(value.trim())}`;
+        const response = await fetch(`${API_URL}/api/usuarios?${queryParam}`, {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        });
+  
+        if (response.status === 409) { // 🔥 Solo marca error si el backend devuelve 409
+          const errorMessage = await response.text();
           setErrors((prev) => ({
             ...prev,
-            userExists: "El nombre de usuario ya está en uso",
+            [name === "username" ? "userExists" : "emailExists"]: errorMessage,
           }));
-        } else {
-          setErrors((prev) => ({ ...prev, userExists: "" }));
+        } else if (response.ok) {
+          // 🔥 Si el usuario NO existe, limpiamos el error
+          setErrors((prev) => ({ ...prev, [name === "username" ? "userExists" : "emailExists"]: "" }));
         }
       } catch (error) {
-        console.error("Error al verificar el usuario:", error);
-        setErrors((prev) => ({
-          ...prev,
-          userExists: "",
-        }));
-      }
-      setIsCheckingUser(false);
-    }
-
-    if (name === "email" && value.trim() !== "") {
-      // Validación en tiempo real para verificar si el email ya existe
-      setIsCheckingUser(true);
-      try {
-        const response = await fetch(
-          `${API_URL}/api/usuarios/?email=${encodeURIComponent(value.trim())}`,
-          {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json'
-            },
-            credentials: 'include'
-          }
-        );
-        if (response.ok) {
-          setErrors((prev) => ({
-            ...prev,
-            emailExists: "El correo electrónico ya está en uso",
-          }));
-        } else {
-          setErrors((prev) => ({ ...prev, emailExists: "" }));
-        }
-      } catch (error) {
-        console.error("Error al verificar el correo:", error);
-        setErrors((prev) => ({
-          ...prev,
-          emailExists: "",
-        }));
+        console.error(`Error verificando ${name}:`, error);
       }
       setIsCheckingUser(false);
     }
   };
+  
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
-    // Validaciones finales antes de enviar
-    let validationErrors = {};
-
-    if (!validateEmail(formData.email)) {
-      validationErrors.email = "El correo no tiene un formato válido";
-    }
-
-    if (formData.password !== formData.confirmPassword) {
-      validationErrors.passwordMatch = "Las contraseñas no coinciden";
-    }
-
-    if (errors.userExists) {
-      validationErrors.userExists = "El nombre de usuario ya esta registrado";
-    }
-
-    if (errors.emailExists) {
-      validationErrors.emailExists = "El email ya esta en uso";
-    }
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    try {
-      // Primero registramos al usuario
-      const registerResponse = await fetch(`${API_URL}/api/usuarios`, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json" 
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          username: formData.username,
-          email: formData.email,
-          password: formData.password,
-          role: "USER",
-        }),
-      });
-
-      if (registerResponse.status === 409) {
-        setErrors((prev) => ({
-          ...prev,
-          userExists: "El usuario ya esta registrado",
-          emailExists: "El email ya esta en uso",
-        }));
+    const handleSubmit = async (e) => {
+      e.preventDefault();
+    
+      let validationErrors = {};
+    
+      if (!validateEmail(formData.email)) {
+        validationErrors.email = "El correo no tiene un formato válido";
+      }
+    
+      if (formData.password !== formData.confirmPassword) {
+        validationErrors.passwordMatch = "Las contraseñas no coinciden";
+      }
+    
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
         return;
       }
-
-      if (!registerResponse.ok) {
-        throw new Error("Error en el registro");
+    
+      try {
+        // Intentar registrar el usuario
+        const registerResponse = await fetch(`${API_URL}/api/usuarios`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include',
+          body: JSON.stringify({
+            username: formData.username,
+            email: formData.email,
+            password: formData.password,
+            role: "USER",
+          }),
+        });
+    
+        if (registerResponse.status === 409) { 
+          const errorMessage = await registerResponse.text();
+          setErrors((prev) => ({
+            ...prev,
+            userExists: errorMessage.includes("usuario") ? "El usuario ya está registrado" : "",
+            emailExists: errorMessage.includes("correo") ? "El email ya está en uso" : "",
+          }));
+          return;
+        }
+    
+        if (!registerResponse.ok) {
+          throw new Error("Error en el registro");
+        }
+    
+        // 🔥 Si el registro fue exitoso, hacer login automáticamente
+        const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
+          method: 'POST',
+          headers: { "Content-Type": "application/json" },
+          credentials: 'include',
+          body: JSON.stringify({
+            username: formData.username,
+            password: formData.password,
+          }),
+        });
+    
+        if (loginResponse.ok) {
+          const loginData = await loginResponse.json();
+    
+          localStorage.clear(); // Limpiar localStorage antes de guardar nuevos datos
+          localStorage.setItem('token', loginData.token);
+          localStorage.setItem('usuarioId', loginData.usuarioId.toString());
+    
+          window.location.href = '/camisetas'; // Redirigir al usuario
+        } else {
+          setSuccessMessage(true); // Si el login falla, redirigir manualmente
+        }
+    
+      } catch (error) {
+        setErrors((prev) => ({
+          ...prev,
+          userExists: "Hubo un error al intentar registrar el usuario",
+        }));
       }
-
-      // Si el registro fue exitoso, hacemos login automáticamente
-      const loginResponse = await fetch(`${API_URL}/api/auth/login`, {
-        method: 'POST',
-        headers: { 
-          'Content-Type': 'application/json' 
-        },
-        credentials: 'include',
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password,
-        }),
-      });
-
-      if (loginResponse.ok) {
-        const loginData = await loginResponse.json();
-        
-        // Limpiar localStorage antes de guardar nuevos datos
-        localStorage.clear();
-        
-        // Guardar token y usuarioId
-        localStorage.setItem('token', loginData.token);
-        localStorage.setItem('usuarioId', loginData.usuarioId.toString());
-        
-        // Redirigir directamente a camisetas
-        window.location.href = '/camisetas';
-      } else {
-        // Si hay error en el login, mostrar mensaje de éxito y redirigir al login
-        setSuccessMessage(true);
-      }
-
-    } catch (error) {
-      setErrors((prev) => ({
-        ...prev,
-        userExists: "Hubo un error al intentar registrar el usuario",
-      }));
-    }
-  };
+    };
+  
 
   const handleNavigateHome = () => {
     setSuccessMessage(false);
