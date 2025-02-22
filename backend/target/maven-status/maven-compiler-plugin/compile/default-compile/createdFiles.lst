@@ -14,6 +14,7 @@ com/mi_coleccion_camisetas/util/JwtUtil.class
 com/mi_coleccion_camisetas/service/UsuarioService.class
 com/mi_coleccion_camisetas/model/SharedLink.class
 com/mi_coleccion_camisetas/model/Camiseta.class
+com/mi_coleccion_camisetas/config/CorsFilter.class
 com/mi_coleccion_camisetas/BackendColeccionCamisetasApplication.class
 com/mi_coleccion_camisetas/service/SharedLinkService.class
 com/mi_coleccion_camisetas/model/Usuario.class

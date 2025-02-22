@@ -92,22 +92,18 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         
-        // 🔥 PERMITIR TODOS LOS ORÍGENES TEMPORALMENTE PARA PROBAR (luego restringimos)
-        configuration.setAllowedOrigins(Arrays.asList("https://micoleccioncamisetas.com"));
-        
-        // 🔥 MÉTODOS PERMITIDOS
+        configuration.setAllowedOrigins(Arrays.asList("https://micoleccioncamisetas.com")); // 🔥 Asegurar solo un origen
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        
-        // 🔥 HEADERS PERMITIDOS
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
-        
-        // 🔥 PERMITIR ENVÍO DE CREDENCIALES (COOKIES, JWT)
         configuration.setAllowCredentials(true);
-        
-        // 🔥 REGISTRAR CORS PARA TODAS LAS RUTAS
+
+        // 🔥 Eliminar cualquier valor duplicado
+        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Type"));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
 
 }

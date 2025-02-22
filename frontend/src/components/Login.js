@@ -83,8 +83,10 @@ function Login() {
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId.toString());
 
-        // Redirigir a la página de camisetas
-        window.location.href = '/camisetas';
+         // Añadir un pequeño retraso para asegurar que el estado esté listo antes de redirigir
+      setTimeout(() => {
+        navigate('/camisetas');
+      }, 100);  // 100 ms de espera
       } else {
         setError('Respuesta del servidor inválida');
       }

@@ -32,7 +32,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private UserDetailsService userDetailsService;
 
     @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
+    protected boolean shouldNotFilter(@NonNull HttpServletRequest request) {
         String path = request.getServletPath();
         return EXCLUDED_PATHS.stream().anyMatch(path::startsWith);
     }
@@ -74,7 +74,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (Exception e) {
-            logger.error("Cannot set user authentication: {}", e.getMessage());
+            logger.error("❌ Error en la autenticación: {}", e.getMessage());
+
+            // 🔥 Asegurar que los headers CORS se incluyan en la respuesta de error
+            response.setHeader("Access-Control-Allow-Origin", "https://micoleccioncamisetas.com");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+            response.setHeader("Access-Control-Allow-Credentials", "true");
+
+            // 🔥 Responder con un error 401 Unauthorized
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.getWriter().write("Error: No se pudo autenticar el usuario.");
+            return;
         }
 
         filterChain.doFilter(request, response);
