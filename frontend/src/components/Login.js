@@ -84,20 +84,21 @@ function Login() {
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
   
-      // 🔥 Validar la estructura de la respuesta
       if (data?.token && data?.usuarioId) {
-        // Guardar los datos del usuario
+        console.log("🔐 Guardando token en localStorage...");
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId.toString());
-  
-        console.log("✅ Login exitoso. Redirigiendo a /camisetas...");
-        // Añadir un pequeño retraso para asegurar que el estado esté listo antes de redirigir
+      
+        console.log("✅ Token guardado:", localStorage.getItem('token'));
+        console.log("✅ Usuario ID guardado:", localStorage.getItem('usuarioId'));
+      
         setTimeout(() => {
           navigate('/camisetas');
-        }, 100);  // 100 ms de espera
+        }, 100);
       } else {
         setError('Respuesta del servidor inválida');
       }
+      
   
     } catch (error) {
       console.error('Error de conexión:', error);
