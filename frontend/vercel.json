@@ -1,17 +1,8 @@
 {
-  "version": 2,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/((?!static|.*\\.\\w+$).*)",
-      "dest": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/$1"
-    },
-    {
-      "handle": "filesystem"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "status": 200
+      "source": "/:path*",
+      "destination": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/:path*"
     }
   ]
 }
