@@ -13,9 +13,7 @@ function Login() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Limpiar todos los datos del usuario anterior
-    localStorage.removeItem('token');
-    localStorage.removeItem('usuarioId');
+   
 
     // Limpiar cualquier customOrder existente
     Object.keys(localStorage).forEach((key) => {
