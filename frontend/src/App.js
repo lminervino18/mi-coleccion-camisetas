@@ -1,4 +1,32 @@
-// Modificar el ProtectedRoute para recibir y usar setIsLoggedIn
+import React, { useState, useEffect } from 'react';
+import { 
+  BrowserRouter as Router, 
+  Route, 
+  Routes, 
+  Navigate,
+  useLocation
+} from 'react-router-dom';
+
+// Importar componentes
+import Login from './components/Login';
+import Camisetas from './components/Camisetas';
+import DetalleCamiseta from './components/DetalleCamiseta';
+import EstadisticasCamisetas from './components/EstadisticasCamisetas';
+import SharedCollection from './components/SharedCollection';
+import Loading from './components/Loading';
+
+// Componente de transición
+const PageTransition = React.memo(({ children }) => {
+  return (
+    <div className="page-transition">
+      {children}
+    </div>
+  );
+});
+
+PageTransition.displayName = 'PageTransition';
+
+// Componente ProtectedRoute mejorado
 const ProtectedRoute = ({ children, setIsLoggedIn }) => {
   const [isChecking, setIsChecking] = useState(true);
   const location = useLocation();
@@ -13,10 +41,15 @@ const ProtectedRoute = ({ children, setIsLoggedIn }) => {
       }
 
       try {
-        // Opcional: Verificar token con el backend
+        // Verificar que también exista el usuarioId
+        const usuarioId = localStorage.getItem('usuarioId');
+        if (!usuarioId) {
+          throw new Error('Usuario ID no encontrado');
+        }
+
         setIsLoggedIn(true);
       } catch (error) {
-        console.error('Error verificando token:', error);
+        console.error('Error de autenticación:', error);
         localStorage.removeItem('token');
         localStorage.removeItem('usuarioId');
         setIsLoggedIn(false);
@@ -40,12 +73,43 @@ const ProtectedRoute = ({ children, setIsLoggedIn }) => {
   return children;
 };
 
-// En el componente App, modificar las rutas protegidas para pasar setIsLoggedIn
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  // ... resto del código ...
+  useEffect(() => {
+    // Verificar autenticación inicial
+    const token = localStorage.getItem('token');
+    const usuarioId = localStorage.getItem('usuarioId');
+
+    if (token && usuarioId) {
+      setIsLoggedIn(true);
+    } else {
+      // Si falta alguno, limpiar todo
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuarioId');
+      setIsLoggedIn(false);
+    }
+    
+    setIsInitializing(false);
+
+    // Evento para sincronizar estado entre pestañas
+    const handleStorageChange = (e) => {
+      if (e.key === 'token') {
+        setIsLoggedIn(!!e.newValue);
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+    };
+  }, []);
+
+  if (isInitializing) {
+    return <Loading />;
+  }
 
   return (
     <Router>
