@@ -1,45 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  BrowserRouter as Router, 
-  Route, 
-  Routes, 
-  Navigate,
-  useLocation
-} from 'react-router-dom';
-
-// Importar componentes
-import Login from './components/Login';
-import Camisetas from './components/Camisetas';
-import DetalleCamiseta from './components/DetalleCamiseta';
-import EstadisticasCamisetas from './components/EstadisticasCamisetas';
-import SharedCollection from './components/SharedCollection';
-import Loading from './components/Loading';
-
-// Componente de transición
-const PageTransition = React.memo(({ children }) => {
-  return (
-    <div className="page-transition">
-      {children}
-    </div>
-  );
-});
-
-PageTransition.displayName = 'PageTransition';
-
-// Componente ProtectedRoute simplificado
-const ProtectedRoute = ({ children }) => {
+// Modificar el ProtectedRoute para recibir y usar setIsLoggedIn
+const ProtectedRoute = ({ children, setIsLoggedIn }) => {
   const [isChecking, setIsChecking] = useState(true);
   const location = useLocation();
   const token = localStorage.getItem('token');
 
   useEffect(() => {
-    // Simulamos una pequeña demora para evitar parpadeos
-    const timer = setTimeout(() => {
-      setIsChecking(false);
-    }, 500);
+    const checkAuth = async () => {
+      if (!token) {
+        setIsLoggedIn(false);
+        setIsChecking(false);
+        return;
+      }
 
+      try {
+        // Opcional: Verificar token con el backend
+        setIsLoggedIn(true);
+      } catch (error) {
+        console.error('Error verificando token:', error);
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuarioId');
+        setIsLoggedIn(false);
+      } finally {
+        setIsChecking(false);
+      }
+    };
+
+    const timer = setTimeout(checkAuth, 500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [token, setIsLoggedIn]);
 
   if (isChecking) {
     return <Loading />;
@@ -52,33 +40,12 @@ const ProtectedRoute = ({ children }) => {
   return children;
 };
 
+// En el componente App, modificar las rutas protegidas para pasar setIsLoggedIn
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isInitializing, setIsInitializing] = useState(true);
 
-  useEffect(() => {
-    // Verificar si hay token en localStorage
-    const token = localStorage.getItem('token');
-    setIsLoggedIn(!!token);
-    setIsInitializing(false);
-
-    // Evento para sincronizar estado entre pestañas
-    const handleStorageChange = (e) => {
-      if (e.key === 'token') {
-        setIsLoggedIn(!!e.newValue);
-      }
-    };
-
-    window.addEventListener('storage', handleStorageChange);
-
-    return () => {
-      window.removeEventListener('storage', handleStorageChange);
-    };
-  }, []);
-
-  if (isInitializing) {
-    return <Loading />;
-  }
+  // ... resto del código ...
 
   return (
     <Router>
@@ -109,9 +76,9 @@ function App() {
           <Route 
             path="/camisetas" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute setIsLoggedIn={setIsLoggedIn}>
                 <PageTransition>
-                  <Camisetas />
+                  <Camisetas setIsLoggedIn={setIsLoggedIn} />
                 </PageTransition>
               </ProtectedRoute>
             } 
@@ -120,9 +87,9 @@ function App() {
           <Route 
             path="/camiseta/:id" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute setIsLoggedIn={setIsLoggedIn}>
                 <PageTransition>
-                  <DetalleCamiseta />
+                  <DetalleCamiseta setIsLoggedIn={setIsLoggedIn} />
                 </PageTransition>
               </ProtectedRoute>
             } 
@@ -131,9 +98,9 @@ function App() {
           <Route 
             path="/estadisticas-camisetas" 
             element={
-              <ProtectedRoute>
+              <ProtectedRoute setIsLoggedIn={setIsLoggedIn}>
                 <PageTransition>
-                  <EstadisticasCamisetas />
+                  <EstadisticasCamisetas setIsLoggedIn={setIsLoggedIn} />
                 </PageTransition>
               </ProtectedRoute>
             } 
