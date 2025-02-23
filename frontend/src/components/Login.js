@@ -38,7 +38,7 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: 'POST',
@@ -52,45 +52,53 @@ function Login() {
         }),
         credentials: 'include',  // 🔥 IMPORTANTE para cookies/sesiones (depende del backend)
       });
-
+  
       console.log('Status de respuesta:', response.status);
-
+  
       // 🔥 Revisar si CORS bloqueó la solicitud
       if (response.type === 'opaque') {
         throw new Error('Error de CORS: El servidor no permite solicitudes desde este origen.');
       }
-
+  
       // 🔥 Manejar errores de autenticación
       if (response.status === 401) {
         const errorText = await response.text();
         setError(errorText || 'Credenciales inválidas');
         return;
       }
-
+  
+      // 🔥 Manejar conflictos (por ejemplo, usuario ya registrado)
+      if (response.status === 409) {
+        const errorText = await response.text();
+        setError(errorText || 'Conflicto: el recurso ya existe');
+        return;
+      }
+  
       // 🔥 Manejar cualquier otro error del backend
       if (!response.ok) {
         const errorText = await response.text();
         setError(errorText || 'Error en el inicio de sesión');
         return;
       }
-
+  
       const data = await response.json();
       console.log('Respuesta del servidor:', data);
-
+  
       // 🔥 Validar la estructura de la respuesta
       if (data?.token && data?.usuarioId) {
         // Guardar los datos del usuario
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId.toString());
-
-         // Añadir un pequeño retraso para asegurar que el estado esté listo antes de redirigir
-      setTimeout(() => {
-        navigate('/camisetas');
-      }, 100);  // 100 ms de espera
+  
+        console.log("✅ Login exitoso. Redirigiendo a /camisetas...");
+        // Añadir un pequeño retraso para asegurar que el estado esté listo antes de redirigir
+        setTimeout(() => {
+          navigate('/camisetas');
+        }, 100);  // 100 ms de espera
       } else {
         setError('Respuesta del servidor inválida');
       }
-
+  
     } catch (error) {
       console.error('Error de conexión:', error);
       setError('No se pudo conectar con el servidor');

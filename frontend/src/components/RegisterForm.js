@@ -160,7 +160,7 @@ function RegisterForm({ onClose, onNavigateToHome }) {
 
   const handleNavigateHome = () => {
     setSuccessMessage(false);
-    navigate("/login"); // 🔥 Usamos navigate para la redirección
+    navigate("/camisetas"); // 🔥 Usamos navigate para la redirección
   };
 
   return (

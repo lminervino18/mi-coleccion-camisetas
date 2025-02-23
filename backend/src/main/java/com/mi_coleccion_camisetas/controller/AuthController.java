@@ -39,49 +39,50 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
-        try {
-            // Loguear el payload recibido
-            logger.info("Login payload received: {}", payload);
+public ResponseEntity<?> login(@RequestBody Map<String, String> payload) {
+    try {
+        // Loguear el payload recibido
+        logger.info("Login payload received: {}", payload);
 
-            // Extraer username y password del payload
-            String username = payload.get("username");
-            String password = payload.get("password");
+        // Extraer username y password del payload
+        String username = payload.get("username");
+        String password = payload.get("password");
 
-            // Validaciones
-            if (username == null || username.trim().isEmpty()) {
-                logger.warn("Login attempt with empty username");
-                return ResponseEntity.badRequest().body("Username es requerido");
-            }
+        // Validaciones
+        if (username == null || username.trim().isEmpty()) {
+            logger.warn("Login attempt with empty username");
+            return ResponseEntity.badRequest().body("Username es requerido");
+        }
 
-            if (password == null || password.trim().isEmpty()) {
-                logger.warn("Login attempt with empty password");
-                return ResponseEntity.badRequest().body("Password es requerida");
-            }
+        if (password == null || password.trim().isEmpty()) {
+            logger.warn("Login attempt with empty password");
+            return ResponseEntity.badRequest().body("Password es requerida");
+        }
 
-            // Buscar el usuario en la base de datos
-            Usuario usuario = usuarioService.findByUsername(username);
-
-            // Generar token JWT
-            String token = jwtUtil.generateToken(usuario.getUsername(), usuario.getId());
-
-            // Loguear información de inicio de sesión exitoso
-            logger.info("Successful login for user: {}", username);
-
-            // Devolver token y ID de usuario
-            return ResponseEntity.ok(Map.of(
-                "token", token,
-                "usuarioId", usuario.getId()
-            ));
-
-        } catch (BadCredentialsException e) {
-            logger.error("Bad credentials for user: {}", payload.get("username"));
+        // Validar credenciales
+        Usuario usuario = usuarioService.findByUsernameAndPassword(username, password);
+        if (usuario == null) {
+            logger.error("Bad credentials for user: {}", username);
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body("Credenciales inválidas");
-        } catch (Exception e) {
-            logger.error("Login error", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body("Error en el inicio de sesión: " + e.getMessage());
         }
+
+        // Generar token JWT
+        String token = jwtUtil.generateToken(usuario.getUsername(), usuario.getId());
+
+        // Loguear información de inicio de sesión exitoso
+        logger.info("Successful login for user: {}", username);
+
+        // Devolver token y ID de usuario
+        return ResponseEntity.ok(Map.of(
+            "token", token,
+            "usuarioId", usuario.getId()
+        ));
+
+    } catch (Exception e) {
+        logger.error("Login error", e);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("Error en el inicio de sesión: " + e.getMessage());
     }
+}
 }
