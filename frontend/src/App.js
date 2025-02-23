@@ -3,7 +3,8 @@ import {
   BrowserRouter as Router, 
   Route, 
   Routes, 
-  Navigate
+  Navigate,
+  useLocation
 } from 'react-router-dom';
 
 // Importar componentes
@@ -12,8 +13,9 @@ import Camisetas from './components/Camisetas';
 import DetalleCamiseta from './components/DetalleCamiseta';
 import EstadisticasCamisetas from './components/EstadisticasCamisetas';
 import SharedCollection from './components/SharedCollection';
+import Loading from './components/Loading';
 
-// Componente de transición simple usando React.memo para evitar re-renders innecesarios
+// Componente de transición
 const PageTransition = React.memo(({ children }) => {
   return (
     <div className="page-transition">
@@ -22,34 +24,61 @@ const PageTransition = React.memo(({ children }) => {
   );
 });
 
-// Asignar un displayName para mejor debugging
 PageTransition.displayName = 'PageTransition';
 
-function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(!!localStorage.getItem('token'));
+// Componente ProtectedRoute simplificado
+const ProtectedRoute = ({ children }) => {
+  const [isChecking, setIsChecking] = useState(true);
+  const location = useLocation();
+  const token = localStorage.getItem('token');
 
   useEffect(() => {
-    // Función para verificar el estado de autenticación
-    const checkAuth = () => {
-      const token = localStorage.getItem('token');
-      setIsLoggedIn(!!token);
+    // Simulamos una pequeña demora para evitar parpadeos
+    const timer = setTimeout(() => {
+      setIsChecking(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (isChecking) {
+    return <Loading />;
+  }
+
+  if (!token) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+};
+
+function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  useEffect(() => {
+    // Verificar si hay token en localStorage
+    const token = localStorage.getItem('token');
+    setIsLoggedIn(!!token);
+    setIsInitializing(false);
+
+    // Evento para sincronizar estado entre pestañas
+    const handleStorageChange = (e) => {
+      if (e.key === 'token') {
+        setIsLoggedIn(!!e.newValue);
+      }
     };
 
-    // Verificar autenticación inicial
-    checkAuth();
+    window.addEventListener('storage', handleStorageChange);
 
-    // Escuchar cambios en localStorage
-    window.addEventListener('storage', checkAuth);
-    
-    // Crear un intervalo para verificar el token periódicamente
-    const authInterval = setInterval(checkAuth, 1000);
-
-    // Cleanup: remover event listener y limpiar intervalo
     return () => {
-      window.removeEventListener('storage', checkAuth);
-      clearInterval(authInterval);
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
+
+  if (isInitializing) {
+    return <Loading />;
+  }
 
   return (
     <Router>
@@ -71,7 +100,7 @@ function App() {
                 <Navigate to="/camisetas" replace />
               ) : (
                 <PageTransition>
-                  <Login />
+                  <Login setIsLoggedIn={setIsLoggedIn} />
                 </PageTransition>
               )
             } 
@@ -80,48 +109,47 @@ function App() {
           <Route 
             path="/camisetas" 
             element={
-              isLoggedIn ? (
+              <ProtectedRoute>
                 <PageTransition>
                   <Camisetas />
                 </PageTransition>
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/camiseta/:id" 
             element={
-              isLoggedIn ? (
+              <ProtectedRoute>
                 <PageTransition>
                   <DetalleCamiseta />
                 </PageTransition>
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              </ProtectedRoute>
             } 
           />
 
           <Route 
             path="/estadisticas-camisetas" 
             element={
-              isLoggedIn ? (
+              <ProtectedRoute>
                 <PageTransition>
                   <EstadisticasCamisetas />
                 </PageTransition>
-              ) : (
-                <Navigate to="/login" replace />
-              )
+              </ProtectedRoute>
             } 
           />
 
-          {/* Ruta para colección compartida (sin autenticación) */}
+          {/* Ruta pública para colección compartida */}
           <Route 
             path="/shared/:token" 
-            element={<SharedCollection />} 
+            element={
+              <PageTransition>
+                <SharedCollection />
+              </PageTransition>
+            } 
           />
 
+          {/* Ruta para manejar rutas no encontradas */}
           <Route 
             path="*" 
             element={<Navigate to="/" replace />} 

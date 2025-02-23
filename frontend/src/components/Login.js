@@ -3,39 +3,85 @@ import { useNavigate } from 'react-router-dom';
 import './Login.css';
 import logo from '../assets/logo.png';
 import RegisterForm from './RegisterForm';
+import Loading from './Loading';
 
 const API_URL = process.env.REACT_APP_API_URL;
 
-function Login() {
+function Login({ setIsLoggedIn }) {
   const [showRegister, setShowRegister] = useState(false);
   const [credentials, setCredentials] = useState({ username: '', password: '' });
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [loadingError, setLoadingError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-   
+    // Verificar autenticación al cargar el componente
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const usuarioId = localStorage.getItem('usuarioId');
 
-    // Limpiar cualquier customOrder existente
+      if (!token) {
+        localStorage.clear();
+        return;
+      }
+
+      if (token && usuarioId) {
+        setIsLoggedIn(true);
+        navigate('/camisetas', { replace: true });
+      }
+    };
+
+    checkAuth();
+
+    // Limpiar customOrder existente
     Object.keys(localStorage).forEach((key) => {
       if (key.startsWith('customOrder_')) {
         localStorage.removeItem(key);
       }
     });
-  }, [navigate]);
+
+    const handleBeforeUnload = () => {
+      if (!localStorage.getItem('token')) {
+        localStorage.clear();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [navigate, setIsLoggedIn]);
 
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => setShowRegister(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setCredentials({
-      ...credentials,
+    setCredentials(prev => ({
+      ...prev,
       [name]: value,
-    });
+    }));
+    if (error) setError('');
+    if (loadingError) setLoadingError(null);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+    setLoadingError(null);
+
+    if (!credentials.username.trim()) {
+      setError('El nombre de usuario es requerido');
+      return;
+    }
+
+    if (!credentials.password.trim()) {
+      setError('La contraseña es requerida');
+      return;
+    }
+
+    setIsLoading(true);
   
     try {
       const response = await fetch(`${API_URL}/api/auth/login`, {
@@ -45,34 +91,28 @@ function Login() {
           'Accept': 'application/json'
         },
         body: JSON.stringify({
-          username: credentials.username,
-          password: credentials.password
+          username: credentials.username.trim(),
+          password: credentials.password.trim()
         }),
-        credentials: 'include',  // 🔥 IMPORTANTE para cookies/sesiones (depende del backend)
+        credentials: 'include',
       });
   
-      console.log('Status de respuesta:', response.status);
-  
-      // 🔥 Revisar si CORS bloqueó la solicitud
       if (response.type === 'opaque') {
         throw new Error('Error de CORS: El servidor no permite solicitudes desde este origen.');
       }
   
-      // 🔥 Manejar errores de autenticación
       if (response.status === 401) {
         const errorText = await response.text();
         setError(errorText || 'Credenciales inválidas');
         return;
       }
   
-      // 🔥 Manejar conflictos (por ejemplo, usuario ya registrado)
       if (response.status === 409) {
         const errorText = await response.text();
         setError(errorText || 'Conflicto: el recurso ya existe');
         return;
       }
   
-      // 🔥 Manejar cualquier otro error del backend
       if (!response.ok) {
         const errorText = await response.text();
         setError(errorText || 'Error en el inicio de sesión');
@@ -80,29 +120,28 @@ function Login() {
       }
   
       const data = await response.json();
-      console.log('Respuesta del servidor:', data);
-  
+      
       if (data?.token && data?.usuarioId) {
-        console.log("🔐 Guardando token en localStorage...");
+        localStorage.clear();
         localStorage.setItem('token', data.token);
         localStorage.setItem('usuarioId', data.usuarioId.toString());
-      
-        console.log("✅ Token guardado:", localStorage.getItem('token'));
-        console.log("✅ Usuario ID guardado:", localStorage.getItem('usuarioId'));
-      
-        setTimeout(() => {
-          navigate('/camisetas');
-        }, 100);
+        
+        setIsLoggedIn(true);
+        navigate('/camisetas', { replace: true });
       } else {
         setError('Respuesta del servidor inválida');
       }
-      
-  
     } catch (error) {
       console.error('Error de conexión:', error);
-      setError('No se pudo conectar con el servidor');
+      setLoadingError('No se pudo conectar con el servidor. Por favor, intenta nuevamente.');
+    } finally {
+      setIsLoading(false);
     }
   };
+
+  if (isLoading) {
+    return <Loading error={loadingError} />;
+  }
 
   return (
     <>
@@ -140,7 +179,10 @@ function Login() {
               />
             </div>
             <div className="form-actions">
-              <button type="submit" className="btn btn-primary">
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+              >
                 Iniciar Sesión
               </button>
               <button

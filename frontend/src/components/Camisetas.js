@@ -64,7 +64,7 @@ const CamisetaItem = React.memo(({
 });
 
 CamisetaItem.displayName = 'CamisetaItem';
-function Camisetas() {
+function Camisetas({ setIsLoggedIn }) {
 
 
 
@@ -149,35 +149,51 @@ function Camisetas() {
     'Arquero Suplente', 'Arquero Tercera', 'Entrenamiento', 'Edición especial', 'Otra'
   ];
 
-
-// Agregar este useEffect después de los otros useEffect
+// Al inicio del componente Camisetas, justo después de las constantes
 useEffect(() => {
-  const fetchUserData = async () => {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    navigate('/login');
+    return;
+  }
+
+  // Verificar que el token sea válido intentando obtener los datos del usuario
+  const fetchInitialData = async () => {
     try {
       const usuarioId = localStorage.getItem('usuarioId');
       const response = await fetch(`${API_URL}/api/usuarios/${usuarioId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
         },
         credentials: 'include',
       });
-      if (response.ok) {
-        const data = await response.json();
-        setUserData(data);
+
+      if (!response.ok) {
+        // Si hay error en la respuesta, limpiar localStorage y redirigir
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuarioId');
+        navigate('/login');
+        return;
       }
+
+      const data = await response.json();
+      setUserData(data);
     } catch (error) {
-      console.error('Error al obtener datos del usuario', error);
+      console.error('Error al verificar autenticación:', error);
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuarioId');
+      navigate('/login');
     }
   };
 
-  fetchUserData();
-}, []);
+  fetchInitialData();
+}, [navigate]);
 
   useEffect(() => {
-    const fetchCamisetas = async () => {
+    const fetchUserData = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`${API_URL}/api/camisetas/${usuarioId}`, {
+        const response = await fetch(`${API_URL}/api/usuarios/${usuarioId}`, {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
@@ -185,8 +201,75 @@ useEffect(() => {
         });
         if (response.ok) {
           const data = await response.json();
-          setCamisetas(data);
-          
+          setUserData(data);
+        } else if (response.status === 401) {
+          // Si hay error de autenticación, cerrar sesión
+          localStorage.removeItem('token');
+          localStorage.removeItem('usuarioId');
+          setIsLoggedIn(false);
+          navigate('/login', { replace: true });
+        }
+      } catch (error) {
+        console.error('Error al obtener datos del usuario', error);
+        // Si hay error de conexión, también cerrar sesión
+        localStorage.removeItem('token');
+        localStorage.removeItem('usuarioId');
+        setIsLoggedIn(false);
+        navigate('/login', { replace: true });
+      }
+    };
+
+    fetchUserData();
+  }, [navigate, setIsLoggedIn]); // Añadir navigate y setIsLoggedIn como dependencias
+
+  useEffect(() => {
+    const fetchCamisetas = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const usuarioId = localStorage.getItem('usuarioId');
+        
+        if (!token || !usuarioId) {
+          navigate('/login');
+          return;
+        }
+    
+        const response = await fetch(`${API_URL}/api/camisetas/${usuarioId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          credentials: 'include',
+        });
+    
+        // Manejar errores de respuesta
+        if (!response.ok) {
+          if (response.status === 401) {
+            // Error de autenticación
+            localStorage.removeItem('token');
+            localStorage.removeItem('usuarioId');
+            navigate('/login');
+            return;
+          }
+          if (response.status === 403) {
+            // Error de permisos
+            throw new Error('No tienes permisos para acceder a estos datos');
+          }
+          if (response.status === 404) {
+            // Usuario no encontrado
+            throw new Error('No se encontraron datos para este usuario');
+          }
+          throw new Error('Error al obtener camisetas');
+        }
+    
+        const data = await response.json();
+        
+        // Validar que data sea un array
+        if (!Array.isArray(data)) {
+          throw new Error('Formato de datos inválido');
+        }
+    
+        setCamisetas(data);
+        
+        try {
           // Aplicar filtros guardados
           const savedFilters = getFromLocalStorage('activeFilters');
           const savedQuickFilter = getFromLocalStorage('quickFilter');
@@ -214,17 +297,54 @@ useEffect(() => {
           
           setFilteredCamisetas(filteredData);
           
-          const savedOrder = localStorage.getItem(`customOrder_${usuarioId}`);
-          if (savedOrder) {
-            setCustomOrder(JSON.parse(savedOrder));
-          } else {
-            const newOrder = data.map(c => c.id);
-            setCustomOrder(newOrder);
-            localStorage.setItem(`customOrder_${usuarioId}`, JSON.stringify(newOrder));
+          // Manejar el orden personalizado
+          try {
+            const savedOrder = localStorage.getItem(`customOrder_${usuarioId}`);
+            if (savedOrder) {
+              const parsedOrder = JSON.parse(savedOrder);
+              // Verificar que el orden guardado sea válido para las camisetas actuales
+              const isValidOrder = parsedOrder.length === data.length && 
+                data.every(camiseta => parsedOrder.includes(camiseta.id));
+              
+              if (isValidOrder) {
+                setCustomOrder(parsedOrder);
+              } else {
+                // Si el orden no es válido, crear uno nuevo
+                const newOrder = data.map(c => c.id);
+                setCustomOrder(newOrder);
+                localStorage.setItem(`customOrder_${usuarioId}`, JSON.stringify(newOrder));
+              }
+            } else {
+              const newOrder = data.map(c => c.id);
+              setCustomOrder(newOrder);
+              localStorage.setItem(`customOrder_${usuarioId}`, JSON.stringify(newOrder));
+            }
+          } catch (orderError) {
+            console.error('Error manejando el orden personalizado:', orderError);
+            // En caso de error, establecer un orden predeterminado
+            const defaultOrder = data.map(c => c.id);
+            setCustomOrder(defaultOrder);
           }
+          
+        } catch (filterError) {
+          console.error('Error aplicando filtros:', filterError);
+          // En caso de error en los filtros, mostrar todos los datos sin filtrar
+          setFilteredCamisetas(data);
         }
+    
       } catch (error) {
-        console.error('Error al obtener camisetas', error);
+        console.error('Error al obtener camisetas:', error);
+        
+        // Manejar diferentes tipos de errores
+        if (error.message.includes('401')) {
+          navigate('/login');
+        } else if (error.message.includes('403')) {
+          alert('No tienes permisos para ver estas camisetas');
+        } else if (error.message.includes('404')) {
+          alert('No se encontraron camisetas para este usuario');
+        } else {
+          alert('Error al cargar las camisetas. Por favor, intenta nuevamente.');
+        }
       }
     };
   
@@ -874,7 +994,8 @@ useEffect(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('usuarioId');
     
-    navigate('/login');
+    setIsLoggedIn(false); // Actualizar estado global
+    navigate('/login', { replace: true });
   };
 
   const handleAgregarCamiseta = (nuevaCamiseta) => {
