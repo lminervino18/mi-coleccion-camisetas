@@ -94,7 +94,6 @@ function Login({ setIsLoggedIn }) {
           username: credentials.username.trim(),
           password: credentials.password.trim()
         }),
-        credentials: 'include',
       });
   
       if (response.type === 'opaque') {
