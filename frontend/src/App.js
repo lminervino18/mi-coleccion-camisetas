@@ -184,7 +184,7 @@ function App() {
           {/* Ruta para manejar rutas no encontradas */}
           <Route 
             path="*" 
-            element={<Navigate to="/" replace />} 
+            element={<Navigate to="/login" replace />} 
           />
         </Routes>
       </div>

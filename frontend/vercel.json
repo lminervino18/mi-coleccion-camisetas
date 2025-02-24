@@ -2,12 +2,27 @@
   "version": 2,
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "/(.*)",
       "dest": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/$1"
     },
     {
-      "src": "/auth/(.*)",
-      "dest": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/$1"
+      "handle": "filesystem"
+    },
+    {
+      "src": "/camisetas",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/login",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/estadisticas-camisetas",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/shared/(.*)",
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
