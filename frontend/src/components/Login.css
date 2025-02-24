@@ -31,12 +31,8 @@
 }
 
 .logo {
-  width: 150px; /* o el tamaño que necesites */
-  height: 150px; /* o el tamaño que necesites */
-  background-image: url('../assets/logo.png');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  height: 150px;
+  margin-right: 10px;
 }
 
 .title {
