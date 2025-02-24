@@ -524,16 +524,7 @@ useEffect(() => {
       }
     };
     
-    // En el render:
-    {showShareModal && (
-      <ShareModal
-        isOpen={showShareModal}
-        shareLink={shareLink}
-        onClose={() => setShowShareModal(false)}
-      />
-    )}
-
-
+   
     const copyShareLink = () => {
       navigator.clipboard.writeText(shareLink)
         .then(() => {
