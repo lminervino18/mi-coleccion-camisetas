@@ -1,17 +1,42 @@
 {
   "version": 2,
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/$1"
+      "source": "/api/(.*)",
+      "destination": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/$1"
     },
     {
-      "src": "/auth/(.*)",
-      "dest": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/$1"
+      "source": "/auth/(.*)",
+      "destination": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/$1"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
-  ]
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=1, stale-while-revalidate"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ],
+  "cleanUrls": true,
+  "trailingSlash": false
 }
