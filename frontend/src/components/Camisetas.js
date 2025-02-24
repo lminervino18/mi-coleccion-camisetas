@@ -349,7 +349,7 @@ useEffect(() => {
     };
   
     fetchCamisetas();
-  }, []);
+  }, [navigate]);
 
   useEffect(() => {
     const clubs = [...new Set(camisetas.map(c => c.club))]

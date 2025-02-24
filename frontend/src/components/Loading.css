@@ -1,4 +1,4 @@
-/* Loading.css */
+/* Fondo con imagen personalizada */
 .loading-container {
     position: fixed;
     top: 0;
@@ -6,68 +6,110 @@
     right: 0;
     bottom: 0;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background-color: rgba(0, 0, 0, 0.8); /* Mantiene la consistencia con el overlay oscuro */
+    background: url("../assets/background.jpg") no-repeat center center;
+    background-size: cover;
     z-index: 9999;
-    backdrop-filter: blur(5px); /* Efecto de desenfoque para el fondo */
-  }
-  
-  .loading-spinner {
-    width: 60px;
-    height: 60px;
-    border: 4px solid rgba(204, 207, 211, 0.1); /* Color similar a los botones */
-    border-top: 4px solid #cccfd3; /* Color consistente con el diseño */
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Sombra similar a otros elementos */
-  }
-  
-  .loading-container p {
-    margin-top: 20px;
+}
+
+/* Efecto de desenfoque en el fondo */
+.loading-container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    z-index: -1;
+}
+
+/* Contenedor del contenido de carga */
+.loading-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+/* Logo animado */
+.loading-logo img {
+    width: 120px;
+    height: auto;
+    animation: bounce 1.5s infinite alternate;
+}
+
+/* Barra de carga animada */
+.loading-bar {
+    width: 120px;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 5px;
+    margin-top: 15px;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Progreso animado */
+.loading-progress {
+    width: 0%;
+    height: 100%;
+    background: #cccfd3;
+    animation: progress 2s infinite ease-in-out;
+}
+
+/* Texto de carga */
+.loading-content p {
+    margin-top: 15px;
     color: #fff;
     font-size: 1.1rem;
-    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Consistente con el título */
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
     animation: fadeInOut 1.5s ease-in-out infinite;
-  }
-  
-  /* Animación del spinner */
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-  
-  /* Animación del texto */
-  @keyframes fadeInOut {
+}
+
+/* Animación del logo */
+@keyframes bounce {
+    from {
+        transform: translateY(0);
+    }
+    to {
+        transform: translateY(-10px);
+    }
+}
+
+/* Animación de la barra de progreso */
+@keyframes progress {
     0% {
-      opacity: 0.5;
-      transform: translateY(0px);
+        width: 0%;
     }
     50% {
-      opacity: 1;
-      transform: translateY(-5px);
+        width: 100%;
     }
     100% {
-      opacity: 0.5;
-      transform: translateY(0px);
+        width: 0%;
     }
-  }
-  
-  /* Responsive design */
-  @media (max-width: 768px) {
-    .loading-spinner {
-      width: 50px;
-      height: 50px;
+}
+
+/* Animación del texto */
+@keyframes fadeInOut {
+    0% {
+        opacity: 0.5;
+        transform: translateY(0px);
     }
-  
-    .loading-container p {
-      font-size: 1rem;
+    50% {
+        opacity: 1;
+        transform: translateY(-3px);
     }
-  }
-  
-  /* Opcional: Variante para mensajes de error durante la carga */
-  .loading-error {
+    100% {
+        opacity: 0.5;
+        transform: translateY(0px);
+    }
+}
+
+/* Mensaje de error */
+.loading-error {
     color: #ff3333;
     background-color: rgba(255, 51, 51, 0.1);
     border: 1px solid #ff3333;
@@ -78,43 +120,4 @@
     font-size: 0.9rem;
     max-width: 80%;
     animation: fadeIn 0.3s ease-in-out;
-  }
-  
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  /* Opcional: Efecto de pulso para el spinner */
-  .loading-spinner::after {
-    content: '';
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    right: -10px;
-    bottom: -10px;
-    border-radius: 50%;
-    border: 3px solid rgba(204, 207, 211, 0.1);
-    animation: pulse 2s linear infinite;
-  }
-  
-  @keyframes pulse {
-    0% {
-      transform: scale(0.8);
-      opacity: 0;
-    }
-    50% {
-      transform: scale(1);
-      opacity: 0.5;
-    }
-    100% {
-      transform: scale(1.2);
-      opacity: 0;
-    }
-  }
+}
