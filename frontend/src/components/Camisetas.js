@@ -269,6 +269,19 @@ useEffect(() => {
     
         setCamisetas(data);
         
+         // Verificar si hay un estado guardado de filteredCamisetas en localStorage
+        const savedFilteredIds = localStorage.getItem(`filteredCamisetasIds_${usuarioId}`);
+        
+        if (savedFilteredIds) {
+          const filteredIds = JSON.parse(savedFilteredIds);
+          const filteredData = data.filter(c => filteredIds.includes(c.id));
+          setFilteredCamisetas(filteredData);
+        } else {
+          // Si no hay datos guardados, usar todas las camisetas como estado inicial
+          setFilteredCamisetas(data);
+          localStorage.setItem(`filteredCamisetasIds_${usuarioId}`, JSON.stringify(data.map(c => c.id)));
+        }
+
         try {
           // Aplicar filtros guardados
           const savedFilters = getFromLocalStorage('activeFilters');
