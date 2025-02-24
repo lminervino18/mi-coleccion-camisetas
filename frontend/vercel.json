@@ -1,48 +1,17 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { 
-        "distDir": "build",
-        "maxLambdaSize": "15mb"
-      }
-    }
-  ],
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/:path*"
+      "source": "/api/(.*)",
+      "destination": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/$1"
     },
     {
-      "source": "/auth/:path*",
-      "destination": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/:path*"
+      "source": "/auth/(.*)",
+      "destination": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/$1"
     },
     {
       "source": "/(.*)",
       "destination": "/index.html"
     }
-  ],
-  "headers": [
-    {
-      "source": "/static/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    },
-    {
-      "source": "/:path*.(js|css|map|json|ico|png|jpg|jpeg|svg|gif)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=31536000, immutable"
-        }
-      ]
-    }
-  ],
-  "cleanUrls": true
+  ]
 }
