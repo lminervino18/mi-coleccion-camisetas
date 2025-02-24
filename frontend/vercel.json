@@ -35,7 +35,7 @@
       ]
     },
     {
-      "source": "/(.*)\\.(?:js|css|map|json|ico|png|jpg|jpeg|svg|gif)$",
+      "source": "/:path*.(js|css|map|json|ico|png|jpg|jpeg|svg|gif)",
       "headers": [
         {
           "key": "Cache-Control",
