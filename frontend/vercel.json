@@ -10,40 +10,18 @@
       }
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/static/(.*)",
-      "headers": { "cache-control": "public, max-age=31536000, immutable" },
-      "dest": "/static/$1"
+      "source": "/api/:path*",
+      "destination": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/:path*"
     },
     {
-      "src": "^/favicon.ico$",
-      "dest": "/favicon.ico"
+      "source": "/auth/:path*",
+      "destination": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/:path*"
     },
     {
-      "src": "^/manifest.json$",
-      "dest": "/manifest.json"
-    },
-    {
-      "src": "^/asset-manifest.json$",
-      "dest": "/asset-manifest.json"
-    },
-    {
-      "src": "/api/(.*)",
-      "dest": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/$1"
-    },
-    {
-      "src": "/auth/(.*)",
-      "dest": "https://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/$1"
-    },
-    {
-      "src": "/(.*)\\.(?:js|css|map|json|ico|png|jpg|jpeg|svg|gif)$",
-      "headers": { "cache-control": "public, max-age=31536000, immutable" },
-      "dest": "/$1.$2"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "headers": [
@@ -55,6 +33,16 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    },
+    {
+      "source": "/(.*)\\.(?:js|css|map|json|ico|png|jpg|jpeg|svg|gif)$",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
     }
-  ]
+  ],
+  "cleanUrls": true
 }
