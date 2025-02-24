@@ -30,9 +30,12 @@
   margin-bottom: 1rem;
 }
 
+/* Para el logo */
 .logo {
   height: 150px;
   margin-right: 10px;
+  background: url("../assets/logo.png") no-repeat center center;
+  background-size: contain;
 }
 
 .title {
