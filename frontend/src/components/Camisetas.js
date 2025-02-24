@@ -13,7 +13,8 @@ import {
   faArrowLeft,
   faExclamation,
   faChartSimple,  // Añade este ícono
-  faExternalLinkAlt
+  faExternalLinkAlt,
+  faCheck
 } from '@fortawesome/free-solid-svg-icons';
 
 
@@ -62,6 +63,35 @@ const CamisetaItem = React.memo(({
     </div>
   );
 });
+
+const CopyButton = ({ shareLink }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareLink);
+      setCopied(true);
+    } catch (error) {
+      console.error('Error al copiar:', error);
+    }
+  };
+
+  return (
+    <button 
+      onClick={handleCopy}
+      disabled={copied}
+      className={`copy-button ${copied ? 'copied' : ''}`}
+    >
+      {copied ? (
+        <>
+          Copiado <FontAwesomeIcon icon={faCheck} />
+        </>
+      ) : (
+        'Copiar Link'
+      )}
+    </button>
+  );
+};
 
 CamisetaItem.displayName = 'CamisetaItem';
 function Camisetas({ setIsLoggedIn }) {
@@ -482,7 +512,6 @@ useEffect(() => {
     
         const data = await response.json();
         
-        // Asegúrate de que la respuesta tenga la URL completa
         if (data.urlCompleta) {
           setShareLink(data.urlCompleta);
           setShowShareModal(true);
@@ -494,6 +523,15 @@ useEffect(() => {
         alert(error.message);
       }
     };
+    
+    // En el render:
+    {showShareModal && (
+      <ShareModal
+        isOpen={showShareModal}
+        shareLink={shareLink}
+        onClose={() => setShowShareModal(false)}
+      />
+    )}
 
 
     const copyShareLink = () => {
@@ -1156,23 +1194,24 @@ useEffect(() => {
           )}
         </div>
         
-        {showShareModal && (
-          <div className="share-modal-overlay">
-            <div className="share-modal-content">
-              <h2>Compartir Colección</h2>
-              <input 
-                type="text" 
-                value={shareLink} 
-                readOnly 
-                className="share-link-input"
-              />
-              <div className="share-modal-actions">
-                <button onClick={copyShareLink}>Copiar Link</button>
-                <button onClick={() => setShowShareModal(false)}>Cerrar</button>
-              </div>
+        // Por esto:
+      {showShareModal && (
+        <div className="share-modal-overlay">
+          <div className="share-modal-content">
+            <h2>Compartir Colección</h2>
+            <input 
+              type="text" 
+              value={shareLink} 
+              readOnly 
+              className="share-link-input"
+            />
+            <div className="share-modal-actions">
+              <CopyButton shareLink={shareLink} />
+              <button onClick={() => setShowShareModal(false)}>Cerrar</button>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
         {showProfileMenu && (
           <div className="profile-menu">

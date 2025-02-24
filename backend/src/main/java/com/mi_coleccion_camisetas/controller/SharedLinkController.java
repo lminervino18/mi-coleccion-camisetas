@@ -37,7 +37,6 @@ public class SharedLinkController {
         this.usuarioRepository = usuarioRepository;
         this.camisetaRepository = camisetaRepository;
     }
-
     @PostMapping("/generar-link")
     public ResponseEntity<SharedLinkDTO> generarLinkCompartido(Principal principal) {
         // Obtener el usuario actual
@@ -49,8 +48,7 @@ public class SharedLinkController {
         String token = sharedLinkService.generarLinkCompartido(usuario.getId());
         
         // Construir URL completa
-        String urlCompleta = "https://micoleccioncamisetas.com\"" + token;
-
+        String urlCompleta = String.format("https://micoleccioncamisetas.com/%s", token);
     
         SharedLinkDTO linkDTO = new SharedLinkDTO();
         linkDTO.setUrlCompleta(urlCompleta);

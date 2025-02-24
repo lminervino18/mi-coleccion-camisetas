@@ -8,7 +8,7 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import './DetalleCamiseta.css';
 import EditarCamiseta from './EditarCamiseta';
-
+import Loading from './Loading'; 
 
 const API_URL = process.env.REACT_APP_API_URL;
 
@@ -141,8 +141,9 @@ function DetalleCamiseta() {
     setShowEditForm(false);
   };
 
+  // Por esto:
   if (loading) {
-    return <div className="detalle-loading">Cargando...</div>;
+    return <Loading error={error} />;
   }
 
   if (error || !camiseta) {

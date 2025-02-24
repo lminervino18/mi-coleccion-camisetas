@@ -7,6 +7,7 @@ import {
 } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import Loading from './Loading'; // Añade esta línea al inicio con los otros imports
 
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -609,15 +610,10 @@ function EstadisticasCamisetas() {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="estadisticas-overlay">
-        <div className="estadisticas-container">
-          <div className="loading-spinner">Cargando estadísticas...</div>
-        </div>
-      </div>
-    );
-  }
+  // Por esto:
+    if (loading) {
+      return <Loading error={error} />;
+    }
   
   if (error) {
     return (
