@@ -2,34 +2,31 @@
   "version": 2,
   "routes": [
     {
-      "src": "/api/(.*)",
+      "src": "/(.*)",
       "dest": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/$1"
     },
     {
-      "src": "/static/(.*)",
-      "dest": "/static/$1"
+      "handle": "filesystem"
     },
     {
-      "src": "/favicon.ico",
-      "dest": "/favicon.ico"
+      "src": "/camisetas",
+      "dest": "/index.html"
     },
     {
-      "src": "/manifest.json",
-      "dest": "/manifest.json"
+      "src": "/login",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/estadisticas-camisetas",
+      "dest": "/index.html"
+    },
+    {
+      "src": "/shared/(.*)",
+      "dest": "/index.html"
     },
     {
       "src": "/(.*)",
-      "headers": {
-        "Cache-Control": "s-maxage=1, stale-while-revalidate"
-      },
       "dest": "/index.html"
-    }
-  ],
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
     }
   ]
 }
