@@ -1,7 +1,7 @@
+// Login.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Login.css';
-import logo from '../assets/logo.png';
 import RegisterForm from './RegisterForm';
 import Loading from './Loading';
 
@@ -102,7 +102,7 @@ function Login({ setIsLoggedIn }) {
   
       if (response.status === 401) {
         const errorText = await response.text();
-        setError(errorText || 'Credenciales inválidas');
+        setError(errorText || 'Usuario o Contraseña Incorrectas');
         return;
       }
   
@@ -147,7 +147,7 @@ function Login({ setIsLoggedIn }) {
       <div className="login-container">
         <div className="overlay">
           <div className="logo-title">
-            <img src={logo} alt="Logo" className="logo" />
+            <div className="logo"></div>
             <h1 className="title">Mi Colección de Camisetas</h1>
           </div>
           <p className="subtitle">Las camisetas que amás, ahora organizadas.</p>

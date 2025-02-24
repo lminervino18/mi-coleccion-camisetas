@@ -438,6 +438,19 @@ useEffect(() => {
       saveToLocalStorage('quickFilter', quickFilter);
     }, [quickFilter]);
 
+    useEffect(() => {
+      // Verificamos que no haya ningún filtro activo
+      const noHayFiltros =
+        quickFilter === null &&
+        Object.values(activeFilters).every(filter =>
+          Array.isArray(filter) ? filter.length === 0 : filter === null
+        );
+    
+      if (noHayFiltros) {
+        setFilteredCamisetas(camisetas);
+      }
+    }, [camisetas, quickFilter, activeFilters]);
+
     const generateShareLink = async () => {
       try {
         const response = await fetch(`${API_URL}/api/shared/generar-link`, {

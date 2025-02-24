@@ -621,8 +621,8 @@ function EditarCamiseta({
 
         <input 
           type="text" 
-          name="nombre" 
-          placeholder="Nombre" 
+          name="jugador" 
+          placeholder="JUgador" 
           value={formData.nombre} 
           onChange={handleChange} 
         />
