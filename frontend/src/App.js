@@ -107,8 +107,9 @@ function App() {
     };
   }, []);
 
+  // Asegúrate de que la app no renderice contenido hasta que la inicialización haya terminado
   if (isInitializing) {
-    return <Loading />;
+    return <Loading />; // Muestra un loading mientras se verifica el estado
   }
 
   return (
@@ -190,5 +191,6 @@ function App() {
     </Router>
   );
 }
+
 
 export default App;
