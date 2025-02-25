@@ -525,17 +525,6 @@ useEffect(() => {
     };
     
    
-    const copyShareLink = () => {
-      navigator.clipboard.writeText(shareLink)
-        .then(() => {
-          alert('Link copiado al portapapeles');
-        })
-        .catch(err => {
-          console.error('Error copiando link:', err);
-          alert('No se pudo copiar el link');
-        });
-    };
-
   const handleFilterChange = (filterType, value, isChecked = null) => {
     setActiveFilters(prev => {
       const newFilters = { ...prev };
@@ -1185,7 +1174,6 @@ useEffect(() => {
           )}
         </div>
         
-        // Por esto:
       {showShareModal && (
         <div className="share-modal-overlay">
           <div className="share-modal-content">
@@ -1249,9 +1237,9 @@ useEffect(() => {
               className="share-link-input"
             />
             <div className="share-modal-actions">
-              <button onClick={copyShareLink}>Copiar Link</button>
-              <button onClick={() => setShowShareModal(false)}>Cerrar</button>
-            </div>
+            <CopyButton shareLink={shareLink} />
+            <button onClick={() => setShowShareModal(false)}>Cerrar</button>
+          </div>
           </div>
         </div>
       )}
