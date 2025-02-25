@@ -24,3 +24,5 @@ com/mi_coleccion_camisetas/filter/JwtAuthenticationFilter.class
 com/mi_coleccion_camisetas/repository/SharedLinkRepository.class
 com/mi_coleccion_camisetas/controller/UsuarioController.class
 com/mi_coleccion_camisetas/dto/CamisetaDTO.class
+com/mi_coleccion_camisetas/config/WebMvcConfig.class
+com/mi_coleccion_camisetas/interceptor/AuthInterceptor.class

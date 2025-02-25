@@ -48,7 +48,7 @@ public class SharedLinkController {
         String token = sharedLinkService.generarLinkCompartido(usuario.getId());
         
         // Construir URL completa
-        String urlCompleta = String.format("https://micoleccioncamisetas.com/%s", token);
+        String urlCompleta = String.format("https://micoleccioncamisetas.com/shared/%s", token);
     
         SharedLinkDTO linkDTO = new SharedLinkDTO();
         linkDTO.setUrlCompleta(urlCompleta);
