@@ -141,7 +141,6 @@ function DetalleCamiseta() {
     setShowEditForm(false);
   };
 
-  // Por esto:
   if (loading) {
     return <Loading error={error} />;
   }
