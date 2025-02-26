@@ -1,3 +1,4 @@
+/* Contenedor principal */
 .home-container {
     min-height: 100vh;
     background: url("../assets/background.jpg") no-repeat center center fixed;
@@ -9,14 +10,12 @@
 .home-container::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: 0;
     background-color: rgba(0, 0, 0, 0.7);
     z-index: 1;
 }
 
+/* Encabezado */
 .header {
     display: flex;
     justify-content: space-between;
@@ -49,11 +48,13 @@
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* Botones de navegación */
 .nav-buttons {
     display: flex;
     gap: 1rem;
 }
 
+/* Botones generales */
 .btn {
     padding: 10px 20px;
     border: none;
@@ -83,6 +84,7 @@
     height: 200%;
 }
 
+/* Botón primario */
 .btn-primary {
     background-color: #cccfd3;
     color: rgb(15, 15, 15);
@@ -92,6 +94,7 @@
     background-color: #fdfdfd;
 }
 
+/* Botón secundario */
 .btn-secondary {
     background-color: rgba(255, 255, 255, 0.1);
     color: white;
@@ -101,6 +104,7 @@
     background-color: rgba(255, 255, 255, 0.2);
 }
 
+/* Contenedor de contenido principal */
 .content-container {
     position: relative;
     z-index: 2;
@@ -121,6 +125,7 @@
     max-width: 1200px;
 }
 
+/* Slider de imágenes */
 .image-slider {
     width: 600px;
     height: 400px;
@@ -148,6 +153,7 @@
     transform: scale(1);
 }
 
+/* Contenedor de eslogan */
 .slogan-container {
     text-align: center;
     color: white;
@@ -170,6 +176,7 @@
     color: #cccfd3;
 }
 
+/* Animación del logo */
 @keyframes floatLogo {
     0%, 100% {
         transform: translateY(0);
@@ -180,39 +187,10 @@
 }
 
 /* Media Queries */
-@media (max-width: 1024px) {
-    .image-slider {
-        width: 500px;
-        height: 333px;
-    }
-
-    .slogan-container {
-        width: 90%;
-    }
-}
-
 @media (max-width: 768px) {
     .header {
         padding: 0.8rem;
     }
-
-    .header-left {
-        gap: 0.5rem;
-    }
-
-    .header-logo {
-        width: 40px;
-        height: 40px;
-    }
-
-    .site-title {
-        font-size: 1rem;
-    }
-
-    .nav-buttons {
-        gap: 6px;
-    }
-
     .btn {
         padding: 6px 10px;
         font-size: 0.75rem;
@@ -222,77 +200,14 @@
         align-items: center;
         justify-content: center;
     }
-
-    .image-slider {
-        width: 100%;
-        max-width: 400px;
-        height: 267px;
-    }
-
-    .content-container {
-        padding: 1rem;
-    }
-
-    .slogan-container {
-        width: 95%;
-        padding: 1rem;
-    }
-
-    .slogan {
-        font-size: 0.9rem;
-        line-height: 1.4;
-    }
-
-    .tagline {
-        font-size: 1.1rem;
-    }
 }
 
 @media (max-width: 480px) {
-    .header {
-        padding: 0.5rem 0.8rem;
-    }
-
-    .header-left {
-        gap: 0.3rem;
-    }
-
-    .header-logo {
-        width: 30px;
-        height: 30px;
-    }
-
-    .site-title {
-        font-size: 0.85rem;
-    }
-
-    .nav-buttons {
-        gap: 4px;
-    }
-
     .btn {
         padding: 4px 8px;
         font-size: 0.7rem;
         min-width: 50px;
         height: 24px;
-    }
-
-    .image-slider {
-        width: 100%;
-        max-width: 300px;
-        height: 200px;
-    }
-
-    .slogan-container {
-        padding: 0.8rem;
-    }
-
-    .slogan {
-        font-size: 0.8rem;
-    }
-
-    .tagline {
-        font-size: 0.9rem;
     }
 }
 
@@ -301,29 +216,9 @@
     .btn {
         -webkit-tap-highlight-color: transparent;
     }
-
     .btn:active {
         transform: scale(0.95);
         transition: transform 0.1s;
-    }
-}
-
-/* Orientación landscape */
-@media (max-height: 500px) and (orientation: landscape) {
-    .header {
-        position: relative;
-    }
-
-    .content-container {
-        padding: 0.5rem;
-    }
-
-    .image-slider {
-        height: 200px;
-    }
-
-    .slogan-container {
-        padding: 0.5rem;
     }
 }
 
@@ -333,7 +228,7 @@
     outline-offset: 2px;
 }
 
-/* Optimizaciones */
+/* Optimizaciones generales */
 * {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
