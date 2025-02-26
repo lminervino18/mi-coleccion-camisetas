@@ -201,193 +201,52 @@
   text-size-adjust: 100%;
 }
 
-/* Mejoras Mobile-Friendly */
+/* Media Queries */
 @media (max-width: 768px) {
-  .login-container {
-    padding: 10px;
-    background-attachment: scroll; /* Mejor rendimiento en móviles */
-  }
-
   .overlay {
-    width: 100%;
-    max-width: none;
-    padding: 20px 15px;
-    margin: 10px;
-    border-radius: 12px;
+    padding: 1.5rem;
   }
 
-  .logo-title {
-    flex-direction: column;
-    gap: 10px;
+  .back-button {
+    top: 15px;
+    left: 15px;
+    font-size: 1.2rem;
   }
 
   .logo {
-    height: 80px;
-    margin-right: 0;
-    margin-bottom: 10px;
+    height: 100px;
   }
 
   .title {
     font-size: 1.4rem;
-    text-align: center;
-  }
-
-  .subtitle {
-    font-size: 0.9rem;
-    padding: 0 10px;
-    margin-bottom: 20px;
-  }
-
-  .login-form {
-    width: 100%;
-  }
-
-  .form-group {
-    margin-bottom: 15px;
-  }
-
-  .form-group label {
-    font-size: 0.9rem;
-  }
-
-  .form-group input {
-    padding: 12px;
-    font-size: 16px; /* Prevenir zoom en iOS */
-    width: 100%;
-    margin-bottom: 10px;
-  }
-
-  .form-actions {
-    gap: 12px;
-  }
-
-  .btn-primary,
-  .btn-secondary {
-    min-height: 44px;
-    padding: 12px;
-    font-size: 16px;
-  }
-
-  .error-message {
-    font-size: 0.85rem;
-    padding: 8px;
-    width: 100%;
   }
 }
 
-/* Ajustes para pantallas muy pequeñas */
 @media (max-width: 480px) {
   .overlay {
-    padding: 15px 10px;
+    padding: 1rem;
+  }
+
+  .back-button {
+    top: 10px;
+    left: 10px;
+    font-size: 1rem;
   }
 
   .logo {
-    height: 60px;
+    height: 80px;
   }
 
   .title {
     font-size: 1.2rem;
   }
 
-  .back-button {
-    top: 10px;
-    left: 10px;
-    padding: 8px;
+  .login-form .form-group input {
+    font-size: 0.9rem;
+  }
+
+  .btn {
+    font-size: 0.9rem;
   }
 }
 
-/* Mejoras de accesibilidad táctil */
-@media (hover: none) {
-  .form-group input,
-  .btn-primary,
-  .btn-secondary,
-  .back-button {
-    min-height: 44px;
-  }
-
-  .back-button {
-    padding: 12px;
-  }
-
-  /* Prevenir zoom en iOS */
-  input[type="text"],
-  input[type="password"] {
-    font-size: 16px !important;
-  }
-}
-
-/* Orientación landscape */
-@media screen and (orientation: landscape) and (max-height: 500px) {
-  .login-container {
-    height: auto;
-    min-height: 100vh;
-  }
-
-  .overlay {
-    margin: 20px auto;
-  }
-
-  .logo {
-    height: 50px;
-  }
-
-  .form-group {
-    margin-bottom: 10px;
-  }
-}
-
-/* Mejoras de rendimiento */
-@media (prefers-reduced-motion: reduce) {
-  * {
-    animation: none !important;
-    transition: none !important;
-  }
-}
-
-/* Mejoras de usabilidad */
-.form-group input:focus {
-  outline: 2px solid #007bff;
-  outline-offset: 2px;
-}
-
-/* Estado activo de botones más visible */
-.btn-primary:active,
-.btn-secondary:active {
-  transform: scale(0.98);
-  transition: transform 0.1s;
-}
-
-/* Mejoras visuales para modo oscuro */
-@media (prefers-color-scheme: dark) {
-  .overlay {
-    background-color: rgba(0, 0, 0, 0.9);
-  }
-
-  .form-group input {
-    background-color: rgba(255, 255, 255, 0.05);
-  }
-}
-
-/* Mejoras de contraste */
-.error-message {
-  background-color: rgba(255, 0, 0, 0.1);
-  border: 1px solid rgba(255, 0, 0, 0.3);
-  padding: 10px;
-  margin: 10px 0;
-  border-radius: 4px;
-}
-
-/* Mejoras de accesibilidad del teclado */
-:focus-visible {
-  outline: 3px solid #007bff;
-  outline-offset: 2px;
-}
-
-/* Optimizaciones de rendimiento */
-.login-container,
-.overlay,
-.btn-primary,
-.btn-secondary {
-  will-change: transform;
-  -webkit-font-smoothing: antialiased;
-}

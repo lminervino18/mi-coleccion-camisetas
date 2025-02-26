@@ -20,9 +20,8 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 
 const CamisetaItem = React.memo(({ camiseta, camisetas, currentIndex, onNavigate }) => {
-    const [showModal, setShowModal] = useState(false);
-    
-    const normalizeColorName = (color) => {
+      const [showModal, setShowModal] = useState(false);
+      const normalizeColorName = (color) => {
       const colorMap = {
         'ROJO': 'rojo',
         'AZUL': 'azul',
@@ -246,7 +245,7 @@ function SharedCollection() {
     club: [],
     numeroEquipacion: []
   });
-
+  const [linkExpired, setLinkExpired] = useState(false);
   const [sortBy, setSortBy] = useState(null);
   const [sortDirection, setSortDirection] = useState('asc');
   const [quickFilter, setQuickFilter] = useState(null);
@@ -283,15 +282,23 @@ function SharedCollection() {
         // Obtener datos de las camisetas
         const camisetasResponse = await fetch(`${API_URL}/api/shared/camisetas/${token}`);
         if (!camisetasResponse.ok) {
+          if (camisetasResponse.status === 400) {
+            setLinkExpired(true);
+            return;
+          }
           throw new Error('No se pudieron cargar las camisetas');
         }
         const camisetasData = await camisetasResponse.json();
         setCamisetas(camisetasData);
         setFilteredCamisetas(camisetasData);
-  
+    
         // Obtener datos del usuario usando el nuevo endpoint
         const userResponse = await fetch(`${API_URL}/api/shared/user/${token}`);
         if (!userResponse.ok) {
+          if (userResponse.status === 400) {
+            setLinkExpired(true);
+            return;
+          }
           throw new Error('No se pudieron cargar los datos del usuario');
         }
         const userData = await userResponse.json();
@@ -299,7 +306,7 @@ function SharedCollection() {
           username: userData.username,
           userPhoto: userData.photoUrl
         });
-  
+    
         // Extraer datos únicos para los filtros
         const clubs = [...new Set(camisetasData.map(c => c.club))]
           .filter(club => club !== null && club !== '')
@@ -310,12 +317,13 @@ function SharedCollection() {
         const ligas = [...new Set(camisetasData.map(c => c.liga))]
           .filter(liga => liga !== null && liga !== '')
           .sort();
-  
+    
         setAvailableClubs(clubs);
         setAvailablePaises(paises);
         setAvailableLigas(ligas);
       } catch (error) {
         console.error('Error al cargar datos:', error);
+        setLinkExpired(true);
       }
     };
   
@@ -843,7 +851,13 @@ function SharedCollection() {
   
       {/* Grid de Camisetas */}
       <div className="grid-container">
-        {filteredCamisetas
+      {linkExpired ? (
+        <div className="link-expired-message">
+          <h2>EL LINK HA EXPIRADO</h2>
+          <p>Este enlace ya no está disponible.</p>
+        </div>
+      ) : (
+        filteredCamisetas
           .filter((camiseta) => {
             const searchTerm = search.toLowerCase();
             return (
@@ -865,8 +879,9 @@ function SharedCollection() {
               currentIndex={index}
               onNavigate={handleNavigate}
             />
-          ))}
-      </div>
+          ))
+      )}
+    </div>
     </div>
     </div>
   );

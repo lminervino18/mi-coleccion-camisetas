@@ -262,6 +262,27 @@
   border: 1px solid;
 }
 
+.link-expired-message {
+  width: 100%;
+  text-align: center;
+  padding: 40px;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  margin: 20px auto;
+}
+
+.link-expired-message h2 {
+  color: #ff3333;
+  font-size: 2rem;
+  margin-bottom: 15px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.link-expired-message p {
+  color: #fff;
+  font-size: 1.2rem;
+}
+
 /* Media Queries */
 @media (max-width: 1024px) {
   .shared-collection .detalle-content {
@@ -380,6 +401,20 @@
     height: 35px;
     display: none;
   }
+
+  .link-expired-message {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  .link-expired-message h2 {
+    font-size: 1.5rem;
+  }
+
+  .link-expired-message p {
+    font-size: 1rem;
+  }
+  
 }
 
 @media (max-width: 480px) {
