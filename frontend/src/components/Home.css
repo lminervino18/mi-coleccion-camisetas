@@ -210,14 +210,14 @@
     }
 
     .nav-buttons {
-        gap: 8px;
+        gap: 6px;
     }
 
     .btn {
-        padding: 6px 12px;
-        font-size: 0.8rem;
-        min-width: 70px;
-        height: 30px;
+        padding: 6px 10px;
+        font-size: 0.75rem;
+        min-width: 60px;
+        height: 28px;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -267,14 +267,14 @@
     }
 
     .nav-buttons {
-        gap: 6px;
+        gap: 4px;
     }
 
     .btn {
         padding: 4px 8px;
-        font-size: 0.75rem;
-        min-width: 60px;
-        height: 25px;
+        font-size: 0.7rem;
+        min-width: 50px;
+        height: 24px;
     }
 
     .image-slider {

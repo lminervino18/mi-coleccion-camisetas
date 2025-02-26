@@ -1,4 +1,3 @@
-// Home.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import RegisterForm from './RegisterForm';
@@ -15,6 +14,44 @@ function Home() {
   const importAll = (r) => r.keys().map(r);
   const images = importAll(require.context('../assets/people', false, /\.(png|jpe?g|svg)$/));
 
+  // Verificar autenticación al cargar el componente
+  useEffect(() => {
+    const checkAuth = () => {
+      const token = localStorage.getItem('token');
+      const usuarioId = localStorage.getItem('usuarioId');
+
+      if (!token) {
+        localStorage.clear();
+        return;
+      }
+
+      if (token && usuarioId) {
+        navigate('/camisetas', { replace: true });
+      }
+    };
+
+    checkAuth();
+
+    // Limpiar customOrder existente
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('customOrder_')) {
+        localStorage.removeItem(key);
+      }
+    });
+
+    const handleBeforeUnload = () => {
+      if (!localStorage.getItem('token')) {
+        localStorage.clear();
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [navigate]);
+
+  // Efecto para el slider de imágenes
   useEffect(() => {
     const interval = setInterval(() => {
       const nextIndex = (currentImageIndex + 1) % images.length;

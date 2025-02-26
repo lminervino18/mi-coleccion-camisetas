@@ -14,6 +14,7 @@ import {
 
 import './Camisetas.css';
 import './SharedCollection.css';
+import { useNavigate } from 'react-router-dom';
 
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -262,6 +263,7 @@ function SharedCollection() {
     username: '',
     userPhoto: null
   });
+  const navigate = useNavigate();
 
   const { token } = useParams();
 
@@ -545,8 +547,7 @@ function SharedCollection() {
                 </div>
                 <button 
                   className="create-collection-btn"
-                  onClick={() => window.location.href = 'https://micoleccioncamisetas-o2i9s0ka7-lorenzo-minervinos-projects.vercel.app/login'}
-
+                  onClick={() => navigate("/camisetas")}
                 >
                   ¡Crea tu propia colección!
                 </button>
