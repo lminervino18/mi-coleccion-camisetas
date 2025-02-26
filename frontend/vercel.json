@@ -10,10 +10,6 @@
       "destination": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/$1"
     },
     {
-      "source": "/shared/:token",
-      "destination": "/index.html"
-    },
-    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
