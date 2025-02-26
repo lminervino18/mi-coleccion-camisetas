@@ -271,53 +271,186 @@
   .shared-collection .detalle-imagen-container {
     max-height: 50vh;
   }
+
+  .shared-collection .grid-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
+  .shared-collection .camisetas-container {
+    padding: 10px;
+  }
+
   .shared-collection .top-bar {
     width: 95%;
-    padding: 10px;
+    padding: 15px;
+    flex-direction: column;
+    gap: 15px;
   }
 
   .shared-collection .user-info-container {
     flex-direction: column;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 15px;
+  }
+
+  .shared-collection .user-info-left {
+    width: 100%;
+  }
+
+  .shared-collection .user-photo-section {
+    flex-wrap: wrap;
   }
 
   .shared-collection .create-collection-btn {
     width: 100%;
     margin-top: 10px;
+    padding: 12px;
+    font-size: 14px;
   }
 
   .shared-collection .user-photo,
   .shared-collection .user-photo-placeholder {
-    width: 32px;
-    height: 32px;
+    width: 35px;
+    height: 35px;
   }
 
   .shared-collection .collection-title {
     font-size: 1rem;
   }
 
+  .shared-collection .collection-stats {
+    font-size: 0.9rem;
+    margin-top: 10px;
+    padding: 4px 10px;
+  }
+
+  .shared-collection .search-controls {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    gap: 8px;
+    width: 100%;
+  }
+
+  .shared-collection .search-controls input {
+    width: 100%;
+    font-size: 14px;
+    padding: 10px;
+  }
+
+  .shared-collection .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    width: 100%;
+  }
+
+  .shared-collection .camiseta-item {
+    height: 250px;
+  }
+
+  .shared-collection .quick-filters-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 5px 0;
+    margin-top: 10px;
+    gap: 8px;
+    flex-wrap: nowrap;
+    width: 100%;
+  }
+
+  .shared-collection .quick-filter-button {
+    padding: 6px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  .shared-collection .detalle-container {
+    padding: 10px;
+  }
+
+  .shared-collection .detalle-titulo {
+    font-size: 1.5rem;
+    margin: 15px 0;
+  }
+
   .shared-collection .btn-nav {
     width: 35px;
     height: 35px;
+    display: none;
   }
 }
 
 @media (max-width: 480px) {
+  .shared-collection .grid-container {
+    grid-template-columns: 1fr;
+    max-width: 300px;
+    margin: 10px auto;
+  }
+
+  .shared-collection .camiseta-item {
+    height: 350px;
+  }
+
   .shared-collection .detalle-titulo {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
   }
 
   .shared-collection .header-buttons {
-    flex-wrap: wrap;
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
   }
 
   .shared-collection .btn-back,
   .shared-collection .btn-download {
     width: 100%;
-    margin: 5px 0;
+    padding: 12px;
+    justify-content: center;
+  }
+
+  .shared-collection .detalle-info {
+    padding: 10px;
+  }
+
+  .shared-collection .info-section,
+  .shared-collection .colores-section,
+  .shared-collection .comentarios-section {
+    padding: 15px;
+  }
+
+  .shared-collection .info-item {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .shared-collection .colores-container {
+    justify-content: center;
+  }
+}
+
+/* Optimizaciones táctiles */
+@media (hover: none) {
+  .shared-collection .quick-filter-button,
+  .shared-collection .btn-back,
+  .shared-collection .btn-download,
+  .shared-collection .create-collection-btn {
+    min-height: 44px;
+  }
+
+  .shared-collection .search-controls input {
+    min-height: 44px;
+  }
+}
+
+/* Mejoras de rendimiento */
+@media (prefers-reduced-motion: reduce) {
+  .shared-collection *,
+  .shared-collection *::before,
+  .shared-collection *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

@@ -5,21 +5,50 @@
   align-items: center;
   height: 100vh;
   background: url("../assets/background.jpg") no-repeat center center;
-  background-size: cover; /* Ajusta automáticamente para cubrir el área */
-  background-attachment: fixed; /* Opcional: crea un efecto de paralaje */
+  background-size: cover;
+  background-attachment: fixed;
   position: relative;
 }
 
 /* Superposición oscura sobre el fondo */
 .overlay {
-  background-color: rgba(0, 0, 0, 0.8); /* Oscurece más el fondo */
+  background-color: rgba(0, 0, 0, 0.8);
   padding: 2rem;
   border-radius: 8px;
   color: #fff;
   text-align: center;
   max-width: 400px;
-  width: 90%; /* Adaptativo para pantallas pequeñas */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8); /* Sombra para resaltar el formulario */
+  width: 90%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.8);
+  position: relative; /* Para el posicionamiento del botón de retorno */
+}
+
+/* Botón de retorno */
+.back-button {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+.back-button:hover {
+  transform: scale(1.1);
+  color: #cccfd3;
+}
+
+.back-button:focus {
+  outline: none;
+  color: #cccfd3;
 }
 
 /* Estilo del logo y el título */
@@ -28,6 +57,7 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
+  margin-top: 1.5rem; /* Espacio para el botón de retorno */
 }
 
 /* Para el logo */
@@ -42,7 +72,7 @@
   font-size: 1.8rem;
   font-weight: bold;
   color: #fff;
-  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8); /* Contorno oscuro para resaltar */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
 }
 
 /* Estilo del subtítulo */
@@ -72,7 +102,7 @@
   background-color: rgba(255, 255, 255, 0.1);
   color: #fff;
   font-size: 1rem;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5); /* Resalta el input */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
   margin-bottom: 1rem;
 }
 
@@ -83,12 +113,11 @@
 }
 
 /* Botones */
-.form-buttons {
+.form-actions {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: 10px;
 }
-
-/* Estilos para los botones */
 
 .login-form .btn-primary {
   width: 100%;
@@ -99,26 +128,29 @@
   color: rgb(15, 15, 15);
   border-radius: 5px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .login-form .btn-primary:hover {
   background-color: #fdfdfd;
+  transform: translateY(-2px);
 }
 
 .login-form .btn-secondary {
-  margin-top: 10px;
   width: 100%;
   padding: 10px;
   font-size: 1rem;
   border: none;
-  background-color: rgba(255, 255, 255, 0.1); /* Fondo translúcido */
+  background-color: rgba(255, 255, 255, 0.1);
   color: white;
   border-radius: 5px;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .login-form .btn-secondary:hover {
-  background-color: rgba(255, 255, 255, 0.2); /* Más translúcido al pasar */
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 
 /* Estilo para mensajes de error */
@@ -132,9 +164,10 @@
   text-align: center;
   font-size: 0.9rem;
   width: 95%;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Animación para el mensaje de error */
+/* Animaciones */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -146,94 +179,215 @@
   }
 }
 
+/* Mejoras de accesibilidad */
+.back-button:focus,
+.btn:focus {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* Efectos de hover mejorados */
+.back-button:hover {
+  transform: scale(1.1) translateX(-2px);
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Prevenir problemas de texto */
+* {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* Mejoras Mobile-Friendly */
+@media (max-width: 768px) {
+  .login-container {
+    padding: 10px;
+    background-attachment: scroll; /* Mejor rendimiento en móviles */
+  }
+
+  .overlay {
+    width: 100%;
+    max-width: none;
+    padding: 20px 15px;
+    margin: 10px;
+    border-radius: 12px;
+  }
+
+  .logo-title {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .logo {
+    height: 80px;
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    padding: 0 10px;
+    margin-bottom: 20px;
+  }
+
+  .login-form {
+    width: 100%;
+  }
+
+  .form-group {
+    margin-bottom: 15px;
+  }
+
+  .form-group label {
+    font-size: 0.9rem;
+  }
+
+  .form-group input {
+    padding: 12px;
+    font-size: 16px; /* Prevenir zoom en iOS */
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .form-actions {
+    gap: 12px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    min-height: 44px;
+    padding: 12px;
+    font-size: 16px;
+  }
+
+  .error-message {
+    font-size: 0.85rem;
+    padding: 8px;
+    width: 100%;
+  }
+}
+
+/* Ajustes para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .overlay {
+    padding: 15px 10px;
+  }
+
+  .logo {
+    height: 60px;
+  }
+
+  .title {
+    font-size: 1.2rem;
+  }
+
+  .back-button {
+    top: 10px;
+    left: 10px;
+    padding: 8px;
+  }
+}
+
+/* Mejoras de accesibilidad táctil */
+@media (hover: none) {
+  .form-group input,
+  .btn-primary,
+  .btn-secondary,
+  .back-button {
+    min-height: 44px;
+  }
+
+  .back-button {
+    padding: 12px;
+  }
+
+  /* Prevenir zoom en iOS */
+  input[type="text"],
+  input[type="password"] {
+    font-size: 16px !important;
+  }
+}
+
+/* Orientación landscape */
+@media screen and (orientation: landscape) and (max-height: 500px) {
+  .login-container {
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .overlay {
+    margin: 20px auto;
+  }
+
+  .logo {
+    height: 50px;
+  }
+
+  .form-group {
+    margin-bottom: 10px;
+  }
+}
+
+/* Mejoras de rendimiento */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Mejoras de usabilidad */
+.form-group input:focus {
+  outline: 2px solid #007bff;
+  outline-offset: 2px;
+}
+
+/* Estado activo de botones más visible */
+.btn-primary:active,
+.btn-secondary:active {
+  transform: scale(0.98);
+  transition: transform 0.1s;
+}
+
+/* Mejoras visuales para modo oscuro */
+@media (prefers-color-scheme: dark) {
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.9);
+  }
+
+  .form-group input {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
+/* Mejoras de contraste */
 .error-message {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Estilo para mensajes de error generales */
-.register-form .error-message {
-  color: #ff3333;
-  background-color: rgba(255, 51, 51, 0.1);
-  border: 1px solid #ff3333;
+  background-color: rgba(255, 0, 0, 0.1);
+  border: 1px solid rgba(255, 0, 0, 0.3);
   padding: 10px;
+  margin: 10px 0;
   border-radius: 4px;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  font-size: 0.9rem;
-  width: 100%;
-  animation: fadeIn 0.3s ease-in-out;
 }
 
-/* Animación para el mensaje de error */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* Mejoras de accesibilidad del teclado */
+:focus-visible {
+  outline: 3px solid #007bff;
+  outline-offset: 2px;
 }
 
-/* Estilo para errores específicos de campo */
-.form-group .field-error {
-  color: #ff3333;
-  font-size: 0.8rem;
-  margin-top: 5px;
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-/* Estilo para campos con error */
-.form-group input.error {
-  border: 1px solid #ff3333;
-  background-color: rgba(255, 51, 51, 0.05);
-}
-
-.form-group input.error:focus {
-  border-color: #ff3333;
-  box-shadow: 0 0 0 2px rgba(255, 51, 51, 0.2);
-}
-
-/* Estilo para el contenedor de mensajes de error */
-.error-container {
-  margin-bottom: 1.5rem;
-  width: 100%;
-}
-
-/* Estilo para múltiples mensajes de error */
-.error-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.error-list li {
-  color: #ff3333;
-  margin-bottom: 5px;
-  font-size: 0.9rem;
-}
-
-/* Estilo para el mensaje de éxito actualizado */
-.register-form .success-message {
-  text-align: center;
-  color: #4caf50;
-  border: 1px solid #4caf50;
-  padding: 15px;
-  border-radius: 4px;
-  margin-bottom: 1.5rem;
-  background-color: rgba(76, 175, 80, 0.1);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.register-form .success-message h2 {
-  font-size: 1.4rem;
-  margin-bottom: 10px;
-  color: #ffffff;
-}
-
-.register-form .success-message p {
-  font-size: 1rem;
-  margin-bottom: 15px;
-  color: #ffffff;
+/* Optimizaciones de rendimiento */
+.login-container,
+.overlay,
+.btn-primary,
+.btn-secondary {
+  will-change: transform;
+  -webkit-font-smoothing: antialiased;
 }

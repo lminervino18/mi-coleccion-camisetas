@@ -121,3 +121,156 @@
     max-width: 80%;
     animation: fadeIn 0.3s ease-in-out;
 }
+
+/* Mejoras Mobile-Friendly */
+@media (max-width: 768px) {
+    .loading-container {
+      background-attachment: scroll; /* Mejor rendimiento en móviles */
+      padding: 20px;
+    }
+  
+    .loading-content {
+      width: 90%;
+      max-width: 300px;
+    }
+  
+    .loading-logo img {
+      width: 100px; /* Logo más pequeño en móviles */
+      height: auto;
+    }
+  
+    .loading-bar {
+      width: 100%;
+      height: 6px; /* Barra más delgada */
+      margin-top: 20px;
+    }
+  
+    .loading-content p {
+      font-size: 1rem;
+      margin-top: 20px;
+    }
+  
+    .loading-error {
+      padding: 12px;
+      font-size: 0.85rem;
+      width: 100%;
+      max-width: none;
+      margin-top: 15px;
+    }
+  }
+  
+  /* Ajustes para pantallas muy pequeñas */
+  @media (max-width: 480px) {
+    .loading-logo img {
+      width: 80px;
+    }
+  
+    .loading-content p {
+      font-size: 0.9rem;
+    }
+  
+    .loading-bar {
+      height: 4px;
+    }
+  }
+  
+  /* Optimizaciones de rendimiento para móviles */
+  @media (prefers-reduced-motion: reduce) {
+    .loading-logo img {
+      animation: none;
+    }
+  
+    .loading-progress {
+      animation: simpleProgress 3s infinite linear;
+    }
+  
+    .loading-content p {
+      animation: simpleFade 2s infinite;
+    }
+  
+    @keyframes simpleProgress {
+      0% { width: 0%; }
+      100% { width: 100%; }
+    }
+  
+    @keyframes simpleFade {
+      0%, 100% { opacity: 0.7; }
+      50% { opacity: 1; }
+    }
+  }
+  
+  /* Mejoras de rendimiento */
+  .loading-container,
+  .loading-content,
+  .loading-progress {
+    will-change: transform, opacity;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* Orientación landscape */
+  @media screen and (orientation: landscape) and (max-height: 500px) {
+    .loading-container {
+      padding: 10px;
+    }
+  
+    .loading-content {
+      flex-direction: row;
+      align-items: center;
+      gap: 20px;
+      max-width: 500px;
+    }
+  
+    .loading-logo img {
+      width: 60px;
+    }
+  
+    .loading-bar {
+      margin-top: 0;
+    }
+  }
+  
+  /* Mejoras visuales para modo oscuro */
+  @media (prefers-color-scheme: dark) {
+    .loading-container::before {
+      background: rgba(0, 0, 0, 0.8);
+    }
+  
+    .loading-progress {
+      background: #a0a0a0;
+    }
+  }
+  
+  
+  /* Mejoras de contraste */
+  .loading-error {
+    background-color: rgba(255, 0, 0, 0.15);
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Animaciones optimizadas */
+  @media (hover: none) {
+    .loading-logo img {
+      animation: simpleBounce 2s infinite;
+    }
+  
+    @keyframes simpleBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+  }
+  
+  /* Mejoras de rendimiento para dispositivos de bajo rendimiento */
+  @media (max-width: 768px) and (prefers-reduced-motion: no-preference) {
+    .loading-container::before {
+      backdrop-filter: none;
+      background: rgba(0, 0, 0, 0.8);
+    }
+  }
+  
+  /* Soporte para pantallas de alta densidad */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .loading-content p {
+      text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+    }
+  }

@@ -8,6 +8,7 @@ import {
 } from 'react-router-dom';
 
 // Importar componentes
+import Home from './components/Home';
 import Login from './components/Login';
 import Camisetas from './components/Camisetas';
 import DetalleCamiseta from './components/DetalleCamiseta';
@@ -41,7 +42,6 @@ const ProtectedRoute = ({ children, setIsLoggedIn }) => {
       }
 
       try {
-        // Verificar que también exista el usuarioId
         const usuarioId = localStorage.getItem('usuarioId');
         if (!usuarioId) {
           throw new Error('Usuario ID no encontrado');
@@ -67,7 +67,7 @@ const ProtectedRoute = ({ children, setIsLoggedIn }) => {
   }
 
   if (!token) {
-    return <Navigate to="/login" state={{ from: location }} replace />;
+    return <Navigate to="/" state={{ from: location }} replace />;
   }
 
   return children;
@@ -78,14 +78,12 @@ function App() {
   const [isInitializing, setIsInitializing] = useState(true);
 
   useEffect(() => {
-    // Verificar autenticación inicial
     const token = localStorage.getItem('token');
     const usuarioId = localStorage.getItem('usuarioId');
 
     if (token && usuarioId) {
       setIsLoggedIn(true);
     } else {
-      // Si falta alguno, limpiar todo
       localStorage.removeItem('token');
       localStorage.removeItem('usuarioId');
       setIsLoggedIn(false);
@@ -93,7 +91,6 @@ function App() {
     
     setIsInitializing(false);
 
-    // Evento para sincronizar estado entre pestañas
     const handleStorageChange = (e) => {
       if (e.key === 'token') {
         setIsLoggedIn(!!e.newValue);
@@ -107,21 +104,21 @@ function App() {
     };
   }, []);
 
-  // Asegúrate de que la app no renderice contenido hasta que la inicialización haya terminado
   if (isInitializing) {
-    return <Loading />; // Muestra un loading mientras se verifica el estado
+    return <Loading />;
   }
 
   return (
     <Router>
       <div className="page-container">
         <Routes>
+          {/* Ruta principal ahora muestra Home */}
           <Route 
             path="/" 
             element={
-              isLoggedIn ? 
-                <Navigate to="/camisetas" replace /> : 
-                <Navigate to="/login" replace />
+              <PageTransition>
+                <Home />
+              </PageTransition>
             } 
           />
 
@@ -171,7 +168,6 @@ function App() {
             } 
           />
 
-          {/* Ruta pública para colección compartida */}
           <Route 
             path="/shared/:token" 
             element={
@@ -184,13 +180,12 @@ function App() {
           {/* Ruta para manejar rutas no encontradas */}
           <Route 
             path="*" 
-            element={<Navigate to="/login" replace />} 
+            element={<Navigate to="/" replace />} 
           />
         </Routes>
       </div>
     </Router>
   );
 }
-
 
 export default App;

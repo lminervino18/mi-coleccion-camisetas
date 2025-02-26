@@ -1,6 +1,8 @@
 // Login.js
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import './Login.css';
 import RegisterForm from './RegisterForm';
 import Loading from './Loading';
@@ -55,6 +57,7 @@ function Login({ setIsLoggedIn }) {
 
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => setShowRegister(false);
+  const handleBack = () => navigate('/');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -146,6 +149,13 @@ function Login({ setIsLoggedIn }) {
     <>
       <div className="login-container">
         <div className="overlay">
+          <button 
+            className="back-button"
+            onClick={handleBack}
+            aria-label="Volver a inicio"
+          >
+            <FontAwesomeIcon icon={faArrowLeft} />
+          </button>
           <div className="logo-title">
             <div className="logo"></div>
             <h1 className="title">Mi Colección de Camisetas</h1>
