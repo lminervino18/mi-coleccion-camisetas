@@ -523,7 +523,7 @@ function AgregarCamiseta({ onClose, onAgregar }) {
 
         <input 
           type="text" 
-          name="jugador" 
+          name="nombre" 
           placeholder="Jugador" 
           value={formData.nombre} 
           onChange={handleChange} 
