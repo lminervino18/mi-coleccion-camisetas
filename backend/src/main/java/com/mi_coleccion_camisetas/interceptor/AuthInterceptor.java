@@ -23,32 +23,49 @@ public class AuthInterceptor implements HandlerInterceptor {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    // Lista de rutas públicas
+    private final String[] publicRoutes = {
+        "/api/auth/login",
+        "/api/auth/register",
+        "/api/share/",
+        "/api/public/",
+        "/api/shared/camisetas/",
+        "/api/shared/user/",
+        "/api/usuarios"  // Añadida la ruta para registro de usuarios
+    };
+
+    // Lista de métodos permitidos sin autenticación para ciertas rutas
+    private final String[][] publicPathMethods = {
+        {"/api/usuarios", "POST"},    // Permitir POST para registro
+        {"/api/usuarios", "GET"}      // Permitir GET para verificar usuario/email
+    };
+
     @Override
     public boolean preHandle(
             @NonNull HttpServletRequest request,
             @NonNull HttpServletResponse response,
             @NonNull Object handler) throws Exception {
         
+        String requestPath = request.getRequestURI();
+        String requestMethod = request.getMethod();
+
         // Método OPTIONS siempre permitido
-        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+        if ("OPTIONS".equalsIgnoreCase(requestMethod)) {
             return true;
         }
 
-        // Rutas públicas
-        String[] publicRoutes = {
-            "/api/auth/login",
-            "/api/auth/register",
-            "/api/share/",
-            "/api/public/",
-            "/api/shared/camisetas/",
-            "/api/shared/user/"
-        };
+        // Verificar combinaciones específicas de ruta y método
+        for (String[] pathMethod : publicPathMethods) {
+            if (requestPath.equals(pathMethod[0]) && requestMethod.equals(pathMethod[1])) {
+                logger.info("Acceso permitido a ruta pública: {} {}", requestMethod, requestPath);
+                return true;
+            }
+        }
 
-        String requestPath = request.getRequestURI();
-
-        // Verificar rutas públicas
+        // Verificar rutas públicas generales
         for (String route : publicRoutes) {
             if (requestPath.startsWith(route)) {
+                logger.info("Acceso permitido a ruta pública: {}", requestPath);
                 return true;
             }
         }
@@ -73,9 +90,11 @@ public class AuthInterceptor implements HandlerInterceptor {
                 return false;
             }
             
+            logger.info("Acceso autorizado para usuario: {} en ruta: {}", username, requestPath);
             return true;
+
         } catch (Exception e) {
-            logger.error("Authentication error", e);
+            logger.error("Error de autenticación en ruta: " + requestPath, e);
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Error de autenticación");
             return false;
         }
