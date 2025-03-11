@@ -3,11 +3,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/api/$1"
+      "destination": "http://ec2-54-233-79-32.sa-east-1.compute.amazonaws.com/api/$1"
     },
     {
       "source": "/auth/(.*)",
-      "destination": "http://ec2-56-124-125-28.sa-east-1.compute.amazonaws.com/auth/$1"
+      "destination": "http://ec2-54-233-79-32.sa-east-1.compute.amazonaws.com/auth/$1"
     },
     {
       "source": "/shared/static/(.*)",
