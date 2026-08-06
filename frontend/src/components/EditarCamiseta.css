@@ -11,7 +11,7 @@
   overflow-y: auto;
   color: rgb(22, 21, 21);
   padding: 20px;
-  background-image: url("../assets/background.jpg");
+  background-image: url('../assets/background.jpg');
   background-size: cover;
   background-position: center;
 }
@@ -52,18 +52,18 @@
 }
 
 /* Estilo base para el input file */
-.camiseta-form input[type="file"] {
+.camiseta-form input[type='file'] {
   color: #666060;
 }
 
 /* Cuando se ha seleccionado un archivo */
-.camiseta-form input[type="file"]:not(:placeholder-shown),
-.camiseta-form input[type="file"]::-webkit-file-upload-button {
+.camiseta-form input[type='file']:not(:placeholder-shown),
+.camiseta-form input[type='file']::-webkit-file-upload-button {
   color: white;
 }
 
 /* Estilo para el botón de selección de archivo */
-.camiseta-form input[type="file"]::-webkit-file-upload-button {
+.camiseta-form input[type='file']::-webkit-file-upload-button {
   background-color: rgba(87, 85, 85, 0.2);
   color: #666060;
   border: 1px solid #666;
@@ -75,12 +75,12 @@
 }
 
 /* Hover del botón */
-.camiseta-form input[type="file"]::-webkit-file-upload-button:hover {
+.camiseta-form input[type='file']::-webkit-file-upload-button:hover {
   background-color: rgba(87, 85, 85, 0.3);
 }
 
 /* Para Firefox */
-.camiseta-form input[type="file"]::file-selector-button {
+.camiseta-form input[type='file']::file-selector-button {
   background-color: rgba(87, 85, 85, 0.2);
   color: #666060;
   border: 1px solid #666;
@@ -92,15 +92,15 @@
 }
 
 /* Hover del botón en Firefox */
-.camiseta-form input[type="file"]::file-selector-button:hover {
+.camiseta-form input[type='file']::file-selector-button:hover {
   background-color: rgba(87, 85, 85, 0.3);
 }
 
 /* Cuando se ha seleccionado un archivo - Firefox */
-.camiseta-form input[type="file"]:not(:placeholder-shown) {
+.camiseta-form input[type='file']:not(:placeholder-shown) {
   color: gray;
 }
-.camiseta-form input[type="file"]::file-selector-button {
+.camiseta-form input[type='file']::file-selector-button {
   color: rgb(160, 155, 155);
 }
 
@@ -145,7 +145,7 @@
 }
 
 /* Estilo para la opción placeholder del select */
-.camiseta-form select option[value=""][disabled] {
+.camiseta-form select option[value=''][disabled] {
   color: #666060;
 }
 
@@ -332,7 +332,7 @@
   cursor: move !important;
   z-index: 2;
   pointer-events: all;
-  touch-action:none;
+  touch-action: none;
 }
 
 .selector-overlay {

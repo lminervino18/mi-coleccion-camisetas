@@ -11,7 +11,7 @@
   overflow-y: auto;
   color: rgb(22, 21, 21);
   padding: 20px;
-  background-image: url("../assets/background.jpg");
+  background-image: url('../assets/background.jpg');
   background-size: cover;
   background-position: center;
 }
@@ -51,16 +51,16 @@
   appearance: auto;
 }
 
-.camiseta-form input[type="file"] {
+.camiseta-form input[type='file'] {
   color: #666060;
 }
 
-.camiseta-form input[type="file"]:not(:placeholder-shown),
-.camiseta-form input[type="file"]::-webkit-file-upload-button {
+.camiseta-form input[type='file']:not(:placeholder-shown),
+.camiseta-form input[type='file']::-webkit-file-upload-button {
   color: white;
 }
 
-.camiseta-form input[type="file"]::-webkit-file-upload-button {
+.camiseta-form input[type='file']::-webkit-file-upload-button {
   background-color: rgba(87, 85, 85, 0.2);
   color: #666060;
   border: 1px solid #666;
@@ -71,11 +71,11 @@
   transition: all 0.3s ease;
 }
 
-.camiseta-form input[type="file"]::-webkit-file-upload-button:hover {
+.camiseta-form input[type='file']::-webkit-file-upload-button:hover {
   background-color: rgba(87, 85, 85, 0.3);
 }
 
-.camiseta-form input[type="file"]::file-selector-button {
+.camiseta-form input[type='file']::file-selector-button {
   background-color: rgba(87, 85, 85, 0.2);
   color: #666060;
   border: 1px solid #666;
@@ -86,15 +86,15 @@
   transition: all 0.3s ease;
 }
 
-.camiseta-form input[type="file"]::file-selector-button:hover {
+.camiseta-form input[type='file']::file-selector-button:hover {
   background-color: rgba(87, 85, 85, 0.3);
 }
 
-.camiseta-form input[type="file"]:not(:placeholder-shown) {
+.camiseta-form input[type='file']:not(:placeholder-shown) {
   color: gray;
 }
 
-.camiseta-form input[type="file"]::file-selector-button {
+.camiseta-form input[type='file']::file-selector-button {
   color: rgb(160, 155, 155);
 }
 
@@ -133,7 +133,7 @@
   color: #666060;
 }
 
-.camiseta-form select option[value=""][disabled] {
+.camiseta-form select option[value=''][disabled] {
   color: #666060;
 }
 
@@ -406,7 +406,7 @@
   max-width: 200px;
 }
 
-.tipo-option input[type="radio"] {
+.tipo-option input[type='radio'] {
   display: none;
 }
 

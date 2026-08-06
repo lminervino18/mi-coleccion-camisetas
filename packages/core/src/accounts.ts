@@ -123,9 +123,7 @@ export const updateProfile = async (
   const [taken] = await db
     .select({ username: schema.users.username, email: schema.users.email })
     .from(schema.users)
-    .where(
-      and(ne(schema.users.id, userId), matchesUsernameOrEmail(input.username, input.email)),
-    )
+    .where(and(ne(schema.users.id, userId), matchesUsernameOrEmail(input.username, input.email)))
     .limit(1);
 
   if (taken !== undefined) {

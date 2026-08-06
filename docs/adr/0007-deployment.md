@@ -24,12 +24,12 @@ Servicios que dejaron de ser viables:
 
 ## Decisión
 
-| Componente | Servicio | Tarjeta |
-|---|---|---|
-| Aplicación e interfaz | Vercel Hobby | No |
-| Base de datos | Neon | No |
-| Imágenes | Cloudflare R2 | Sí |
-| Correo transaccional | Brevo | No |
+| Componente            | Servicio      | Tarjeta |
+| --------------------- | ------------- | ------- |
+| Aplicación e interfaz | Vercel Hobby  | No      |
+| Base de datos         | Neon          | No      |
+| Imágenes              | Cloudflare R2 | Sí      |
+| Correo transaccional  | Brevo         | No      |
 
 Se elige **Brevo** sobre Resend porque el proyecto no dispone de dominio propio, y Resend sin
 dominio verificado solo entrega mensajes a la casilla del titular de la cuenta, lo que impediría

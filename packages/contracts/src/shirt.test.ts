@@ -79,7 +79,9 @@ describe('createShirtSchema', () => {
   });
 
   it('rejects unknown colours', () => {
-    expect(createShirtSchema.safeParse({ ...validShirt, colors: ['turquesa'] }).success).toBe(false);
+    expect(createShirtSchema.safeParse({ ...validShirt, colors: ['turquesa'] }).success).toBe(
+      false,
+    );
   });
 });
 

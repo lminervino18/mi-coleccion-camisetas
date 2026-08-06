@@ -2,9 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './EstadisticasCamisetas.css';
 import {
-  PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer,
-  BarChart, Bar, XAxis, YAxis, CartesianGrid,
-  LineChart, Line
+  PieChart,
+  Pie,
+  Cell,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  LineChart,
+  Line,
 } from 'recharts';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -18,25 +28,25 @@ const COLORS = [
   '#E0BBE4', // Lavanda
   '#957DAD', // Púrpura suave
   '#D4A5A5', // Rosa pálido
-  '#9E8B8E'  // Gris rosado
+  '#9E8B8E', // Gris rosado
 ];
 
 const COLOR_MAPPING = {
-  'rojo': '#FF0000',
-  'azul': '#0000FF',
-  'verde': '#008000',
-  'amarillo': '#FFD700',
-  'negro': '#000000',
-  'blanco': '#FFFFFF',
-  'gris': '#808080',
-  'naranja': '#FFA500',
-  'violeta': '#8A2BE2',
-  'celeste': '#87CEEB',
-  'bordó': '#800000',
-  'rosa': '#FF69B4',
-  'dorado': 'linear-gradient(45deg, #FFD700, #B8860B)',
-  'plateado': 'linear-gradient(45deg, #C0C0C0, #E8E8E8)',
-  'marrón': '#8B4513'
+  rojo: '#FF0000',
+  azul: '#0000FF',
+  verde: '#008000',
+  amarillo: '#FFD700',
+  negro: '#000000',
+  blanco: '#FFFFFF',
+  gris: '#808080',
+  naranja: '#FFA500',
+  violeta: '#8A2BE2',
+  celeste: '#87CEEB',
+  bordó: '#800000',
+  rosa: '#FF69B4',
+  dorado: 'linear-gradient(45deg, #FFD700, #B8860B)',
+  plateado: 'linear-gradient(45deg, #C0C0C0, #E8E8E8)',
+  marrón: '#8B4513',
 };
 
 const RADIAN = Math.PI / 180;
@@ -55,31 +65,31 @@ const renderCustomizedLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, per
 
   return (
     <g>
-      <text 
-        x={x} 
-        y={y} 
-        fill="black" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="black"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        style={{ 
+        style={{
           fontSize: '16px',
           fontWeight: '700',
           paintOrder: 'stroke',
           strokeWidth: '3px',
-          strokeLinejoin: 'miter'
+          strokeLinejoin: 'miter',
         }}
       >
         {`${(percent * 100).toFixed(0)}%`}
       </text>
-      <text 
-        x={x} 
-        y={y} 
-        fill="white" 
-        textAnchor={x > cx ? 'start' : 'end'} 
+      <text
+        x={x}
+        y={y}
+        fill="white"
+        textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
-        style={{ 
+        style={{
           fontSize: '16px',
-          fontWeight: '700'
+          fontWeight: '700',
         }}
       >
         {`${(percent * 100).toFixed(0)}%`}
@@ -140,10 +150,16 @@ const RankingListComponent = ({ data, showAll = false, isColores = false }) => (
       <div key={item.name} className="ranking-item">
         <span className="ranking-position">{index + 1}</span>
         {isColores && (
-          <div 
+          <div
             className="color-circle"
-            style={{ 
-              background: COLOR_MAPPING[item.name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")] || '#CCCCCC',
+            style={{
+              background:
+                COLOR_MAPPING[
+                  item.name
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '')
+                ] || '#CCCCCC',
               width: '24px',
               height: '24px',
               borderRadius: '50%',
@@ -151,7 +167,7 @@ const RankingListComponent = ({ data, showAll = false, isColores = false }) => (
               border: '2px solid #666',
               display: 'inline-block',
               verticalAlign: 'middle',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+              boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
             }}
           />
         )}
@@ -164,7 +180,7 @@ const RankingListComponent = ({ data, showAll = false, isColores = false }) => (
 
 const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo, tipo }) => {
   if (!isOpen) return null;
-  
+
   const getModalClass = () => {
     switch (tipo) {
       case 'pie':
@@ -179,28 +195,22 @@ const EstadisticasModalGrafico = ({ isOpen, onClose, children, titulo, tipo }) =
   };
 
   return (
-    <div 
+    <div
       className="estadisticas-camisetas-modal-overlay"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
       <div className={`estadisticas-camisetas-modal-content-inner ${getModalClass()}`}>
-        <button 
-          className="estadisticas-camisetas-modal-close" 
-          onClick={onClose}
-        >
+        <button className="estadisticas-camisetas-modal-close" onClick={onClose}>
           ×
         </button>
         <h2 className="estadisticas-camisetas-modal-title">{titulo}</h2>
-        <div className="estadisticas-camisetas-modal-content-wrapper">
-          {children}
-        </div>
+        <div className="estadisticas-camisetas-modal-content-wrapper">{children}</div>
       </div>
     </div>
   );
 };
-
 
 const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModalAbierto }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -239,9 +249,9 @@ const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModal
       case 'ranking':
         return (
           <div className={`chart-container ${isModal ? 'modal-ranking' : ''}`}>
-            <RankingListComponent 
-              data={data} 
-              showAll={isModal} 
+            <RankingListComponent
+              data={data}
+              showAll={isModal}
               isColores={titulo.includes('Colores')}
             />
           </div>
@@ -253,7 +263,7 @@ const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModal
 
   return (
     <>
-      <div 
+      <div
         className={`grafico-card ${isHovered ? 'hovered' : ''}`}
         onMouseEnter={onHover}
         onMouseLeave={onLeave}
@@ -262,8 +272,8 @@ const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModal
         <h2>{titulo}</h2>
         {renderContent(false)}
       </div>
-  
-      <EstadisticasModalGrafico 
+
+      <EstadisticasModalGrafico
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         titulo={titulo}
@@ -277,18 +287,14 @@ const GraficoCard = ({ titulo, data, tipo, isHovered, onHover, onLeave, setModal
 
 const ResumenColeccion = ({ camisetas, userData }) => {
   const totalCamisetas = camisetas.length;
-  const paisesDiferentes = new Set(camisetas.map(c => c.pais)).size;
-  const clubesDiferentes = new Set(camisetas.filter(c => c.club).map(c => c.club)).size;
+  const paisesDiferentes = new Set(camisetas.map((c) => c.pais)).size;
+  const clubesDiferentes = new Set(camisetas.filter((c) => c.club).map((c) => c.club)).size;
 
   return (
     <div className="resumen-container">
       <div className="user-profile-header">
         {userData?.fotoDePerfil ? (
-          <img 
-            src={userData.fotoDePerfil} 
-            alt="Perfil" 
-            className="profile-photo"
-          />
+          <img src={userData.fotoDePerfil} alt="Perfil" className="profile-photo" />
         ) : (
           <div className="profile-photo-placeholder">
             {userData?.username?.charAt(0).toUpperCase()}
@@ -332,24 +338,21 @@ function EstadisticasCamisetas() {
     seleccionesPorPais: [],
     clubesPorPais: [],
     topNombres: [],
-    topColores: [] // Añade esta línea
+    topColores: [], // Añade esta línea
   });
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        
+
         // Fetch usuario
-        const userResponse = await fetch(
-          `http://localhost:8080/api/usuarios/${usuarioId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            credentials: 'include',
-          }
-        );
+        const userResponse = await fetch(`http://localhost:8080/api/usuarios/${usuarioId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          credentials: 'include',
+        });
 
         if (!userResponse.ok) {
           throw new Error('Error al obtener datos del usuario');
@@ -359,26 +362,23 @@ function EstadisticasCamisetas() {
         setUserData(userData);
 
         // Fetch camisetas
-        const camisetasResponse = await fetch(
-          `http://localhost:8080/api/camisetas/${usuarioId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            credentials: 'include',
-          }
-        );
+        const camisetasResponse = await fetch(`http://localhost:8080/api/camisetas/${usuarioId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+          credentials: 'include',
+        });
 
         if (!camisetasResponse.ok) {
           throw new Error('Error al obtener las camisetas');
         }
 
         const camisetasData = await camisetasResponse.json();
-        console.log("Datos recibidos:", camisetasData);
+        console.log('Datos recibidos:', camisetasData);
         setCamisetas(camisetasData);
         procesarEstadisticas(camisetasData);
       } catch (error) {
-        console.error("Error en fetch:", error);
+        console.error('Error en fetch:', error);
         setError('Error al cargar los datos: ' + error.message);
       } finally {
         setLoading(false);
@@ -399,8 +399,8 @@ function EstadisticasCamisetas() {
         topDorsales: [],
         seleccionesPorPais: [],
         clubesPorPais: [],
-        topColores : [],
-        topNombres: []
+        topColores: [],
+        topNombres: [],
       });
       return;
     }
@@ -419,7 +419,7 @@ function EstadisticasCamisetas() {
 
     // Estadísticas por liga
     const ligaCount = camisetas
-      .filter(c => c.liga)
+      .filter((c) => c.liga)
       .reduce((acc, camiseta) => {
         acc[camiseta.liga] = (acc[camiseta.liga] || 0) + 1;
         return acc;
@@ -428,21 +428,21 @@ function EstadisticasCamisetas() {
     const totalLigas = Object.values(ligaCount).reduce((a, b) => a + b, 0);
 
     const ligasSorted = Object.entries(ligaCount)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .reduce((acc, [liga, count], index) => {
         if (index < 5) {
-          acc.push({ 
-            name: liga, 
+          acc.push({
+            name: liga,
             value: count,
-            percentage: (count / totalLigas) * 100 
+            percentage: (count / totalLigas) * 100,
           });
         } else {
-          const otrosIndex = acc.findIndex(item => item.name === 'Otros');
+          const otrosIndex = acc.findIndex((item) => item.name === 'Otros');
           if (otrosIndex === -1) {
-            acc.push({ 
-              name: 'Otros', 
+            acc.push({
+              name: 'Otros',
               value: count,
-              percentage: (count / totalLigas) * 100 
+              percentage: (count / totalLigas) * 100,
             });
           } else {
             acc[otrosIndex].value += count;
@@ -468,62 +468,60 @@ function EstadisticasCamisetas() {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([anio, count]) => ({
         name: anio,
-        value: count
+        value: count,
       }));
 
     // Top clubes
     const clubCount = camisetas
-      .filter(c => c.club)
+      .filter((c) => c.club)
       .reduce((acc, camiseta) => {
         acc[camiseta.club] = (acc[camiseta.club] || 0) + 1;
         return acc;
       }, {});
 
     const topClubes = Object.entries(clubCount)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([club, count]) => ({
         name: club,
-        value: count
+        value: count,
       }));
-
 
     // Agregar dentro de procesarEstadisticas, antes del setStats
     const nombresCount = camisetas
-    .filter(c => c.nombre && c.nombre !== 'null' && c.nombre.trim() !== '') // Filtrar nombres nulos o vacíos
-    .reduce((acc, camiseta) => {
-      acc[camiseta.nombre] = (acc[camiseta.nombre] || 0) + 1;
-      return acc;
-    }, {});
+      .filter((c) => c.nombre && c.nombre !== 'null' && c.nombre.trim() !== '') // Filtrar nombres nulos o vacíos
+      .reduce((acc, camiseta) => {
+        acc[camiseta.nombre] = (acc[camiseta.nombre] || 0) + 1;
+        return acc;
+      }, {});
 
     const topNombres = Object.entries(nombresCount)
-    .sort(([,a], [,b]) => b - a)
-    .slice(0, 5)
-    .map(([nombre, count]) => ({
-      name: nombre,
-      value: count
-    }));
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([nombre, count]) => ({
+        name: nombre,
+        value: count,
+      }));
 
-    
     // Top dorsales
     const dorsalesCount = camisetas
-      .filter(c => c.dorsal)
+      .filter((c) => c.dorsal)
       .reduce((acc, c) => {
         acc[c.dorsal] = (acc[c.dorsal] || 0) + 1;
         return acc;
       }, {});
 
     const topDorsales = Object.entries(dorsalesCount)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .slice(0, 10)
       .map(([dorsal, count]) => ({
         name: `#${dorsal}`,
-        value: count
+        value: count,
       }));
 
     // Selecciones por país
     const seleccionesCount = camisetas
-      .filter(c => c.tipoDeCamiseta === 'Seleccion')
+      .filter((c) => c.tipoDeCamiseta === 'Seleccion')
       .reduce((acc, camiseta) => {
         acc[camiseta.pais] = (acc[camiseta.pais] || 0) + 1;
         return acc;
@@ -532,21 +530,21 @@ function EstadisticasCamisetas() {
     const totalSelecciones = Object.values(seleccionesCount).reduce((a, b) => a + b, 0);
 
     const seleccionesPorPais = Object.entries(seleccionesCount)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .reduce((acc, [pais, count], index) => {
         if (index < 5) {
           acc.push({
             name: pais,
             value: count,
-            percentage: (count / totalSelecciones) * 100
+            percentage: (count / totalSelecciones) * 100,
           });
         } else {
-          const otrosIndex = acc.findIndex(item => item.name === 'Otros');
+          const otrosIndex = acc.findIndex((item) => item.name === 'Otros');
           if (otrosIndex === -1) {
             acc.push({
               name: 'Otros',
               value: count,
-              percentage: (count / totalSelecciones) * 100
+              percentage: (count / totalSelecciones) * 100,
             });
           } else {
             acc[otrosIndex].value += count;
@@ -558,7 +556,7 @@ function EstadisticasCamisetas() {
 
     // Clubes por país
     const clubesPorPaisCount = camisetas
-      .filter(c => c.tipoDeCamiseta === 'Club')
+      .filter((c) => c.tipoDeCamiseta === 'Club')
       .reduce((acc, camiseta) => {
         acc[camiseta.pais] = (acc[camiseta.pais] || 0) + 1;
         return acc;
@@ -567,21 +565,21 @@ function EstadisticasCamisetas() {
     const totalClubes = Object.values(clubesPorPaisCount).reduce((a, b) => a + b, 0);
 
     const clubesPorPais = Object.entries(clubesPorPaisCount)
-      .sort(([,a], [,b]) => b - a)
+      .sort(([, a], [, b]) => b - a)
       .reduce((acc, [pais, count], index) => {
         if (index < 5) {
           acc.push({
             name: pais,
             value: count,
-            percentage: (count / totalClubes) * 100
+            percentage: (count / totalClubes) * 100,
           });
         } else {
-          const otrosIndex = acc.findIndex(item => item.name === 'Otros');
+          const otrosIndex = acc.findIndex((item) => item.name === 'Otros');
           if (otrosIndex === -1) {
             acc.push({
               name: 'Otros',
               value: count,
-              percentage: (count / totalClubes) * 100
+              percentage: (count / totalClubes) * 100,
             });
           } else {
             acc[otrosIndex].value += count;
@@ -590,26 +588,25 @@ function EstadisticasCamisetas() {
         }
         return acc;
       }, []);
-      // Dentro de procesarEstadisticas, antes del setStats
-      const coloresCount = camisetas.reduce((acc, camiseta) => {
-        // Verifica si camiseta.colores existe y es un array
-        if (camiseta.colores && Array.isArray(camiseta.colores)) {
-          // Procesa cada color en la lista
-          camiseta.colores.forEach(color => {
-            acc[color] = (acc[color] || 0) + 1;
-          });
-        }
-        return acc;
-      }, {});
+    // Dentro de procesarEstadisticas, antes del setStats
+    const coloresCount = camisetas.reduce((acc, camiseta) => {
+      // Verifica si camiseta.colores existe y es un array
+      if (camiseta.colores && Array.isArray(camiseta.colores)) {
+        // Procesa cada color en la lista
+        camiseta.colores.forEach((color) => {
+          acc[color] = (acc[color] || 0) + 1;
+        });
+      }
+      return acc;
+    }, {});
 
-      const topColores = Object.entries(coloresCount)
-        .sort(([,a], [,b]) => b - a)
-        .slice(0, 5)
-        .map(([color, count]) => ({
-          name: color,
-          value: count
-        }));
-
+    const topColores = Object.entries(coloresCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([color, count]) => ({
+        name: color,
+        value: count,
+      }));
 
     setStats({
       porTipo: Object.entries(tipoCount).map(([name, value]) => ({ name, value })),
@@ -620,7 +617,7 @@ function EstadisticasCamisetas() {
       topDorsales,
       seleccionesPorPais,
       clubesPorPais,
-      topColores
+      topColores,
     });
   };
 
@@ -633,7 +630,7 @@ function EstadisticasCamisetas() {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="estadisticas-overlay">
@@ -643,25 +640,22 @@ function EstadisticasCamisetas() {
       </div>
     );
   }
-  
+
   return (
     <div className="estadisticas-overlay">
       <div className="estadisticas-container">
         <div className="header-container">
-          <button 
-            className="back-button" 
-            onClick={() => navigate('/camisetas')}
-          >
+          <button className="back-button" onClick={() => navigate('/camisetas')}>
             <FontAwesomeIcon icon={faArrowLeft} />
           </button>
           <h1 className="estadisticas-titulo">Estadísticas de tu Colección</h1>
         </div>
-        
+
         <ResumenColeccion camisetas={camisetas} userData={userData} />
-        
+
         <div className={`graficos-grid ${modalAbierto ? 'modal-abierto' : ''}`}>
           {/* Club vs Selección */}
-          <GraficoCard 
+          <GraficoCard
             titulo="Club vs Selección"
             data={stats.porTipo}
             tipo="pie"
@@ -672,7 +666,7 @@ function EstadisticasCamisetas() {
           />
 
           {/* Top Clubes */}
-          <GraficoCard 
+          <GraficoCard
             titulo="Clubes"
             data={stats.topClubes}
             tipo="ranking"
@@ -683,7 +677,7 @@ function EstadisticasCamisetas() {
           />
 
           {/* Top Ligas */}
-          <GraficoCard 
+          <GraficoCard
             titulo="Ligas"
             data={stats.porLiga}
             tipo="pie"
@@ -694,7 +688,7 @@ function EstadisticasCamisetas() {
           />
 
           {/* Selecciones por País */}
-          <GraficoCard 
+          <GraficoCard
             titulo="Selecciones"
             data={stats.seleccionesPorPais}
             tipo="pie"
@@ -703,9 +697,9 @@ function EstadisticasCamisetas() {
             onLeave={() => setHoveredCard(null)}
             setModalAbierto={setModalAbierto}
           />
-          
-                 {/* Evolución por Año */}
-                 <GraficoCard 
+
+          {/* Evolución por Año */}
+          <GraficoCard
             titulo="Cantidad por Año"
             data={stats.porAnio}
             tipo="line"
@@ -716,7 +710,7 @@ function EstadisticasCamisetas() {
           />
 
           {/* Top Colores */}
-          <GraficoCard 
+          <GraficoCard
             titulo="Colores"
             data={stats.topColores}
             tipo="ranking"
@@ -726,8 +720,7 @@ function EstadisticasCamisetas() {
             setModalAbierto={setModalAbierto}
           />
 
-
-          <GraficoCard 
+          <GraficoCard
             titulo="Jugadores"
             data={stats.topNombres}
             tipo="ranking"
@@ -738,7 +731,7 @@ function EstadisticasCamisetas() {
           />
 
           {/* Top Dorsales */}
-          <GraficoCard 
+          <GraficoCard
             titulo="Dorsales"
             data={stats.topDorsales}
             tipo="ranking"
@@ -748,9 +741,8 @@ function EstadisticasCamisetas() {
             setModalAbierto={setModalAbierto}
           />
 
-
           {/* Distribución por Talle */}
-          <GraficoCard 
+          <GraficoCard
             titulo="Talles"
             data={stats.porTalle}
             tipo="ranking"
@@ -759,7 +751,6 @@ function EstadisticasCamisetas() {
             onLeave={() => setHoveredCard(null)}
             setModalAbierto={setModalAbierto}
           />
-          
         </div>
       </div>
     </div>

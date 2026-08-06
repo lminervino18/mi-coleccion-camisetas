@@ -11,22 +11,22 @@ function Login() {
   const navigate = useNavigate();
 
   // En Login.js
-    useEffect(() => {
-      // Limpiar todos los datos del usuario anterior
-      const token = localStorage.getItem('token');
-      if (!token) {
-          localStorage.removeItem('token');
-          localStorage.removeItem('usuarioId');
-          
-          // Limpiar cualquier customOrder existente
-          const keys = Object.keys(localStorage);
-          keys.forEach(key => {
-              if (key.startsWith('customOrder_')) {
-                  localStorage.removeItem(key);
-              }
-          });
-      }
-    }, [navigate]);
+  useEffect(() => {
+    // Limpiar todos los datos del usuario anterior
+    const token = localStorage.getItem('token');
+    if (!token) {
+      localStorage.removeItem('token');
+      localStorage.removeItem('usuarioId');
+
+      // Limpiar cualquier customOrder existente
+      const keys = Object.keys(localStorage);
+      keys.forEach((key) => {
+        if (key.startsWith('customOrder_')) {
+          localStorage.removeItem(key);
+        }
+      });
+    }
+  }, [navigate]);
 
   const handleOpenRegister = () => setShowRegister(true);
   const handleCloseRegister = () => setShowRegister(false);
@@ -41,28 +41,28 @@ function Login() {
 
   const decodeToken = (token) => {
     try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return payload.usuarioId || null;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.usuarioId || null;
     } catch (error) {
-        console.error('Error al decodificar el token:', error);
-        return null;
+      console.error('Error al decodificar el token:', error);
+      return null;
     }
-};
+  };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  try {
+    try {
       const response = await fetch('http://localhost:8080/api/auth/login', {
-          method: 'POST',
-          headers: { 
-              'Content-Type': 'application/json' 
-          },
-          body: JSON.stringify({
-              username: credentials.username,
-              password: credentials.password
-          }),
-          credentials: 'include',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          username: credentials.username,
+          password: credentials.password,
+        }),
+        credentials: 'include',
       });
 
       // Loguear el status de la respuesta
@@ -70,15 +70,15 @@ const handleSubmit = async (e) => {
 
       // Manejar diferentes códigos de estado
       if (response.status === 401) {
-          const errorText = await response.text();
-          setError(errorText || 'Credenciales inválidas');
-          return;
+        const errorText = await response.text();
+        setError(errorText || 'Credenciales inválidas');
+        return;
       }
 
       if (!response.ok) {
-          const errorText = await response.text();
-          setError(errorText || 'Error en el inicio de sesión');
-          return;
+        const errorText = await response.text();
+        setError(errorText || 'Error en el inicio de sesión');
+        return;
       }
 
       const data = await response.json();
@@ -86,24 +86,23 @@ const handleSubmit = async (e) => {
 
       // Validar la estructura de la respuesta
       if (data && data.token && data.usuarioId) {
-          // Limpiar cualquier dato anterior
-          localStorage.clear();
-          
-          // Guardar los nuevos datos
-          localStorage.setItem('token', data.token);
-          localStorage.setItem('usuarioId', data.usuarioId.toString());
-          
-          // Redirigir a la página de camisetas
-          window.location.href = '/camisetas';
-      } else {
-          setError('Respuesta del servidor inválida');
-      }
+        // Limpiar cualquier dato anterior
+        localStorage.clear();
 
-  } catch (error) {
+        // Guardar los nuevos datos
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('usuarioId', data.usuarioId.toString());
+
+        // Redirigir a la página de camisetas
+        window.location.href = '/camisetas';
+      } else {
+        setError('Respuesta del servidor inválida');
+      }
+    } catch (error) {
       console.error('Error de conexión:', error);
       setError('No se pudo conectar con el servidor');
-  }
-};
+    }
+  };
 
   return (
     <>
@@ -144,11 +143,7 @@ const handleSubmit = async (e) => {
               <button type="submit" className="btn btn-primary">
                 Iniciar Sesión
               </button>
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={handleOpenRegister}
-              >
+              <button type="button" className="btn btn-secondary" onClick={handleOpenRegister}>
                 Registrarse
               </button>
             </div>

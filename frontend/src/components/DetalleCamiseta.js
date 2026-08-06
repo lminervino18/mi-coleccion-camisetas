@@ -1,11 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { 
-  faDownload, 
-  faChevronLeft, 
-  faChevronRight 
-} from '@fortawesome/free-solid-svg-icons';
+import { faDownload, faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import './DetalleCamiseta.css';
 import EditarCamiseta from './EditarCamiseta';
 
@@ -17,7 +13,7 @@ function DetalleCamiseta() {
   const [showEditForm, setShowEditForm] = useState(false);
   const [adjacentCamisetas, setAdjacentCamisetas] = useState({
     anterior: null,
-    siguiente: null
+    siguiente: null,
   });
 
   const { id } = useParams();
@@ -25,17 +21,17 @@ function DetalleCamiseta() {
 
   const normalizeColorName = (color) => {
     const colorMap = {
-      'ROJO': 'rojo',
-      'AZUL': 'azul',
-      'VERDE': 'verde',
-      'AMARILLO': 'amarillo',
-      'NEGRO': 'negro',
-      'BLANCO': 'blanco',
-      'GRIS': 'gris',
-      'MARRON': 'marron',
-      'MORADO': 'morado',
-      'ROSA': 'rosa',
-      'NARANJA': 'naranja'
+      ROJO: 'rojo',
+      AZUL: 'azul',
+      VERDE: 'verde',
+      AMARILLO: 'amarillo',
+      NEGRO: 'negro',
+      BLANCO: 'blanco',
+      GRIS: 'gris',
+      MARRON: 'marron',
+      MORADO: 'morado',
+      ROSA: 'rosa',
+      NARANJA: 'naranja',
     };
     return colorMap[color.toUpperCase()] || color.toLowerCase();
   };
@@ -54,27 +50,32 @@ function DetalleCamiseta() {
     const fetchCamiseta = async () => {
       try {
         const usuarioId = localStorage.getItem('usuarioId');
-        const response = await fetch(`http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        const response = await fetch(
+          `http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+            credentials: 'include',
           },
-          credentials: 'include',
-        });
-        
+        );
+
         if (response.ok) {
           const data = await response.json();
           setCamiseta(data);
 
           // Obtener los IDs filtrados de localStorage
-          const filteredIds = JSON.parse(localStorage.getItem(`filteredCamisetasIds_${usuarioId}`) || '[]');
-          
+          const filteredIds = JSON.parse(
+            localStorage.getItem(`filteredCamisetasIds_${usuarioId}`) || '[]',
+          );
+
           // Encontrar el índice de la camiseta actual
           const currentIndex = filteredIds.indexOf(Number(id));
 
           // Establecer camisetas adyacentes
           setAdjacentCamisetas({
             anterior: currentIndex > 0 ? filteredIds[currentIndex - 1] : null,
-            siguiente: currentIndex < filteredIds.length - 1 ? filteredIds[currentIndex + 1] : null
+            siguiente: currentIndex < filteredIds.length - 1 ? filteredIds[currentIndex + 1] : null,
           });
         } else {
           setError('Error al obtener la camiseta');
@@ -111,14 +112,14 @@ function DetalleCamiseta() {
     try {
       const usuarioId = localStorage.getItem('usuarioId');
       const response = await fetch(
-        `http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`, 
+        `http://localhost:8080/api/camisetas/usuario/${usuarioId}/camiseta/${id}`,
         {
           method: 'DELETE',
           headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
           credentials: 'include',
-        }
+        },
       );
 
       if (response.ok) {
@@ -158,7 +159,7 @@ function DetalleCamiseta() {
         camisetaSeleccionada={{
           ...camiseta,
           tipoDeCamiseta: camiseta.tipoDeCamiseta || 'Club',
-          liga: camiseta.liga || ''
+          liga: camiseta.liga || '',
         }}
         onClose={() => setShowEditForm(false)}
         onActualizar={handleUpdate}
@@ -173,8 +174,8 @@ function DetalleCamiseta() {
           <div className="header-buttons">
             {/* Botón de navegación izquierda */}
             {adjacentCamisetas.anterior && (
-              <button 
-                className="btn-nav btn-prev" 
+              <button
+                className="btn-nav btn-prev"
                 onClick={() => navigate(`/camiseta/${adjacentCamisetas.anterior}`)}
               >
                 <FontAwesomeIcon icon={faChevronLeft} />
@@ -184,32 +185,23 @@ function DetalleCamiseta() {
             <button className="btn-back" onClick={() => navigate('/camisetas')}>
               ← Volver
             </button>
-            
+
             <div className="action-buttons">
-            <button 
-                className="btn-download" 
-                onClick={handleDownloadImage}
-              >
+              <button className="btn-download" onClick={handleDownloadImage}>
                 <FontAwesomeIcon icon={faDownload} /> Descargar
               </button>
-              <button 
-                className="btn-edit" 
-                onClick={() => setShowEditForm(true)}
-              >
+              <button className="btn-edit" onClick={() => setShowEditForm(true)}>
                 Editar
               </button>
-              <button 
-                className="btn-delete" 
-                onClick={() => setShowDeleteModal(true)}
-              >
+              <button className="btn-delete" onClick={() => setShowDeleteModal(true)}>
                 Eliminar
               </button>
             </div>
 
             {/* Botón de navegación derecha */}
             {adjacentCamisetas.siguiente && (
-              <button 
-                className="btn-nav btn-next" 
+              <button
+                className="btn-nav btn-next"
                 onClick={() => navigate(`/camiseta/${adjacentCamisetas.siguiente}`)}
               >
                 <FontAwesomeIcon icon={faChevronRight} />
@@ -217,10 +209,9 @@ function DetalleCamiseta() {
             )}
           </div>
           <h1 className="detalle-titulo">
-            {camiseta.tipoDeCamiseta === 'Club' 
+            {camiseta.tipoDeCamiseta === 'Club'
               ? `${camiseta.club} - ${camiseta.temporada}`
-              : `${camiseta.pais} - ${camiseta.temporada}`
-            }
+              : `${camiseta.pais} - ${camiseta.temporada}`}
           </h1>
         </div>
 
@@ -286,11 +277,7 @@ function DetalleCamiseta() {
                 <h3>Colores</h3>
                 <div className="colores-container">
                   {camiseta.colores.map((color, index) => (
-                    <span 
-                      key={index} 
-                      className="color-tag"
-                      data-color={normalizeColorName(color)}
-                    >
+                    <span key={index} className="color-tag" data-color={normalizeColorName(color)}>
                       {color}
                     </span>
                   ))}
@@ -314,16 +301,10 @@ function DetalleCamiseta() {
             <h2>¿Estás seguro?</h2>
             <p>Esta acción eliminará permanentemente la camiseta y toda su información.</p>
             <div className="modal-buttons">
-              <button 
-                className="btn-confirm" 
-                onClick={handleDelete}
-              >
+              <button className="btn-confirm" onClick={handleDelete}>
                 Sí, eliminar
               </button>
-              <button 
-                className="btn-cancel" 
-                onClick={() => setShowDeleteModal(false)}
-              >
+              <button className="btn-cancel" onClick={() => setShowDeleteModal(false)}>
                 Cancelar
               </button>
             </div>

@@ -17,6 +17,7 @@
   "devDependencies": {
     "@camisetas/eslint-config": "workspace:*",
     "@camisetas/typescript-config": "workspace:*",
+    "eslint": "^9.39.5",
     "vitest": "^3.0.4"
   }
 }

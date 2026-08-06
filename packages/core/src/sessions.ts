@@ -17,8 +17,7 @@ export type AuthenticatedUser = {
 
 export type CreatedSession = { token: string; expiresAt: Date };
 
-const expiryFromNow = (): Date =>
-  new Date(Date.now() + SESSION_TTL_DAYS * 24 * 60 * 60 * 1000);
+const expiryFromNow = (): Date => new Date(Date.now() + SESSION_TTL_DAYS * 24 * 60 * 60 * 1000);
 
 export const createSession = async (
   db: Database,
@@ -56,7 +55,10 @@ export const resolveSession = async (
     .from(schema.sessions)
     .innerJoin(schema.users, eq(schema.users.id, schema.sessions.userId))
     .where(
-      and(eq(schema.sessions.tokenHash, hashToken(token)), gt(schema.sessions.expiresAt, new Date())),
+      and(
+        eq(schema.sessions.tokenHash, hashToken(token)),
+        gt(schema.sessions.expiresAt, new Date()),
+      ),
     )
     .limit(1);
 

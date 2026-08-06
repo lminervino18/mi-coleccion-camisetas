@@ -98,12 +98,8 @@
           "name": "image_uploads_user_id_users_id_fk",
           "tableFrom": "image_uploads",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -194,12 +190,8 @@
           "name": "password_reset_tokens_user_id_users_id_fk",
           "tableFrom": "password_reset_tokens",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -312,12 +304,8 @@
           "name": "sessions_user_id_users_id_fk",
           "tableFrom": "sessions",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -408,12 +396,8 @@
           "name": "share_links_user_id_users_id_fk",
           "tableFrom": "share_links",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -485,12 +469,8 @@
           "name": "shirt_colors_shirt_id_shirts_id_fk",
           "tableFrom": "shirt_colors",
           "tableTo": "shirts",
-          "columnsFrom": [
-            "shirt_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["shirt_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -719,12 +699,8 @@
           "name": "shirts_user_id_users_id_fk",
           "tableFrom": "shirts",
           "tableTo": "users",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -835,10 +811,7 @@
     "public.image_upload_status": {
       "name": "image_upload_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "confirmed"
-      ]
+      "values": ["pending", "confirmed"]
     },
     "public.shirt_color": {
       "name": "shirt_color",
@@ -864,33 +837,17 @@
     "public.shirt_kind": {
       "name": "shirt_kind",
       "schema": "public",
-      "values": [
-        "club",
-        "national"
-      ]
+      "values": ["club", "national"]
     },
     "public.shirt_kit": {
       "name": "shirt_kit",
       "schema": "public",
-      "values": [
-        "home",
-        "away",
-        "third",
-        "goalkeeper",
-        "special"
-      ]
+      "values": ["home", "away", "third", "goalkeeper", "special"]
     },
     "public.shirt_size": {
       "name": "shirt_size",
       "schema": "public",
-      "values": [
-        "XS",
-        "S",
-        "M",
-        "L",
-        "XL",
-        "XXL"
-      ]
+      "values": ["XS", "S", "M", "L", "XL", "XXL"]
     }
   },
   "schemas": {},

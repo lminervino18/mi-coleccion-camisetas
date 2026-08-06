@@ -21,7 +21,7 @@ export const LogoutButton = () => {
   };
 
   return (
-    <Button variant="secondary" onClick={signOut} isLoading={isSigningOut}>
+    <Button variant="secondary" onClick={() => void signOut()} isLoading={isSigningOut}>
       Cerrar sesión
     </Button>
   );

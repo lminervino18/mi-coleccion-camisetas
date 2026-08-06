@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { detectImageMimeType, requestImageUploadSchema } from './image-upload';
 
-const header = (...bytes: number[]) => Uint8Array.from([...bytes, ...new Array(16).fill(0)]);
+const header = (...bytes: number[]) =>
+  Uint8Array.from([...bytes, ...new Array<number>(16).fill(0)]);
 
 describe('detectImageMimeType', () => {
   it('detects jpeg', () => {

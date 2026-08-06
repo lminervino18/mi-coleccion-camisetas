@@ -1,10 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  BrowserRouter as Router, 
-  Route, 
-  Routes, 
-  Navigate
-} from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 
 // Importar componentes
 import Login from './components/Login';
@@ -15,11 +10,7 @@ import SharedCollection from './components/SharedCollection';
 
 // Componente de transición simple usando React.memo para evitar re-renders innecesarios
 const PageTransition = React.memo(({ children }) => {
-  return (
-    <div className="page-transition">
-      {children}
-    </div>
-  );
+  return <div className="page-transition">{children}</div>;
 });
 
 // Asignar un displayName para mejor debugging
@@ -40,7 +31,7 @@ function App() {
 
     // Escuchar cambios en localStorage
     window.addEventListener('storage', checkAuth);
-    
+
     // Crear un intervalo para verificar el token periódicamente
     const authInterval = setInterval(checkAuth, 1000);
 
@@ -69,17 +60,15 @@ function App() {
     <Router>
       <div className="page-container">
         <Routes>
-          <Route 
-            path="/" 
+          <Route
+            path="/"
             element={
-              isLoggedIn ? 
-                <Navigate to="/camisetas" replace /> : 
-                <Navigate to="/login" replace />
-            } 
+              isLoggedIn ? <Navigate to="/camisetas" replace /> : <Navigate to="/login" replace />
+            }
           />
 
-          <Route 
-            path="/login" 
+          <Route
+            path="/login"
             element={
               isLoggedIn ? (
                 <Navigate to="/camisetas" replace />
@@ -88,11 +77,11 @@ function App() {
                   <Login />
                 </PageTransition>
               )
-            } 
+            }
           />
 
-          <Route 
-            path="/camisetas" 
+          <Route
+            path="/camisetas"
             element={
               isLoggedIn ? (
                 <PageTransition>
@@ -101,11 +90,11 @@ function App() {
               ) : (
                 <Navigate to="/login" replace />
               )
-            } 
+            }
           />
 
-          <Route 
-            path="/camiseta/:id" 
+          <Route
+            path="/camiseta/:id"
             element={
               isLoggedIn ? (
                 <PageTransition>
@@ -114,11 +103,11 @@ function App() {
               ) : (
                 <Navigate to="/login" replace />
               )
-            } 
+            }
           />
 
-          <Route 
-            path="/estadisticas-camisetas" 
+          <Route
+            path="/estadisticas-camisetas"
             element={
               isLoggedIn ? (
                 <PageTransition>
@@ -127,19 +116,13 @@ function App() {
               ) : (
                 <Navigate to="/login" replace />
               )
-            } 
+            }
           />
 
           {/* Ruta para colección compartida (sin autenticación) */}
-          <Route 
-            path="/shared/:token" 
-            element={<SharedCollection />} 
-          />
+          <Route path="/shared/:token" element={<SharedCollection />} />
 
-          <Route 
-            path="*" 
-            element={<Navigate to="/" replace />} 
-          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>

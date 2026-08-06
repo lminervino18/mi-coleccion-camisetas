@@ -27,8 +27,7 @@
   /* The original rendered headings in the browser serif; this keeps that character
      without loading a web font. */
   --font-display: Georgia, 'Times New Roman', Times, serif;
-  --font-sans:
-    system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
 :root {
@@ -59,8 +58,7 @@ body::before {
   position: fixed;
   inset: 0;
   z-index: -1;
-  background-image: linear-gradient(rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.72)),
-    url('/background.jpg');
+  background-image: linear-gradient(rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.72)), url('/background.jpg');
   background-size: cover;
   background-position: center;
 }

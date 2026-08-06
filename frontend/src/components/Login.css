@@ -4,7 +4,7 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  background: url("../assets/background.jpg") no-repeat center center;
+  background: url('../assets/background.jpg') no-repeat center center;
   background-size: cover; /* Ajusta automáticamente para cubrir el área */
   background-attachment: fixed; /* Opcional: crea un efecto de paralaje */
   position: relative;

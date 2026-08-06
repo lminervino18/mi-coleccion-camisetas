@@ -21,6 +21,7 @@
     "@camisetas/eslint-config": "workspace:*",
     "@camisetas/typescript-config": "workspace:*",
     "@types/node": "^26.1.2",
+    "eslint": "^9.39.5",
     "vitest": "^3.0.4"
   }
 }

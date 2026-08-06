@@ -5,20 +5,20 @@ Fecha de auditoría: 6 de agosto de 2026.
 
 La aplicación se ejecutó realmente para producir este documento: backend Spring Boot contra
 MySQL 8 en Docker, frontend CRA en el puerto 3000, recorrido con Playwright en 1440×900 y
-375×812. Los hallazgos marcados como *verificado* provienen de peticiones o capturas reales,
+375×812. Los hallazgos marcados como _verificado_ provienen de peticiones o capturas reales,
 no de lectura de código.
 
 ## Resumen
 
-| Área | Estado |
-|---|---|
-| Autenticación | Crítico — el login no valida la contraseña |
-| Autorización | Crítico — acceso horizontal total entre usuarios |
-| Secretos | Crítico — credenciales en el historial de Git |
-| Mobile | Crítico — la aplicación no es usable en teléfono |
-| Accesibilidad | Ausente |
-| Tests | Prácticamente inexistentes |
-| Infraestructura | Dada de baja, datos no recuperables |
+| Área            | Estado                                           |
+| --------------- | ------------------------------------------------ |
+| Autenticación   | Crítico — el login no valida la contraseña       |
+| Autorización    | Crítico — acceso horizontal total entre usuarios |
+| Secretos        | Crítico — credenciales en el historial de Git    |
+| Mobile          | Crítico — la aplicación no es usable en teléfono |
+| Accesibilidad   | Ausente                                          |
+| Tests           | Prácticamente inexistentes                       |
+| Infraestructura | Dada de baja, datos no recuperables              |
 
 ## 1. Autenticación y autorización
 
@@ -43,11 +43,11 @@ desplegada probablemente no tenía el fallo. La rama por defecto del repositorio
 Ningún endpoint compara el identificador de la URL contra el sujeto del token. Con el token del
 usuario 1:
 
-| Petición | Resultado |
-|---|---|
-| `GET /api/camisetas/2` | 200, colección ajena completa |
-| `GET /api/usuarios/2` | 200, perfil ajeno |
-| `PUT /api/usuarios/2` | 200, se modificó email, contraseña y rol a `ADMIN` |
+| Petición               | Resultado                                          |
+| ---------------------- | -------------------------------------------------- |
+| `GET /api/camisetas/2` | 200, colección ajena completa                      |
+| `GET /api/usuarios/2`  | 200, perfil ajeno                                  |
+| `PUT /api/usuarios/2`  | 200, se modificó email, contraseña y rol a `ADMIN` |
 
 El `usuarioId` que el frontend interpola en cada URL proviene de `localStorage`, editable desde
 las herramientas de desarrollo. `UsuarioDTO` acepta `role` desde el cuerpo de la petición, de
@@ -88,13 +88,13 @@ que todos esos valores deben considerarse comprometidos y rotarse.
 `src/` contiene únicamente `components/` y dos archivos sueltos. No hay capa de servicios,
 hooks, utilidades ni tipos.
 
-| Archivo | Líneas |
-|---|---|
-| `Camisetas.js` | 1876 |
-| `SharedCollection.js` | 869 |
-| `EstadisticasCamisetas.js` | 768 |
-| `EditarCamiseta.js` | 706 |
-| `AgregarCamiseta.js` | 608 |
+| Archivo                    | Líneas |
+| -------------------------- | ------ |
+| `Camisetas.js`             | 1876   |
+| `SharedCollection.js`      | 869    |
+| `EstadisticasCamisetas.js` | 768    |
+| `EditarCamiseta.js`        | 706    |
+| `AgregarCamiseta.js`       | 608    |
 
 `Camisetas.js` declara 42 `useState` y 11 `useEffect` en una sola función y concentra colección,
 búsqueda, filtros, ordenamiento, reordenamiento manual, recorte de foto de perfil, menú de

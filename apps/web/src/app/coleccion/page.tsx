@@ -29,7 +29,7 @@ const CollectionPage = async () => {
       <div className="panel flex flex-col items-center gap-3 px-6 py-14 text-center">
         <Image src="/logo.png" alt="" width={64} height={90} className="h-16 w-auto opacity-70" />
         <h2 className="font-display text-xl font-bold">Todavía no cargaste camisetas</h2>
-        <p className="text-ink-300 max-w-sm text-balance text-sm">
+        <p className="text-ink-300 max-w-sm text-sm text-balance">
           Cuando agregues la primera, vas a poder filtrarla, ordenarla y compartir tu colección.
         </p>
       </div>

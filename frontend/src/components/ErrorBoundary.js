@@ -8,7 +8,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    console.error('Error:', error);  // Puedes agregar más lógica de logging si es necesario
+    console.error('Error:', error); // Puedes agregar más lógica de logging si es necesario
     console.error('Info:', info);
   }
 
@@ -17,7 +17,7 @@ class ErrorBoundary extends React.Component {
       return <h1>Something went wrong. Please try again later.</h1>;
     }
 
-    return this.props.children;  // Renderiza los componentes hijos si no hay error
+    return this.props.children; // Renderiza los componentes hijos si no hay error
   }
 }
 

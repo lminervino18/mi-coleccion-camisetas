@@ -5,17 +5,21 @@
 ![Imagen de ejemplo de la aplicación](./frontend/public/sample.png)
 ![Imagen de ejemplo de la aplicación](./frontend/public/sample2.png)
 ![Imagen de ejemplo de la aplicación](./frontend/public/sample3.png)
+
 ## Tecnologías utilizadas
 
 ### Frontend
+
 - **React**: Usado para construir una interfaz de usuario moderna y responsiva
 - **CSS**: Para estilizar y diseñar la interfaz
 
 ### Backend
+
 - **Spring Boot**: Framework de Java para construir aplicaciones backend escalables y seguras
 - **Maven**: Para gestión de dependencias y construcción del proyecto
 
 ### Base de datos
+
 - **MySQL**: Base de datos relacional para almacenar usuarios y camisetas
 
 ## Modelo de Base de Datos
@@ -27,6 +31,7 @@ El siguiente diagrama muestra la estructura de la base de datos:
 ### Estructura de Tablas
 
 #### Usuarios
+
 - `id`: Identificador único
 - `username`: Nombre de usuario (único)
 - `email`: Correo electrónico (único)
@@ -37,6 +42,7 @@ El siguiente diagrama muestra la estructura de la base de datos:
 - `foto_perfil`: Foto de perfil en formato base64
 
 #### Camisetas
+
 - `id`: Identificador único
 - `usuario_id`: ID del usuario propietario
 - `imagen_completa`: Imagen completa de la camiseta
@@ -53,21 +59,23 @@ El siguiente diagrama muestra la estructura de la base de datos:
 - `comentarios`: Comentarios adicionales
 
 #### Enlaces Compartidos
+
 - `id`: Identificador único
 - `token`: Token único para compartir
 - `usuario_id`: ID del usuario que comparte
 - `fecha_creacion`: Fecha de creación del enlace
 - `fecha_expiracion`: Fecha de expiración del enlace
 
-
 ## Funcionalidades principales
 
 ### Gestión de Usuarios
+
 - Registro y autenticación
 - Actualización de perfil
 - Gestión de foto de perfil
 
 ### Gestión de Camisetas
+
 - Agregar nuevas camisetas con imágenes
 - Editar información de camisetas existentes
 - Eliminar camisetas
@@ -88,6 +96,7 @@ Esta sección permite a los usuarios obtener insights valiosos sobre su colecci�
 ## Configuración y Ejecución
 
 ### Requisitos previos
+
 - Java 17 o superior
 - Node.js y npm
 - MySQL
@@ -112,7 +121,7 @@ BASH
 ```
 cd backend
 mvn spring-boot:run
- ```
+```
 
 Frontend
 BASH
@@ -124,10 +133,12 @@ npm start
 ```
 
 Base de datos
+
 - Crear una base de datos MySQL
 - Configurar las credenciales en application.properties
 
 ### Notas de seguridad
+
 - Contraseñas encriptadas
 - Autenticación mediante JWT
 - Validación de datos en frontend y backend

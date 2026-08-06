@@ -17,14 +17,6 @@ export const metadata: Metadata = {
     locale: 'es_AR',
   },
   twitter: { card: 'summary_large_image' },
-  icons: {
-    icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
-      { url: '/favicon.ico', sizes: '32x32' },
-    ],
-    apple: '/apple-icon.png',
-  },
-  manifest: '/manifest.webmanifest',
 };
 
 export const viewport: Viewport = {

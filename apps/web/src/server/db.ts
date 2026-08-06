@@ -2,7 +2,6 @@ import { createDatabase, type Database } from '@camisetas/db';
 import { env } from './env';
 
 declare global {
-  // eslint-disable-next-line no-var
   var __camisetasDb: Database | undefined;
 }
 
