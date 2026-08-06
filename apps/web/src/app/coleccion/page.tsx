@@ -1,40 +1,56 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import { redirect } from 'next/navigation';
+import { shirtFiltersSchema } from '@camisetas/contracts';
+import { listShirts } from '@camisetas/core';
 import { getCurrentUser } from '@/server/auth';
-import { LogoutButton } from './logout-button';
+import { db } from '@/server/db';
+import { toShirt } from '@/server/serializers';
+import { ShirtCard } from '@/components/shirt-card';
+import { CollectionHeader } from './collection-header';
+import { EmptyCollection } from './empty-collection';
 
 export const metadata: Metadata = {
   title: 'Mi colección',
   robots: { index: false },
 };
 
-const CollectionPage = async () => {
+type SearchParams = Promise<Record<string, string | string[] | undefined>>;
+
+const CollectionPage = async ({ searchParams }: { searchParams: SearchParams }) => {
   const user = await getCurrentUser();
   if (user === null) redirect('/login');
 
-  return (
-    <main id="main" className="mx-auto w-full max-w-6xl px-3 py-4 sm:px-4 sm:py-6">
-      <header className="panel mb-6 flex flex-wrap items-center justify-between gap-3 px-4 py-3">
-        <div className="flex items-center gap-3">
-          <Image src="/logo.png" alt="" width={36} height={51} className="h-9 w-auto" />
-          <div>
-            <h1 className="font-display text-lg font-bold sm:text-xl">Mi colección</h1>
-            <p className="text-ink-300 text-sm">{user.displayName ?? user.username}</p>
-          </div>
-        </div>
-        <LogoutButton />
-      </header>
+  const filters = shirtFiltersSchema.parse(await searchParams);
+  const page = await listShirts(db, user.id, filters);
+  const shirts = page.items.map(toShirt);
 
-      <div className="panel flex flex-col items-center gap-3 px-6 py-14 text-center">
-        <Image src="/logo.png" alt="" width={64} height={90} className="h-16 w-auto opacity-70" />
-        <h2 className="font-display text-xl font-bold">Todavía no cargaste camisetas</h2>
-        <p className="text-ink-300 max-w-sm text-sm text-balance">
-          Cuando agregues la primera, vas a poder filtrarla, ordenarla y compartir tu colección.
-        </p>
-      </div>
+  return (
+    <main id="main" className="mx-auto w-full max-w-7xl px-3 py-4 sm:px-5 sm:py-6">
+      <CollectionHeader user={user} totalItems={page.totalItems} />
+
+      {shirts.length === 0 ? (
+        <EmptyCollection isFiltered={page.totalItems === 0 && hasActiveFilters(filters)} />
+      ) : (
+        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+          {shirts.map((shirt, index) => (
+            <li key={shirt.id}>
+              <ShirtCard shirt={shirt} href={`/camiseta/${shirt.id}`} priority={index < 4} />
+            </li>
+          ))}
+        </ul>
+      )}
     </main>
   );
 };
+
+const hasActiveFilters = (filters: ReturnType<typeof shirtFiltersSchema.parse>): boolean =>
+  filters.search !== undefined ||
+  filters.kind.length > 0 ||
+  filters.size.length > 0 ||
+  filters.kit.length > 0 ||
+  filters.color.length > 0 ||
+  filters.league.length > 0 ||
+  filters.country.length > 0 ||
+  filters.favoritesOnly;
 
 export default CollectionPage;

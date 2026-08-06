@@ -12,7 +12,8 @@
     "migrate": "tsx src/migrate.ts",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "@camisetas/contracts": "workspace:*",
@@ -26,6 +27,7 @@
     "drizzle-kit": "^0.30.2",
     "eslint": "^9.39.5",
     "tsx": "^4.19.2",
-    "vitest": "^3.0.4"
+    "vitest": "^3.0.4",
+    "@node-rs/argon2": "^2.0.2"
   }
 }
