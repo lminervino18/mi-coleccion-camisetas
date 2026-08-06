@@ -41,12 +41,11 @@ describe('createShirt', () => {
   it('refuses to reuse an upload already attached to another shirt', async () => {
     const user = await createTestUser();
     const imageUploadId = await createPendingUpload(user.id);
-    const dimensions = { width: 800, height: 1000 };
 
-    await createShirt(testDb, user.id, { ...shirtInput(), imageUploadId }, dimensions);
+    await createShirt(testDb, user.id, { ...shirtInput(), imageUploadId });
 
     await expect(
-      createShirt(testDb, user.id, { ...shirtInput(), imageUploadId }, dimensions),
+      createShirt(testDb, user.id, { ...shirtInput(), imageUploadId }),
     ).rejects.toMatchObject({ code: 'conflict' });
   });
 
@@ -56,24 +55,34 @@ describe('createShirt', () => {
     const imageUploadId = await createPendingUpload(owner.id);
 
     await expect(
-      createShirt(
-        testDb,
-        intruder.id,
-        { ...shirtInput(), imageUploadId },
-        { width: 800, height: 1000 },
-      ),
+      createShirt(testDb, intruder.id, { ...shirtInput(), imageUploadId }),
+    ).rejects.toMatchObject({ code: 'conflict' });
+  });
+
+  it('refuses an upload whose bytes were never received', async () => {
+    const user = await createTestUser();
+    const [row] = await testDb
+      .insert(schema.imageUploads)
+      .values({
+        userId: user.id,
+        objectKey: `uploads/${user.id}/sin-bytes.jpg`,
+        contentType: 'image/jpeg',
+        byteSize: 1024,
+      })
+      .returning({ id: schema.imageUploads.id });
+
+    await expect(
+      createShirt(testDb, user.id, { ...shirtInput(), imageUploadId: row?.id ?? '' }),
     ).rejects.toMatchObject({ code: 'conflict' });
   });
 
   it('leaves no shirt behind when the upload cannot be claimed', async () => {
     const user = await createTestUser();
     await expect(
-      createShirt(
-        testDb,
-        user.id,
-        { ...shirtInput(), imageUploadId: '11111111-1111-4111-8111-111111111111' },
-        { width: 800, height: 1000 },
-      ),
+      createShirt(testDb, user.id, {
+        ...shirtInput(),
+        imageUploadId: '11111111-1111-4111-8111-111111111111',
+      }),
     ).rejects.toMatchObject({ code: 'conflict' });
 
     expect(await testDb.select().from(schema.shirts)).toHaveLength(0);
@@ -177,13 +186,10 @@ describe('updateShirt', () => {
     const user = await createTestUser();
     const shirt = await addShirt(user.id, { colors: ['red', 'white'] });
 
-    const updated = await updateShirt(
-      testDb,
-      user.id,
-      shirt.id,
-      { ...shirtInput({ colors: ['black'] }), imageUploadId: null },
-      null,
-    );
+    const updated = await updateShirt(testDb, user.id, shirt.id, {
+      ...shirtInput({ colors: ['black'] }),
+      imageUploadId: null,
+    });
 
     expect(updated.colors).toEqual(['black']);
     const stored = await testDb.select().from(schema.shirtColors);
@@ -194,13 +200,10 @@ describe('updateShirt', () => {
     const user = await createTestUser();
     const shirt = await addShirt(user.id);
 
-    const updated = await updateShirt(
-      testDb,
-      user.id,
-      shirt.id,
-      { ...shirtInput({ club: 'Otro club' }), imageUploadId: null },
-      null,
-    );
+    const updated = await updateShirt(testDb, user.id, shirt.id, {
+      ...shirtInput({ club: 'Otro club' }),
+      imageUploadId: null,
+    });
 
     expect(updated.imageKey).toBe(shirt.imageKey);
   });
@@ -211,13 +214,10 @@ describe('updateShirt', () => {
     const shirt = await addShirt(owner.id);
 
     await expect(
-      updateShirt(
-        testDb,
-        intruder.id,
-        shirt.id,
-        { ...shirtInput({ club: 'Robado' }), imageUploadId: null },
-        null,
-      ),
+      updateShirt(testDb, intruder.id, shirt.id, {
+        ...shirtInput({ club: 'Robado' }),
+        imageUploadId: null,
+      }),
     ).rejects.toMatchObject({ code: 'not_found' });
   });
 });

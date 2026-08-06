@@ -1,4 +1,16 @@
-import { and, asc, count, desc, eq, ilike, inArray, or, sql, type SQL } from 'drizzle-orm';
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  ilike,
+  inArray,
+  isNotNull,
+  or,
+  sql,
+  type SQL,
+} from 'drizzle-orm';
 import type { Database, Queryable } from '@camisetas/db';
 import { schema } from '@camisetas/db';
 import type {
@@ -145,13 +157,13 @@ type ConfirmedImage = { objectKey: string; width: number; height: number };
 
 /**
  * Claims a pending upload for this user and marks it confirmed. Returning nothing means the
- * upload does not exist, belongs to someone else, or was already used by another shirt.
+ * upload does not exist, belongs to someone else, was already used, or never received bytes.
  */
 const claimUpload = async (
   db: Queryable,
   userId: string,
   uploadId: string,
-): Promise<string | null> => {
+): Promise<ConfirmedImage | null> => {
   const [row] = await db
     .update(schema.imageUploads)
     .set({ status: 'confirmed' })
@@ -160,22 +172,27 @@ const claimUpload = async (
         eq(schema.imageUploads.id, uploadId),
         eq(schema.imageUploads.userId, userId),
         eq(schema.imageUploads.status, 'pending'),
+        isNotNull(schema.imageUploads.width),
       ),
     )
-    .returning({ objectKey: schema.imageUploads.objectKey });
+    .returning({
+      objectKey: schema.imageUploads.objectKey,
+      width: schema.imageUploads.width,
+      height: schema.imageUploads.height,
+    });
 
-  return row?.objectKey ?? null;
+  if (row === undefined || row.width === null || row.height === null) return null;
+  return { objectKey: row.objectKey, width: row.width, height: row.height };
 };
 
 export const createShirt = async (
   db: Database,
   userId: string,
   input: CreateShirtInput,
-  dimensions: { width: number; height: number },
 ): Promise<ShirtRecord> =>
   db.transaction(async (tx) => {
-    const objectKey = await claimUpload(tx, userId, input.imageUploadId);
-    if (objectKey === null) {
+    const image = await claimUpload(tx, userId, input.imageUploadId);
+    if (image === null) {
       throw conflict('La imagen ya no está disponible. Subila de nuevo.');
     }
 
@@ -194,9 +211,9 @@ export const createShirt = async (
         squadNumber: input.squadNumber,
         notes: input.notes,
         isFavorite: input.isFavorite,
-        imageKey: objectKey,
-        imageWidth: dimensions.width,
-        imageHeight: dimensions.height,
+        imageKey: image.objectKey,
+        imageWidth: image.width,
+        imageHeight: image.height,
       })
       .returning();
 
@@ -214,18 +231,16 @@ export const updateShirt = async (
   userId: string,
   shirtId: string,
   input: UpdateShirtInput,
-  dimensions: { width: number; height: number } | null,
 ): Promise<ShirtRecord> =>
   db.transaction(async (tx) => {
     const uploadId = input.imageUploadId;
     let image: ConfirmedImage | null = null;
 
     if (uploadId !== null) {
-      const objectKey = await claimUpload(tx, userId, uploadId);
-      if (objectKey === null || dimensions === null) {
+      image = await claimUpload(tx, userId, uploadId);
+      if (image === null) {
         throw conflict('La imagen ya no está disponible. Subila de nuevo.');
       }
-      image = { objectKey, ...dimensions };
     }
 
     const [row] = await tx

@@ -94,6 +94,9 @@ export const imageUploads = pgTable(
     objectKey: text('object_key').notNull(),
     contentType: text('content_type').notNull(),
     byteSize: integer('byte_size').notNull(),
+    // Filled in once the bytes are processed; a null width means nothing was stored yet.
+    width: integer('width'),
+    height: integer('height'),
     status: imageUploadStatusEnum('status').notNull().default('pending'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
   },

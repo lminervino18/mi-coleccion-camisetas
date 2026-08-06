@@ -23,6 +23,8 @@ export const createPendingUpload = async (userId: string): Promise<string> => {
       objectKey: `uploads/${userId}/${sequence}.jpg`,
       contentType: 'image/jpeg',
       byteSize: 1024,
+      width: 800,
+      height: 1000,
     })
     .returning({ id: schema.imageUploads.id });
 
@@ -53,10 +55,5 @@ export const addShirt = async (
   overrides: Partial<CreateShirtInput> = {},
 ): Promise<ShirtRecord> => {
   const imageUploadId = await createPendingUpload(userId);
-  return createShirt(
-    testDb,
-    userId,
-    { ...shirtInput(overrides), imageUploadId },
-    { width: 800, height: 1000 },
-  );
+  return createShirt(testDb, userId, { ...shirtInput(overrides), imageUploadId });
 };

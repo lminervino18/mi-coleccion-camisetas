@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { ZodError, type ZodSchema } from 'zod';
+import { ZodError, type TypeOf, type ZodTypeAny } from 'zod';
 import { API_ERROR_STATUS, type ApiError } from '@camisetas/contracts';
 import { DomainError } from '@camisetas/core';
 
@@ -40,22 +40,25 @@ export const toErrorResponse = (error: unknown): NextResponse<ApiError> => {
   return errorResponse({ code: 'internal_error', message: 'Algo salió mal de nuestro lado.' });
 };
 
-export const parseJson = async <T>(request: Request, schema: ZodSchema<T>): Promise<T> => {
+export const parseJson = async <S extends ZodTypeAny>(
+  request: Request,
+  schema: S,
+): Promise<TypeOf<S>> => {
   let body: unknown;
   try {
     body = await request.json();
   } catch {
     throw new DomainError('validation_failed', 'El cuerpo de la petición no es JSON válido.');
   }
-  return schema.parse(body);
+  return schema.parse(body) as TypeOf<S>;
 };
 
-export const parseQuery = <T>(request: Request, schema: ZodSchema<T>): T => {
+export const parseQuery = <S extends ZodTypeAny>(request: Request, schema: S): TypeOf<S> => {
   const params = new URL(request.url).searchParams;
   const raw: Record<string, string | string[]> = {};
   for (const key of new Set(params.keys())) {
     const values = params.getAll(key);
     raw[key] = values.length > 1 ? values : (values[0] ?? '');
   }
-  return schema.parse(raw);
+  return schema.parse(raw) as TypeOf<S>;
 };
