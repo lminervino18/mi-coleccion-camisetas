@@ -14,14 +14,13 @@ const LoginPage = async () => {
 
   return (
     <>
-      <h1 className="mb-1 text-xl font-semibold">Iniciar sesión</h1>
-      <p className="text-pitch-400 mb-6 text-sm">Entrá para ver y gestionar tu colección.</p>
+      <p className="text-ink-300 mb-6">Las camisetas que amás, ahora organizadas.</p>
 
       <LoginForm />
 
-      <p className="text-pitch-400 mt-6 text-center text-sm">
+      <p className="text-ink-300 mt-6 text-sm">
         ¿Todavía no tenés cuenta?{' '}
-        <Link href="/registro" className="text-grass-400 font-medium hover:underline">
+        <Link href="/registro" className="text-celeste-400 font-medium hover:underline">
           Creá una
         </Link>
       </p>

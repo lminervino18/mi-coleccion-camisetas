@@ -4,8 +4,8 @@ import { useId, type InputHTMLAttributes } from 'react';
 
 type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string;
-  errors?: string[];
-  hint?: string;
+  errors?: string[] | undefined;
+  hint?: string | undefined;
 };
 
 /**
@@ -23,8 +23,8 @@ export const Field = ({ label, errors, hint, className = '', ...props }: FieldPr
     .join(' ');
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-pitch-200 text-sm font-medium">
+    <div className="flex flex-col gap-1.5 text-left">
+      <label htmlFor={id} className="text-ink-300 text-sm">
         {label}
       </label>
       <input
@@ -32,12 +32,12 @@ export const Field = ({ label, errors, hint, className = '', ...props }: FieldPr
         id={id}
         aria-invalid={hasErrors}
         aria-describedby={describedBy.length > 0 ? describedBy : undefined}
-        className={`bg-pitch-950/60 text-pitch-50 placeholder:text-pitch-600 min-h-11 rounded-[--radius-control] border px-3.5 py-2.5 text-base transition-colors ${
-          hasErrors ? 'border-danger-400' : 'border-white/12 focus:border-grass-400'
+        className={`text-ink-100 placeholder:text-ink-500 min-h-11 rounded-[6px] border bg-black/45 px-3.5 py-2.5 text-base transition-colors ${
+          hasErrors ? 'border-danger-400' : 'focus:border-celeste-400 border-white/12'
         } ${className}`}
       />
       {hint !== undefined ? (
-        <p id={hintId} className="text-pitch-400 text-xs">
+        <p id={hintId} className="text-ink-500 text-xs">
           {hint}
         </p>
       ) : null}

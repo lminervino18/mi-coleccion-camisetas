@@ -28,7 +28,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#0d1117',
+  themeColor: '#0a0a0b',
   width: 'device-width',
   initialScale: 1,
   viewportFit: 'cover',
@@ -37,7 +37,7 @@ export const viewport: Viewport = {
 const RootLayout = ({ children }: { children: React.ReactNode }) => (
   <html lang="es">
     <body>
-      <a href="#main" className="skip-link bg-grass-500 text-pitch-950 rounded px-4 py-2 font-medium">
+      <a href="#main" className="skip-link bg-brand-500 rounded px-4 py-2 font-medium text-white">
         Saltar al contenido
       </a>
       {children}

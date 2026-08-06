@@ -14,14 +14,13 @@ const RegisterPage = async () => {
 
   return (
     <>
-      <h1 className="mb-1 text-xl font-semibold">Crear cuenta</h1>
-      <p className="text-pitch-400 mb-6 text-sm">Empezá a organizar tus camisetas.</p>
+      <p className="text-ink-300 mb-6">Creá tu cuenta y empezá a cargar tus camisetas.</p>
 
       <RegisterForm />
 
-      <p className="text-pitch-400 mt-6 text-center text-sm">
+      <p className="text-ink-300 mt-6 text-sm">
         ¿Ya tenés cuenta?{' '}
-        <Link href="/login" className="text-grass-400 font-medium hover:underline">
+        <Link href="/login" className="text-celeste-400 font-medium hover:underline">
           Iniciá sesión
         </Link>
       </p>
