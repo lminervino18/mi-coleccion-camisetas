@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { shirtColorSchema, shirtKindSchema, shirtKitSchema, shirtSizeSchema } from './shirt.js';
+import { shirtColorSchema, shirtKindSchema, shirtKitSchema, shirtSizeSchema } from './shirt';
 
 export const SHIRT_SORT_FIELDS = [
   'createdAt',

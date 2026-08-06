@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { createShirtSchema, seasonSchema, shirtTitle } from './shirt.js';
+import { createShirtSchema, seasonSchema, shirtTitle } from './shirt';
 
 describe('seasonSchema', () => {
   it.each(['2023', '2016/2017', '1999/2000'])('accepts %s', (season) => {

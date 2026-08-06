@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { shirtFiltersSchema } from './collection.js';
+import { shirtFiltersSchema } from './collection';
 
 describe('shirtFiltersSchema', () => {
   it('applies defaults when nothing is provided', () => {

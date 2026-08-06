@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { emailSchema, passwordSchema, registerSchema, usernameSchema } from './account.js';
+import { emailSchema, passwordSchema, registerSchema, usernameSchema } from './account';
 
 describe('usernameSchema', () => {
   it.each(['lminervino18', 'a-b_c', 'ABC'])('accepts %s', (username) => {
