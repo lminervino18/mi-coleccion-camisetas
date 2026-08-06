@@ -15,6 +15,7 @@ export const createDatabase = (connectionString: string) => {
     idle_timeout: 20,
     connect_timeout: 10,
     prepare: false,
+    onnotice: () => {},
   });
   return drizzle(client, { schema });
 };

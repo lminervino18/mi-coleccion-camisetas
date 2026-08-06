@@ -1,0 +1,26 @@
+{
+  "name": "@camisetas/core",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@camisetas/contracts": "workspace:*",
+    "@camisetas/db": "workspace:*",
+    "@node-rs/argon2": "^2.0.2",
+    "drizzle-orm": "^0.38.3"
+  },
+  "devDependencies": {
+    "@camisetas/eslint-config": "workspace:*",
+    "@camisetas/typescript-config": "workspace:*",
+    "@types/node": "^26.1.2",
+    "vitest": "^3.0.4"
+  }
+}
