@@ -27,3 +27,5 @@ blob-report/
 *.tsbuildinfo
 .vercel
 .env*
+
+apps/web/test-results/
