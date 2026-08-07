@@ -7,7 +7,7 @@ import {
   unauthenticated,
   type AuthenticatedUser,
 } from '@camisetas/core';
-import { db } from './db';
+import { db, isDatabaseConfigured } from './db';
 import { env, isProduction } from './env';
 
 export const startSession = async (userId: string): Promise<void> => {
@@ -30,10 +30,22 @@ export const endSession = async (): Promise<void> => {
   store.delete(SESSION_COOKIE);
 };
 
+/**
+ * Treats an unreachable database as "nobody is signed in" so the public pages keep rendering
+ * when persistence is missing or down, instead of turning every visit into a server error.
+ */
 export const getCurrentUser = async (): Promise<AuthenticatedUser | null> => {
+  if (!isDatabaseConfigured) return null;
+
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (token === undefined) return null;
-  return resolveSession(db, token);
+
+  try {
+    return await resolveSession(db, token);
+  } catch (error) {
+    console.error('Could not resolve the session', error);
+    return null;
+  }
 };
 
 export const requireUser = async (): Promise<AuthenticatedUser> => {
