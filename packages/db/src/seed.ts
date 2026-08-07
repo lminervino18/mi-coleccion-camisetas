@@ -112,7 +112,7 @@ const SHIRTS: readonly SeedShirt[] = [
     squadNumber: 10,
     colors: ['lightBlue', 'white'],
     isFavorite: false,
-    photoQuery: 'Celta de Vigo shirt',
+    photoQuery: 'RC Celta de Vigo football player',
     fallbackColors: ['#7cb5e3', '#f5f5f5'],
   },
   {
@@ -127,7 +127,7 @@ const SHIRTS: readonly SeedShirt[] = [
     squadNumber: 9,
     colors: ['yellow', 'black'],
     isFavorite: false,
-    photoQuery: 'Borussia Dortmund jersey',
+    photoQuery: 'Borussia Dortmund football player 2013',
     fallbackColors: ['#fbc02d', '#1a1a1a'],
   },
   {
@@ -157,7 +157,7 @@ const SHIRTS: readonly SeedShirt[] = [
     squadNumber: null,
     colors: ['white', 'red'],
     isFavorite: false,
-    photoQuery: 'Ajax Amsterdam jersey',
+    photoQuery: 'AFC Ajax football match Amsterdam',
     fallbackColors: ['#f5f5f5', '#d32f2f'],
   },
   {
