@@ -71,3 +71,32 @@ Vale registrarlo porque cambió el código, no la prueba:
 
 `pnpm db:seed` crea el usuario `coleccionista` con ocho camisetas. El script **se niega a correr
 con `NODE_ENV=production`**.
+
+## Pruebas de carga
+
+`apps/web/e2e/load/collection-load.js` describe el escenario para k6. Sin k6 instalado, la
+medición se hizo con peticiones concurrentes contra el build de producción local:
+
+| Ruta            | p50    | p95    | Resultado                      |
+| --------------- | ------ | ------ | ------------------------------ |
+| `/`             | 441 ms | 605 ms | 150/150 correctas              |
+| `/coleccion`    | 180 ms | 211 ms | 150/150 correctas              |
+| `/estadisticas` | 172 ms | 199 ms | 150/150 correctas              |
+| `/api/health`   | 121 ms | 159 ms | **56 de 150 respondieron 503** |
+
+### Un bug que encontró esta prueba
+
+La conexión a la base no se estaba cacheando en producción: cada petición abría un pool nuevo y
+agotaba el límite de conexiones del servidor con `sorry, too many clients already`. Corregido; el
+mismo escenario pasó de 30 fallos a 0.
+
+### Hallazgo abierto
+
+`/api/health` sigue devolviendo 503 en aproximadamente un tercio de las peticiones bajo 25
+conexiones simultáneas. Las rutas de la aplicación no muestran ese comportamiento, así que el
+impacto para el usuario es nulo, pero **un monitor de disponibilidad daría falsos negativos**.
+Sin diagnosticar.
+
+El tamaño del pool se controla con `DATABASE_POOL_SIZE`. El valor por defecto es 1, correcto para
+un despliegue serverless donde cada instancia atiende una petición por vez; un servidor de larga
+vida necesita un número mayor.
