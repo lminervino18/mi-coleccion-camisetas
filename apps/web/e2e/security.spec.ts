@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { SEED_USER, signIn, uniqueUser } from './support';
+import { SEED_USER, signIn, skipUnlessDesktop, uniqueUser } from './support';
 
 const login = (
   request: import('@playwright/test').APIRequestContext,
@@ -45,6 +45,7 @@ test.describe('authorisation', () => {
   });
 
   test('a signed-in user cannot reach another account shirt', async ({ page }) => {
+    skipUnlessDesktop();
     await signIn(page);
     const mine = await page.request.get('/api/shirts');
     const shirtId = ((await mine.json()) as { items: { id: string }[] }).items[0]?.id ?? '';

@@ -1,4 +1,4 @@
-import type { Page } from '@playwright/test';
+import { test, type Page } from '@playwright/test';
 
 export const SEED_USER = { username: 'lminervino18', password: 'Hermanis123' };
 
@@ -17,6 +17,14 @@ export const signIn = async (page: Page, user = SEED_USER) => {
   await page.fill('input[name=password]', user.password);
   await page.click('button[type=submit]');
   await page.waitForURL('**/coleccion');
+};
+
+/**
+ * Creating accounts is rate limited per address, and the behaviour does not depend on the
+ * viewport, so the tests that need a fresh account only run on the desktop project.
+ */
+export const skipUnlessDesktop = () => {
+  test.skip(test.info().project.name !== 'chromium', 'solo se verifica en escritorio');
 };
 
 export const register = async (page: Page, user: ReturnType<typeof uniqueUser>) => {

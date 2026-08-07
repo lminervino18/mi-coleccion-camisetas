@@ -1,7 +1,8 @@
 import { expect, test } from '@playwright/test';
-import { register, signIn, uniqueUser, SEED_USER } from './support';
+import { register, signIn, skipUnlessDesktop, uniqueUser, SEED_USER } from './support';
 
 test('a visitor can register and lands on their collection', async ({ page }) => {
+  skipUnlessDesktop();
   await register(page, uniqueUser('nuevo'));
   await expect(page).toHaveTitle(/Mi colección/);
 });
@@ -40,22 +41,23 @@ test('an unknown route shows the not found page', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toContainText('No encontramos');
 });
 
+// Reuses the seeded name instead of registering a throwaway first: creating accounts is
+// rate limited, and the suite runs across three viewports.
 test('registering with a taken username reports the field', async ({ page }) => {
-  const user = uniqueUser('duplicado');
-  await register(page, user);
-  await page.getByRole('button', { name: 'Cerrar sesión' }).click();
-  await page.waitForURL('/');
+  skipUnlessDesktop();
+  const fresh = uniqueUser('duplicado');
 
   await page.goto('/registro');
-  await page.fill('input[name=username]', user.username);
-  await page.fill('input[name=email]', `otro-${user.email}`);
-  await page.fill('input[name=password]', user.password);
+  await page.fill('input[name=username]', SEED_USER.username);
+  await page.fill('input[name=email]', fresh.email);
+  await page.fill('input[name=password]', fresh.password);
   await page.click('button[type=submit]');
 
   await expect(page.getByText('Ese nombre de usuario ya está en uso.')).toBeVisible();
 });
 
 test('the submit button locks while the request is in flight', async ({ page }) => {
+  skipUnlessDesktop();
   const user = uniqueUser('doble');
 
   await page.route('**/api/auth/register', async (route) => {
