@@ -26,10 +26,13 @@ export const CollectorMosaic = () => (
                 key={`${String(column)}-${String(tile)}`}
                 src={tileSrc(index)}
                 alt=""
-                width={420}
-                height={420}
-                sizes="(max-width: 640px) 33vw, (max-width: 1280px) 20vw, 14vw"
-                priority={tile < 2}
+                width={240}
+                height={240}
+                sizes="240px"
+                // The first rows are on screen immediately; deferring them makes a decorative
+                // tile become the largest contentful paint.
+                priority={tile < 4}
+                loading={tile < 4 ? undefined : 'lazy'}
                 className="mosaic-tile"
               />
             );
