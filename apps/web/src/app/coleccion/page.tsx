@@ -1,11 +1,12 @@
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { shirtFiltersSchema } from '@camisetas/contracts';
-import { listShirts } from '@camisetas/core';
+import { getCollectionFacets, listShirts } from '@camisetas/core';
 import { getCurrentUser } from '@/server/auth';
 import { db } from '@/server/db';
 import { toShirt } from '@/server/serializers';
 import { ShirtCard } from '@/components/shirt-card';
+import { CollectionFilters } from './collection-filters';
 import { CollectionHeader } from './collection-header';
 import { EmptyCollection } from './empty-collection';
 
@@ -21,12 +22,16 @@ const CollectionPage = async ({ searchParams }: { searchParams: SearchParams }) 
   if (user === null) redirect('/login');
 
   const filters = shirtFiltersSchema.parse(await searchParams);
-  const page = await listShirts(db, user.id, filters);
+  const [page, facets] = await Promise.all([
+    listShirts(db, user.id, filters),
+    getCollectionFacets(db, user.id),
+  ]);
   const shirts = page.items.map(toShirt);
 
   return (
     <main id="main" className="mx-auto w-full max-w-7xl px-3 py-4 sm:px-5 sm:py-6">
       <CollectionHeader user={user} totalItems={page.totalItems} />
+      <CollectionFilters leagues={facets.leagues} countries={facets.countries} />
 
       {shirts.length === 0 ? (
         <EmptyCollection isFiltered={page.totalItems === 0 && hasActiveFilters(filters)} />

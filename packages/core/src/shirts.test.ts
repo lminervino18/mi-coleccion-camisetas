@@ -11,6 +11,7 @@ import {
 import {
   createShirt,
   deleteShirt,
+  getCollectionFacets,
   getShirt,
   listShirts,
   toggleFavorite,
@@ -166,6 +167,40 @@ describe('listShirts', () => {
 
     const page = await listShirts(testDb, user.id, filters({ size: 'L', kind: 'national' }));
     expect(page.totalItems).toBe(1);
+  });
+});
+
+describe('getCollectionFacets', () => {
+  it('lists distinct leagues and countries in alphabetical order', async () => {
+    const user = await createTestUser();
+    await addShirt(user.id, { league: 'La Liga', country: 'España' });
+    await addShirt(user.id, { league: 'Bundesliga', country: 'Alemania' });
+    await addShirt(user.id, { league: 'La Liga', country: 'España' });
+
+    const facets = await getCollectionFacets(testDb, user.id);
+
+    expect(facets.leagues).toEqual(['Bundesliga', 'La Liga']);
+    expect(facets.countries).toEqual(['Alemania', 'España']);
+  });
+
+  it('omits null leagues rather than listing an empty option', async () => {
+    const user = await createTestUser();
+    await addShirt(user.id, { kind: 'national', club: null, league: null, country: 'Brasil' });
+
+    const facets = await getCollectionFacets(testDb, user.id);
+    expect(facets.leagues).toEqual([]);
+    expect(facets.countries).toEqual(['Brasil']);
+  });
+
+  it('never leaks values from another collection', async () => {
+    const user = await createTestUser('duenio');
+    const other = await createTestUser('otro');
+    await addShirt(user.id, { league: 'La Liga', country: 'España' });
+    await addShirt(other.id, { league: 'Serie A', country: 'Italia' });
+
+    const facets = await getCollectionFacets(testDb, user.id);
+    expect(facets.leagues).toEqual(['La Liga']);
+    expect(facets.countries).toEqual(['España']);
   });
 });
 

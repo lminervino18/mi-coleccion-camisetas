@@ -136,6 +136,34 @@ export const listShirts = async (
   };
 };
 
+export type CollectionFacets = { leagues: string[]; countries: string[] };
+
+/** Distinct values present in the collection, used to build the filter controls. */
+export const getCollectionFacets = async (
+  db: Database,
+  userId: string,
+): Promise<CollectionFacets> => {
+  const owned = eq(schema.shirts.userId, userId);
+
+  const [leagues, countries] = await Promise.all([
+    db
+      .selectDistinct({ value: schema.shirts.league })
+      .from(schema.shirts)
+      .where(and(owned, isNotNull(schema.shirts.league)))
+      .orderBy(asc(schema.shirts.league)),
+    db
+      .selectDistinct({ value: schema.shirts.country })
+      .from(schema.shirts)
+      .where(owned)
+      .orderBy(asc(schema.shirts.country)),
+  ]);
+
+  return {
+    leagues: leagues.map((row) => row.value).filter((value): value is string => value !== null),
+    countries: countries.map((row) => row.value),
+  };
+};
+
 export const getShirt = async (
   db: Database,
   userId: string,
