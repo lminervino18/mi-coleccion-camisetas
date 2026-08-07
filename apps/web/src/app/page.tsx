@@ -3,12 +3,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/server/auth';
-import { CollectorSlideshow } from '@/components/collector-slideshow';
+import { CollectorMosaic } from '@/components/collector-mosaic';
+import { LoginForm } from '@/components/login-form';
 
 export const metadata: Metadata = {
   title: 'Mi Colección de Camisetas',
   description:
-    'Tu espacio personal para catalogar, organizar y compartir tu colección de camisetas de fútbol.',
+    'Catalogá, organizá y compartí tu colección de camisetas de fútbol. Cada casaca cuenta una historia.',
   openGraph: {
     title: 'Mi Colección de Camisetas',
     description: 'Las camisetas que amás, ahora organizadas.',
@@ -20,54 +21,46 @@ const HomePage = async () => {
 
   return (
     <div className="relative min-h-dvh">
-      <CollectorSlideshow />
+      <CollectorMosaic />
 
-      <div className="relative flex min-h-dvh flex-col">
-        <header className="flex flex-wrap items-center justify-between gap-3 px-4 py-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <Image src="/logo.png" alt="" width={40} height={57} className="h-10 w-auto" priority />
-            <span className="font-display text-lg font-bold drop-shadow-[2px_2px_6px_rgba(0,0,0,0.9)] sm:text-xl">
-              Mi Colección de Camisetas
-            </span>
-          </div>
-
-          <nav className="flex items-center gap-2">
-            <Link
-              href="/login"
-              className="bg-brand-500 hover:bg-brand-600 inline-flex min-h-11 items-center rounded-[6px] px-4 text-sm font-semibold text-white transition-colors"
-            >
-              Iniciar sesión
-            </Link>
-            <Link
-              href="/registro"
-              className="text-ink-100 inline-flex min-h-11 items-center rounded-[6px] border border-white/20 bg-white/10 px-4 text-sm backdrop-blur-[2px] transition-colors hover:bg-white/20"
-            >
-              Registrarse
-            </Link>
-          </nav>
+      <div className="relative mx-auto flex min-h-dvh w-full max-w-6xl flex-col px-4 py-5 sm:px-6">
+        <header className="flex items-center gap-3">
+          <Image src="/logo.png" alt="" width={40} height={57} className="h-9 w-auto" priority />
+          <span className="font-display text-base font-bold drop-shadow-[2px_2px_6px_rgb(0_0_0/0.9)] sm:text-lg">
+            Mi Colección de Camisetas
+          </span>
         </header>
 
         <main
           id="main"
-          className="flex flex-1 flex-col items-center justify-center px-5 pb-16 text-center"
+          className="flex flex-1 flex-col items-center gap-8 py-10 lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:py-0"
         >
-          <p className="font-display max-w-2xl text-2xl leading-snug font-bold text-balance drop-shadow-[2px_2px_10px_rgba(0,0,0,0.95)] sm:text-4xl">
-            Cada casaca cuenta una historia
-          </p>
-          <p className="text-ink-200 mt-4 max-w-xl text-balance drop-shadow-[1px_1px_6px_rgba(0,0,0,0.95)] sm:text-lg">
-            Catalogá tus camisetas, organizalas como quieras, mirá cómo se compone tu colección y
-            compartila con quien vos elijas.
-          </p>
-          <p className="font-display text-celeste-400 mt-6 text-lg drop-shadow-[1px_1px_6px_rgba(0,0,0,0.95)] sm:text-xl">
-            Las camisetas que amás, ahora organizadas.
-          </p>
+          <div className="max-w-xl text-center lg:text-left">
+            <h1 className="font-display text-3xl leading-[1.15] font-bold text-balance drop-shadow-[2px_3px_12px_rgb(0_0_0/0.95)] sm:text-5xl">
+              Cada casaca cuenta una historia
+            </h1>
+            <p className="text-ink-200 mt-5 text-base text-pretty drop-shadow-[1px_1px_8px_rgb(0_0_0/0.95)] sm:text-lg">
+              Catalogá tus camisetas, organizalas como quieras, mirá cómo se compone tu colección y
+              compartila con quien vos elijas.
+            </p>
+            <p className="font-display text-celeste-400 mt-5 text-lg drop-shadow-[1px_1px_8px_rgb(0_0_0/0.95)] sm:text-xl">
+              Las camisetas que amás, ahora organizadas.
+            </p>
+          </div>
 
-          <Link
-            href="/registro"
-            className="bg-brand-500 hover:bg-brand-600 mt-8 inline-flex min-h-12 items-center rounded-[8px] px-7 font-semibold text-white transition-colors"
-          >
-            Empezar mi colección
-          </Link>
+          <div className="panel w-full max-w-sm shrink-0 p-6">
+            <h2 className="font-display mb-1 text-lg font-bold">Entrá a tu colección</h2>
+            <p className="text-ink-300 mb-5 text-sm">Ingresá con tu usuario y contraseña.</p>
+
+            <LoginForm />
+
+            <p className="text-ink-300 mt-5 text-center text-sm">
+              ¿Todavía no tenés cuenta?{' '}
+              <Link href="/registro" className="text-celeste-400 font-medium hover:underline">
+                Creá una
+              </Link>
+            </p>
+          </div>
         </main>
       </div>
     </div>

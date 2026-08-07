@@ -19,7 +19,7 @@ type SearchParams = Promise<Record<string, string | string[] | undefined>>;
 
 const CollectionPage = async ({ searchParams }: { searchParams: SearchParams }) => {
   const user = await getCurrentUser();
-  if (user === null) redirect('/login');
+  if (user === null) redirect('/');
 
   const filters = shirtFiltersSchema.parse(await searchParams);
   const [page, facets] = await Promise.all([

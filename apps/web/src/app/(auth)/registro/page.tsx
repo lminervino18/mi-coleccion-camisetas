@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getCurrentUser } from '@/server/auth';
-import { RegisterForm } from './register-form';
+import { RegisterForm } from '@/components/register-form';
 
 export const metadata: Metadata = {
   title: 'Crear cuenta',
@@ -20,8 +20,8 @@ const RegisterPage = async () => {
 
       <p className="text-ink-300 mt-6 text-sm">
         ¿Ya tenés cuenta?{' '}
-        <Link href="/login" className="text-celeste-400 font-medium hover:underline">
-          Iniciá sesión
+        <Link href="/" className="text-celeste-400 font-medium hover:underline">
+          Volver al inicio
         </Link>
       </p>
     </>

@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 const NewShirtPage = async () => {
-  if ((await getCurrentUser()) === null) redirect('/login');
+  if ((await getCurrentUser()) === null) redirect('/');
 
   return (
     <main id="main" className="mx-auto w-full max-w-3xl px-3 py-4 sm:px-5 sm:py-6">

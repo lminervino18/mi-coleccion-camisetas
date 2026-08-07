@@ -179,7 +179,7 @@ export const ShirtForm = ({ shirt }: ShirtFormProps) => {
         />
 
         <Field
-          label="Nombre en la camiseta"
+          label="Jugador"
           name="playerName"
           defaultValue={shirt?.playerName ?? ''}
           errors={error?.fieldErrors('playerName')}

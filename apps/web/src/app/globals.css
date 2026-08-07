@@ -100,6 +100,72 @@ h3,
   animation: page-enter 220ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
 }
 
+.mosaic-grid {
+  position: absolute;
+  inset: -12% -2%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.mosaic-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: mosaic-drift 90s linear infinite;
+}
+
+/* Alternate columns drift the other way so the wall never reads as rigid rows. */
+.mosaic-column-1 {
+  animation-duration: 120s;
+  animation-direction: reverse;
+}
+
+/* All seven columns are rendered once; each breakpoint hides the surplus so the drifting
+   columns never wrap into a second grid row. Only hide rules are used, so no override has to
+   win a specificity fight. */
+@media (max-width: 639px) {
+  .mosaic-column:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .mosaic-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1279px) {
+  .mosaic-column:nth-child(n + 6) {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .mosaic-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+/* Desaturated so the wall reads as texture and the foreground copy stays the subject. */
+.mosaic-tile {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  filter: grayscale(0.55) contrast(0.95);
+}
+
+@keyframes mosaic-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
 /* Smooths the in-page jump when navigating to an anchor or restoring scroll. */
 @media (prefers-reduced-motion: no-preference) {
   html {

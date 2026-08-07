@@ -16,7 +16,7 @@ export const metadata: Metadata = {
 
 const StatisticsPage = async () => {
   const user = await getCurrentUser();
-  if (user === null) redirect('/login');
+  if (user === null) redirect('/');
 
   const stats = await calculateCollectionStatistics(db, user.id);
 

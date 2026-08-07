@@ -13,7 +13,7 @@ export const LogoutButton = () => {
     setIsSigningOut(true);
     try {
       await apiRequest('/api/auth/logout', { method: 'POST' });
-      router.replace('/login');
+      router.replace('/');
       router.refresh();
     } catch {
       setIsSigningOut(false);

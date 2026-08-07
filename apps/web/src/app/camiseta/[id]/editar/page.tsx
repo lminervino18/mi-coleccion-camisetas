@@ -12,7 +12,7 @@ type Params = { params: Promise<{ id: string }> };
 
 const loadShirt = async (id: string) => {
   const user = await getCurrentUser();
-  if (user === null) redirect('/login');
+  if (user === null) redirect('/');
 
   try {
     return toShirt(await getShirt(db, user.id, id));
