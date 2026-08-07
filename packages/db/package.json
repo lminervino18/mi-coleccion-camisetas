@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@camisetas/contracts": "workspace:*",
-    "drizzle-orm": "^0.38.3",
+    "drizzle-orm": "^0.45.2",
     "postgres": "^3.4.5"
   },
   "devDependencies": {
@@ -25,7 +25,7 @@
     "@camisetas/typescript-config": "workspace:*",
     "@node-rs/argon2": "^2.0.2",
     "@types/node": "^26.1.2",
-    "drizzle-kit": "^0.30.2",
+    "drizzle-kit": "^0.31.10",
     "eslint": "^9.39.5",
     "sharp": "^0.35.3",
     "tsx": "^4.19.2",

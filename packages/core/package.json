@@ -15,7 +15,7 @@
     "@camisetas/contracts": "workspace:*",
     "@camisetas/db": "workspace:*",
     "@node-rs/argon2": "^2.0.2",
-    "drizzle-orm": "^0.38.3"
+    "drizzle-orm": "^0.45.2"
   },
   "devDependencies": {
     "@camisetas/eslint-config": "workspace:*",

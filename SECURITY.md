@@ -59,6 +59,16 @@ estricta.
 `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy` y
 `Strict-Transport-Security` se aplican a todas las respuestas.
 
+## Dependencias
+
+`pnpm audit --audit-level high` corre en cada integración y la corta si aparece una
+vulnerabilidad alta.
+
+`postcss` y `sharp` llegan como dependencias transitivas de `next`, que las fija en versiones
+con vulnerabilidades altas publicadas. Como no se pueden actualizar desde aquí, están forzadas a
+la versión parcheada mediante `pnpm.overrides` en el `package.json` raíz. Los overrides se
+pueden quitar cuando `next` fije por su cuenta versiones no vulnerables.
+
 ## Deuda conocida
 
 - El secreto JWT y las credenciales RDS del sistema anterior están en el historial de Git en texto
