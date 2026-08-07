@@ -18,6 +18,6 @@ export const POST = async (request: Request) => {
 
     return NextResponse.json(userProfileSchema.parse(toUserProfile(user)), { status: 201 });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

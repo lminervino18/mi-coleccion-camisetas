@@ -11,7 +11,7 @@ export const GET = async () => {
     const user = await requireUser();
     return NextResponse.json(userProfileSchema.parse(toUserProfile(user)));
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };
 
@@ -22,6 +22,6 @@ export const PUT = async (request: Request) => {
     const updated = await updateProfile(db, user.id, input);
     return NextResponse.json(userProfileSchema.parse(toUserProfile(updated)));
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

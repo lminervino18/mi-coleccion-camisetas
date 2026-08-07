@@ -20,6 +20,6 @@ export const POST = async (request: Request) => {
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

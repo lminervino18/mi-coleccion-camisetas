@@ -20,7 +20,7 @@ export const GET = async (request: Request) => {
       totalPages: page.totalPages,
     });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };
 
@@ -32,6 +32,6 @@ export const POST = async (request: Request) => {
 
     return NextResponse.json(shirtSchema.parse(toShirt(shirt)), { status: 201 });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

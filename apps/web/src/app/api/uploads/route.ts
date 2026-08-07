@@ -41,6 +41,6 @@ export const POST = async (request: Request) => {
       { status: 201 },
     );
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

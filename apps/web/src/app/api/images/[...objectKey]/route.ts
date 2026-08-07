@@ -29,6 +29,6 @@ export const GET = async (_request: Request, { params }: Params) => {
       },
     });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

@@ -16,7 +16,7 @@ export const GET = async (_request: Request, { params }: Params) => {
     const shirt = await getShirt(db, user.id, (await params).id);
     return NextResponse.json(shirtSchema.parse(toShirt(shirt)));
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };
 
@@ -27,7 +27,7 @@ export const PUT = async (request: Request, { params }: Params) => {
     const shirt = await updateShirt(db, user.id, (await params).id, input);
     return NextResponse.json(shirtSchema.parse(toShirt(shirt)));
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };
 
@@ -44,6 +44,6 @@ export const DELETE = async (_request: Request, { params }: Params) => {
 
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

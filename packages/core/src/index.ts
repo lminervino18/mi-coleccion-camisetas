@@ -1,5 +1,6 @@
 export * from './accounts';
 export * from './errors';
+export * from './maintenance';
 export * from './password-reset';
 export * from './passwords';
 export * from './sessions';

@@ -30,6 +30,6 @@ export const POST = async (request: Request) => {
     await startSession(user.id);
     return NextResponse.json(userProfileSchema.parse(toUserProfile(user)));
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

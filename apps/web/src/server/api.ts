@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { ZodError, type TypeOf, type ZodTypeAny } from 'zod';
 import { API_ERROR_STATUS, type ApiError } from '@camisetas/contracts';
 import { DomainError } from '@camisetas/core';
+import { logger, requestId } from './logger';
 
 export const errorResponse = (error: ApiError): NextResponse<ApiError> =>
   NextResponse.json(error, { status: API_ERROR_STATUS[error.code] });
@@ -19,7 +20,7 @@ const fieldErrorsFrom = (error: ZodError): Record<string, string[]> => {
  * Maps every thrown value to a stable error shape. Unexpected errors are logged server-side and
  * reported generically so internal details never reach the client.
  */
-export const toErrorResponse = (error: unknown): NextResponse<ApiError> => {
+export const toErrorResponse = async (error: unknown): Promise<NextResponse<ApiError>> => {
   if (error instanceof ZodError) {
     return errorResponse({
       code: 'validation_failed',
@@ -36,7 +37,10 @@ export const toErrorResponse = (error: unknown): NextResponse<ApiError> => {
     });
   }
 
-  console.error('Unhandled route error', error);
+  logger.error('Unhandled route error', {
+    requestId: await requestId(),
+    detail: error instanceof Error ? error.message : String(error),
+  });
   return errorResponse({ code: 'internal_error', message: 'Algo salió mal de nuestro lado.' });
 };
 

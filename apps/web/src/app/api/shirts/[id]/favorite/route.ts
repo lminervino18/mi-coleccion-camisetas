@@ -12,6 +12,6 @@ export const POST = async (_request: Request, { params }: Params) => {
     const isFavorite = await toggleFavorite(db, user.id, (await params).id);
     return NextResponse.json({ isFavorite });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

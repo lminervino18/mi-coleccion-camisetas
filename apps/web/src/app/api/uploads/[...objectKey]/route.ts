@@ -47,6 +47,6 @@ export const PUT = async (request: Request, { params }: Params) => {
 
     return NextResponse.json({ width: processed.width, height: processed.height });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

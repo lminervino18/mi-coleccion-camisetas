@@ -51,7 +51,7 @@ export const PUT = async (request: Request) => {
 
     return NextResponse.json(userProfileSchema.parse(toUserProfile(updated)));
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };
 
@@ -76,6 +76,6 @@ export const DELETE = async () => {
 
     return NextResponse.json(userProfileSchema.parse(toUserProfile(updated)));
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

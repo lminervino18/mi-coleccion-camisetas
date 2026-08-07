@@ -7,6 +7,6 @@ export const POST = async () => {
     await endSession();
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };

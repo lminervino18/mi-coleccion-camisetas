@@ -12,6 +12,6 @@ export const DELETE = async (_request: Request, { params }: Params) => {
     await revokeShareLink(db, user.id, (await params).id);
     return new NextResponse(null, { status: 204 });
   } catch (error) {
-    return toErrorResponse(error);
+    return await toErrorResponse(error);
   }
 };
