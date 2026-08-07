@@ -32,6 +32,10 @@ export type SharedCollectionOwner = {
   username: string;
   displayName: string | null;
   avatarKey: string | null;
+  bio: string | null;
+  favoriteClub: string | null;
+  country: string | null;
+  collectingSince: number | null;
 };
 
 /**
@@ -48,6 +52,10 @@ export const resolveShareToken = async (
       username: schema.users.username,
       displayName: schema.users.displayName,
       avatarKey: schema.users.avatarKey,
+      bio: schema.users.bio,
+      favoriteClub: schema.users.favoriteClub,
+      country: schema.users.country,
+      collectingSince: schema.users.collectingSince,
     })
     .from(schema.shareLinks)
     .innerJoin(schema.users, eq(schema.users.id, schema.shareLinks.userId))

@@ -15,6 +15,13 @@
       "when": 1786056484656,
       "tag": "0001_organic_clint_barton",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1786082539641,
+      "tag": "0002_mean_jackal",
+      "breakpoints": true
     }
   ]
 }

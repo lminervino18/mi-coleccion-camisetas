@@ -12,6 +12,10 @@ export type AuthenticatedUser = {
   email: string;
   displayName: string | null;
   avatarKey: string | null;
+  bio: string | null;
+  favoriteClub: string | null;
+  country: string | null;
+  collectingSince: number | null;
   createdAt: Date;
 };
 
@@ -50,6 +54,10 @@ export const resolveSession = async (
       email: schema.users.email,
       displayName: schema.users.displayName,
       avatarKey: schema.users.avatarKey,
+      bio: schema.users.bio,
+      favoriteClub: schema.users.favoriteClub,
+      country: schema.users.country,
+      collectingSince: schema.users.collectingSince,
       createdAt: schema.users.createdAt,
     })
     .from(schema.sessions)

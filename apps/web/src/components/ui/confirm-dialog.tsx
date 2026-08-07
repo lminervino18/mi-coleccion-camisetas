@@ -11,6 +11,7 @@ type ConfirmDialogProps = {
   isBusy?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
+  children?: React.ReactNode;
 };
 
 /**
@@ -25,6 +26,7 @@ export const ConfirmDialog = ({
   isBusy = false,
   onConfirm,
   onCancel,
+  children,
 }: ConfirmDialogProps) => {
   const dialog = useRef<HTMLDialogElement>(null);
 
@@ -51,9 +53,10 @@ export const ConfirmDialog = ({
       <h2 id="confirm-title" className="font-display mb-2 text-lg font-bold">
         {title}
       </h2>
-      <p id="confirm-description" className="text-ink-300 mb-5 text-sm">
+      <p id="confirm-description" className="text-ink-300 mb-4 text-sm">
         {description}
       </p>
+      {children === undefined ? null : <div className="mb-5">{children}</div>}
       <div className="flex flex-wrap justify-end gap-2">
         <Button variant="secondary" onClick={onCancel} disabled={isBusy}>
           Cancelar

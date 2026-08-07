@@ -17,6 +17,14 @@ const credentials = {
   password: 'una-contrasena-larga',
 };
 
+const emptyProfile = {
+  displayName: null,
+  bio: null,
+  favoriteClub: null,
+  country: null,
+  collectingSince: null,
+};
+
 beforeEach(resetDatabase);
 
 describe('registerUser', () => {
@@ -139,9 +147,9 @@ describe('updateProfile', () => {
 
     await expect(
       updateProfile(testDb, other.id, {
+        ...emptyProfile,
         username: 'LMinervino18',
         email: other.email,
-        displayName: null,
       }),
     ).rejects.toMatchObject({ code: 'conflict' });
   });
@@ -149,6 +157,7 @@ describe('updateProfile', () => {
   it('allows keeping your own username unchanged', async () => {
     const user = await registerUser(testDb, credentials);
     const updated = await updateProfile(testDb, user.id, {
+      ...emptyProfile,
       username: credentials.username,
       email: credentials.email,
       displayName: 'Loren',

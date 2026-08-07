@@ -36,6 +36,12 @@ export const CollectionHeader = ({ user, totalItems }: CollectionHeaderProps) =>
           Estadísticas
         </Link>
         <Link
+          href="/perfil"
+          className="text-ink-100 inline-flex min-h-11 items-center rounded-[6px] border border-white/12 bg-white/10 px-4 text-sm transition-colors hover:bg-white/16"
+        >
+          Perfil
+        </Link>
+        <Link
           href="/compartir"
           className="text-ink-100 inline-flex min-h-11 items-center rounded-[6px] border border-white/12 bg-white/10 px-4 text-sm transition-colors hover:bg-white/16"
         >

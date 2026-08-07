@@ -13,6 +13,10 @@ export const toUserProfile = (user: AuthenticatedUser): UserProfile => ({
   email: user.email,
   displayName: user.displayName,
   avatarUrl: user.avatarKey === null ? null : publicImageUrl(user.avatarKey),
+  bio: user.bio,
+  favoriteClub: user.favoriteClub,
+  country: user.country,
+  collectingSince: user.collectingSince,
   createdAt: user.createdAt.toISOString(),
 });
 
@@ -20,10 +24,18 @@ export const toPublicProfile = (user: {
   username: string;
   displayName: string | null;
   avatarKey: string | null;
+  bio: string | null;
+  favoriteClub: string | null;
+  country: string | null;
+  collectingSince: number | null;
 }): PublicProfile => ({
   username: user.username,
   displayName: user.displayName,
   avatarUrl: user.avatarKey === null ? null : publicImageUrl(user.avatarKey),
+  bio: user.bio,
+  favoriteClub: user.favoriteClub,
+  country: user.country,
+  collectingSince: user.collectingSince,
 });
 
 /** Note the absence of userId: the owner is never part of the shirt contract. */

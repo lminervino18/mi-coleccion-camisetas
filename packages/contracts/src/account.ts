@@ -51,15 +51,25 @@ export const resetPasswordSchema = z.object({
 });
 export type ResetPasswordInput = z.infer<typeof resetPasswordSchema>;
 
+const optionalText = (max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max)
+    .transform((value) => (value.length === 0 ? null : value))
+    .nullable();
+
 export const updateProfileSchema = z.object({
   username: usernameSchema,
   email: emailSchema,
-  displayName: z
-    .string()
-    .trim()
-    .max(60)
-    .transform((value) => (value.length === 0 ? null : value))
-    .nullable(),
+  displayName: optionalText(60),
+  bio: optionalText(280),
+  favoriteClub: optionalText(80),
+  country: optionalText(80),
+  collectingSince: z
+    .union([z.coerce.number().int().min(1950).max(new Date().getFullYear()), z.literal('')])
+    .nullable()
+    .transform((value) => (value === '' || value === null ? null : value)),
 });
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;
 
@@ -69,6 +79,10 @@ export const userProfileSchema = z.object({
   email: emailSchema,
   displayName: z.string().nullable(),
   avatarUrl: z.string().url().nullable(),
+  bio: z.string().nullable(),
+  favoriteClub: z.string().nullable(),
+  country: z.string().nullable(),
+  collectingSince: z.number().int().nullable(),
   createdAt: z.string().datetime(),
 });
 export type UserProfile = z.infer<typeof userProfileSchema>;
@@ -78,5 +92,9 @@ export const publicProfileSchema = z.object({
   username: usernameSchema,
   displayName: z.string().nullable(),
   avatarUrl: z.string().url().nullable(),
+  bio: z.string().nullable(),
+  favoriteClub: z.string().nullable(),
+  country: z.string().nullable(),
+  collectingSince: z.number().int().nullable(),
 });
 export type PublicProfile = z.infer<typeof publicProfileSchema>;

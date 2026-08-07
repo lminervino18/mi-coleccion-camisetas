@@ -47,6 +47,10 @@ export const registerUser = async (
       email: schema.users.email,
       displayName: schema.users.displayName,
       avatarKey: schema.users.avatarKey,
+      bio: schema.users.bio,
+      favoriteClub: schema.users.favoriteClub,
+      country: schema.users.country,
+      collectingSince: schema.users.collectingSince,
       createdAt: schema.users.createdAt,
     });
 
@@ -70,6 +74,10 @@ export const authenticate = async (
       email: schema.users.email,
       displayName: schema.users.displayName,
       avatarKey: schema.users.avatarKey,
+      bio: schema.users.bio,
+      favoriteClub: schema.users.favoriteClub,
+      country: schema.users.country,
+      collectingSince: schema.users.collectingSince,
       createdAt: schema.users.createdAt,
       passwordHash: schema.users.passwordHash,
     })
@@ -143,6 +151,10 @@ export const updateProfile = async (
       username: input.username,
       email: input.email,
       displayName: input.displayName,
+      bio: input.bio,
+      favoriteClub: input.favoriteClub,
+      country: input.country,
+      collectingSince: input.collectingSince,
       updatedAt: new Date(),
     })
     .where(eq(schema.users.id, userId))
@@ -152,6 +164,10 @@ export const updateProfile = async (
       email: schema.users.email,
       displayName: schema.users.displayName,
       avatarKey: schema.users.avatarKey,
+      bio: schema.users.bio,
+      favoriteClub: schema.users.favoriteClub,
+      country: schema.users.country,
+      collectingSince: schema.users.collectingSince,
       createdAt: schema.users.createdAt,
     });
 
