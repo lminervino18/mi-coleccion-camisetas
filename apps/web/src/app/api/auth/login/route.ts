@@ -14,7 +14,9 @@ export const POST = async (request: Request) => {
     const input = await parseJson(request, loginSchema);
     const accountKey = `login:failures:${input.username.toLowerCase()}`;
 
-    await limitByClient('login', 40, FAILED_ATTEMPTS_WINDOW_MS);
+    // Generous per address: an office or a household shares one. The per-account failure
+    // limit below is what actually stops credential stuffing.
+    await limitByClient('login', 200, FAILED_ATTEMPTS_WINDOW_MS);
     // Checked with a zero-cost probe: only failures below count towards the account limit, so a
     // legitimate user signing in from several devices is never locked out.
     enforceRateLimit(accountKey, 10, FAILED_ATTEMPTS_WINDOW_MS, { increment: false });
