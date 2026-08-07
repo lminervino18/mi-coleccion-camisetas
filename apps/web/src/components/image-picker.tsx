@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { ACCEPTED_IMAGE_TYPES, MAX_IMAGE_BYTES } from '@camisetas/contracts';
 import { Button } from '@/components/ui/button';
 
@@ -24,6 +24,7 @@ export const ImagePicker = ({
   onFileSelected,
   error,
 }: ImagePickerProps) => {
+  const inputId = useId();
   const input = useRef<HTMLInputElement>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -69,7 +70,9 @@ export const ImagePicker = ({
 
   return (
     <div className="flex flex-col gap-2">
-      <span className="text-ink-300 text-sm">{label}</span>
+      <span aria-hidden className="text-ink-300 text-sm">
+        {label}
+      </span>
 
       <div className="flex items-start gap-3">
         <div className="relative size-28 shrink-0 overflow-hidden rounded-[8px] border border-white/12 bg-black/40 sm:size-36">
@@ -92,9 +95,11 @@ export const ImagePicker = ({
         <div className="flex flex-col gap-2">
           <input
             ref={input}
+            id={inputId}
             type="file"
             accept={ACCEPT}
             capture="environment"
+            aria-label={label}
             className="sr-only"
             onChange={(event) => select(event.target.files?.[0] ?? null)}
           />

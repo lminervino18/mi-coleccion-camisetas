@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
 
-export const SEED_USER = { username: 'coleccionista', password: 'una-contrasena-larga' };
+export const SEED_USER = { username: 'lminervino18', password: 'Hermanis123' };
 
 export const uniqueUser = (prefix: string) => {
   const suffix = Math.random().toString(36).slice(2, 8);

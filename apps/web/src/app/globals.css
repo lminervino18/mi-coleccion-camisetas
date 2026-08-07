@@ -1,9 +1,10 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Action blue carried over from the original interface. */
-  --color-brand-600: #0069d9;
-  --color-brand-500: #007bff;
+  /* Action blue carried over from the original interface, stepped one shade deeper so white
+     button labels clear the 4.5:1 contrast threshold. */
+  --color-brand-600: #0058b8;
+  --color-brand-500: #0069d9;
   --color-brand-400: #3d9bff;
   /* Light blue taken from the shirt in the logo. */
   --color-celeste-400: #7cb5e3;
@@ -11,7 +12,7 @@
   --color-ink-900: #0a0a0b;
   --color-ink-800: #17181a;
   --color-ink-700: #2a2c2f;
-  --color-ink-500: #6c757d;
+  --color-ink-500: #7d858e;
   --color-ink-300: #b6bcc4;
   --color-ink-100: #e9ecef;
 
