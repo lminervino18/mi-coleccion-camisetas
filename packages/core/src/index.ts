@@ -1,5 +1,6 @@
 export * from './accounts';
 export * from './errors';
+export * from './password-reset';
 export * from './passwords';
 export * from './sessions';
 export * from './share-links';

@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
@@ -78,6 +79,10 @@ export const LoginForm = () => {
       <Button type="submit" isLoading={isSubmitting} className="mt-1 w-full">
         {isSubmitting ? 'Entrando…' : 'Iniciar sesión'}
       </Button>
+
+      <Link href="/recuperar" className="text-ink-300 hover:text-celeste-400 text-center text-sm">
+        Olvidé mi contraseña
+      </Link>
     </form>
   );
 };
