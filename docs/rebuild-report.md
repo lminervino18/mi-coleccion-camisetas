@@ -116,11 +116,9 @@ siendo recuperable.
 
 ### Requieren acción del propietario
 
-1. **Vercel → Settings → Git → Production Branch:** cambiar `v1-prod` por `main`. Mientras siga
-   apuntando a una rama borrada, los push van a preview y producción queda congelada.
-2. **Credenciales de Cloudflare R2.** Producción reporta `objectStorage: local`, es decir que las
+1. **Credenciales de Cloudflare R2.** Producción reporta `objectStorage: local`, es decir que las
    imágenes se guardan en disco efímero y se pierden. Es el único componente que exige tarjeta.
-3. **DNS:** registro `A micoleccioncamisetas.com → 76.76.21.21`.
+2. **DNS:** registro `A micoleccioncamisetas.com → 76.76.21.21`.
 
 ### Deuda conocida
 
