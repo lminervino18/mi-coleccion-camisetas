@@ -24,4 +24,5 @@ blob-report/
 
 .uploads/
 
-test-results/
+*.tsbuildinfo
+.vercel
