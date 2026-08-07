@@ -1,5 +1,6 @@
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { dirname, join, normalize, resolve, sep } from 'node:path';
+import { env } from '../env';
 import type { ObjectStorage } from './types';
 
 const ROOT = resolve(process.cwd(), '.uploads');
@@ -18,8 +19,12 @@ const resolveWithinRoot = (objectKey: string): string => {
 
 /** Development stand-in for R2: the browser uploads through the app instead of to a bucket. */
 export const localStorage: ObjectStorage = {
+  // Absolute so the upload ticket has the same shape as a presigned bucket URL.
   createUploadTarget: ({ objectKey }) =>
-    Promise.resolve({ objectKey, uploadUrl: `/api/uploads/${objectKey}` }),
+    Promise.resolve({
+      objectKey,
+      uploadUrl: new URL(`/api/uploads/${objectKey}`, env.APP_URL).toString(),
+    }),
 
   read: async (objectKey) => {
     try {
