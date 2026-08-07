@@ -1,0 +1,3 @@
+# pnpm owns this file's layout and rewrites it on every install; reformatting it only
+# produces churn that the next install undoes.
+pnpm-lock.yaml
