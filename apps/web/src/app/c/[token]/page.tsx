@@ -6,6 +6,7 @@ import { listShirts, resolveShareToken } from '@camisetas/core';
 import { appUrl } from '@/server/auth';
 import { db } from '@/server/db';
 import { toPublicProfile, toShirt } from '@/server/serializers';
+import { Pagination } from '@/components/pagination';
 import { ShirtCard } from '@/components/shirt-card';
 import { ExpiredShareLink } from './expired-share-link';
 
@@ -68,7 +69,8 @@ const SharedCollectionPage = async ({
   searchParams: SearchParams;
 }) => {
   const token = (await params).token;
-  const filters = shirtFiltersSchema.parse(await searchParams);
+  const rawParams = await searchParams;
+  const filters = shirtFiltersSchema.parse(rawParams);
   const owner = await resolveShareToken(db, token);
 
   if (owner === null) return <ExpiredShareLink />;
@@ -121,13 +123,23 @@ const SharedCollectionPage = async ({
           <h2 className="font-display text-lg font-bold">Esta colección todavía está vacía</h2>
         </div>
       ) : (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
-          {shirts.map((shirt, index) => (
-            <li key={shirt.id}>
-              <ShirtCard shirt={shirt} href={`/c/${token}/${shirt.id}`} priority={index < 4} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            {shirts.map((shirt, index) => (
+              <li key={shirt.id}>
+                <ShirtCard shirt={shirt} href={`/c/${token}/${shirt.id}`} priority={index < 4} />
+              </li>
+            ))}
+          </ul>
+
+          <Pagination
+            page={page.page}
+            totalPages={page.totalPages}
+            totalItems={page.totalItems}
+            baseParams={new URLSearchParams()}
+            basePath={`/c/${token}`}
+          />
+        </>
       )}
     </main>
   );

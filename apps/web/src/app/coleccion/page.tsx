@@ -5,6 +5,7 @@ import { getCollectionFacets, listShirts } from '@camisetas/core';
 import { getCurrentUser } from '@/server/auth';
 import { db } from '@/server/db';
 import { toShirt } from '@/server/serializers';
+import { Pagination } from '@/components/pagination';
 import { ShirtCard } from '@/components/shirt-card';
 import { CollectionFilters } from './collection-filters';
 import { CollectionHeader } from './collection-header';
@@ -21,7 +22,8 @@ const CollectionPage = async ({ searchParams }: { searchParams: SearchParams }) 
   const user = await getCurrentUser();
   if (user === null) redirect('/');
 
-  const filters = shirtFiltersSchema.parse(await searchParams);
+  const rawParams = await searchParams;
+  const filters = shirtFiltersSchema.parse(rawParams);
   const [page, facets] = await Promise.all([
     listShirts(db, user.id, filters),
     getCollectionFacets(db, user.id),
@@ -36,16 +38,36 @@ const CollectionPage = async ({ searchParams }: { searchParams: SearchParams }) 
       {shirts.length === 0 ? (
         <EmptyCollection isFiltered={page.totalItems === 0 && hasActiveFilters(filters)} />
       ) : (
-        <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
-          {shirts.map((shirt, index) => (
-            <li key={shirt.id}>
-              <ShirtCard shirt={shirt} href={`/camiseta/${shirt.id}`} priority={index < 4} />
-            </li>
-          ))}
-        </ul>
+        <>
+          <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4 xl:grid-cols-5">
+            {shirts.map((shirt, index) => (
+              <li key={shirt.id}>
+                <ShirtCard shirt={shirt} href={`/camiseta/${shirt.id}`} priority={index < 4} />
+              </li>
+            ))}
+          </ul>
+
+          <Pagination
+            page={page.page}
+            totalPages={page.totalPages}
+            totalItems={page.totalItems}
+            baseParams={toSearchParams(rawParams)}
+            basePath="/coleccion"
+          />
+        </>
       )}
     </main>
   );
+};
+
+/** Rebuilds the incoming query string so pagination links keep the active filters. */
+const toSearchParams = (raw: Record<string, string | string[] | undefined>) => {
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(raw)) {
+    if (key === 'page' || value === undefined) continue;
+    for (const item of Array.isArray(value) ? value : [value]) params.append(key, item);
+  }
+  return params;
 };
 
 const hasActiveFilters = (filters: ReturnType<typeof shirtFiltersSchema.parse>): boolean =>
