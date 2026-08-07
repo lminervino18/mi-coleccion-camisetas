@@ -40,4 +40,4 @@ pnpm build
 ## Documentation
 
 Everything else lives in [`docs/`](docs/): architecture, decisions, testing, environment variables
-and deployment.
+and deployment. The rebuild itself is written up in [`docs/rebuild-report.md`](docs/rebuild-report.md).
