@@ -1,0 +1,23 @@
+{
+  "name": "@camisetas/contracts",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint src",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@camisetas/eslint-config": "workspace:*",
+    "@camisetas/typescript-config": "workspace:*",
+    "eslint": "^9.39.5",
+    "vitest": "^3.0.4"
+  }
+}

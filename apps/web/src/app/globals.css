@@ -1,0 +1,206 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Action blue carried over from the original interface. */
+  --color-brand-600: #0069d9;
+  --color-brand-500: #007bff;
+  --color-brand-400: #3d9bff;
+  /* Light blue taken from the shirt in the logo. */
+  --color-celeste-400: #7cb5e3;
+
+  --color-ink-900: #0a0a0b;
+  --color-ink-800: #17181a;
+  --color-ink-700: #2a2c2f;
+  --color-ink-500: #6c757d;
+  --color-ink-300: #b6bcc4;
+  --color-ink-100: #e9ecef;
+
+  --color-danger-600: #a33b3b;
+  --color-danger-400: #e07a7a;
+
+  /* Chart marks. Validated against the dark chart surface for lightness band, chroma floor,
+     colour-vision separation and contrast; do not substitute by eye. */
+  --color-chart-1: #2f7fd4;
+  --color-chart-2: #c47a2c;
+
+  --radius-card: 10px;
+  --radius-control: 6px;
+
+  --shadow-panel: 0 4px 10px rgb(0 0 0 / 0.8);
+  --shadow-card: 0 4px 8px rgb(0 0 0 / 0.6);
+
+  /* The original rendered headings in the browser serif; this keeps that character
+     without loading a web font. */
+  --font-display: Georgia, 'Times New Roman', Times, serif;
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+:root {
+  color-scheme: dark;
+  --panel: rgb(8 8 10 / 0.9);
+  --panel-strong: rgb(8 8 10 / 0.96);
+  --border-subtle: rgb(255 255 255 / 0.12);
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  min-height: 100dvh;
+  color: var(--color-ink-100);
+  font-family: var(--font-sans);
+  background-color: var(--color-ink-900);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/*
+ * The shirt-display photograph is the product's visual signature. It is painted on a fixed
+ * pseudo-element rather than the body so iOS Safari does not break background-attachment.
+ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image: linear-gradient(rgb(0 0 0 / 0.55), rgb(0 0 0 / 0.72)), url('/background.jpg');
+  background-size: cover;
+  background-position: center;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-celeste-400);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/*
+ * Page entry: a short fade with a 6px rise. The previous app animated 20px over 300ms, which
+ * reads as a jump; keeping the travel under the text line height makes it feel like settling.
+ */
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.page-enter {
+  animation: page-enter 220ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.mosaic-grid {
+  position: absolute;
+  inset: -12% -2%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+}
+
+.mosaic-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  animation: mosaic-drift 90s linear infinite;
+}
+
+/* Alternate columns drift the other way so the wall never reads as rigid rows. */
+.mosaic-column-1 {
+  animation-duration: 120s;
+  animation-direction: reverse;
+}
+
+/* All seven columns are rendered once; each breakpoint hides the surplus so the drifting
+   columns never wrap into a second grid row. Only hide rules are used, so no override has to
+   win a specificity fight. */
+@media (max-width: 639px) {
+  .mosaic-column:nth-child(n + 4) {
+    display: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .mosaic-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1279px) {
+  .mosaic-column:nth-child(n + 6) {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .mosaic-grid {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+/* Desaturated so the wall reads as texture and the foreground copy stays the subject. */
+.mosaic-tile {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  filter: grayscale(0.55) contrast(0.95);
+}
+
+@keyframes mosaic-drift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(0, -50%, 0);
+  }
+}
+
+/* Smooths the in-page jump when navigating to an anchor or restoring scroll. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@utility panel {
+  background-color: var(--panel);
+  /* The blur keeps form controls legible over the busy photograph behind them. */
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-panel);
+}
+
+@utility skip-link {
+  position: absolute;
+  left: 0.5rem;
+  top: -3rem;
+  z-index: 100;
+  transition: top 0.15s ease;
+
+  &:focus {
+    top: 0.5rem;
+  }
+}
