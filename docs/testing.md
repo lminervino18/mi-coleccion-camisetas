@@ -90,12 +90,13 @@ La conexión a la base no se estaba cacheando en producción: cada petición abr
 agotaba el límite de conexiones del servidor con `sorry, too many clients already`. Corregido; el
 mismo escenario pasó de 30 fallos a 0.
 
-### Hallazgo abierto
+Los 503 que aparecían en `/api/health` durante la investigación eran una consecuencia del mismo
+fallo: una vez corregido y reiniciado el proceso, 60 peticiones simultáneas responden todas 200 y
+el servidor mantiene 11 conexiones estables.
 
-`/api/health` sigue devolviendo 503 en aproximadamente un tercio de las peticiones bajo 25
-conexiones simultáneas. Las rutas de la aplicación no muestran ese comportamiento, así que el
-impacto para el usuario es nulo, pero **un monitor de disponibilidad daría falsos negativos**.
-Sin diagnosticar.
+Vale registrar por qué costó verlo: las rutas de la aplicación **enmascaraban el problema**.
+`getCurrentUser` trata una base inalcanzable como "nadie ha iniciado sesión", así que en lugar de
+fallar respondían con una redirección al inicio. El health check era el único que lo decía.
 
 El tamaño del pool se controla con `DATABASE_POOL_SIZE`. El valor por defecto es 1, correcto para
 un despliegue serverless donde cada instancia atiende una petición por vez; un servidor de larga
