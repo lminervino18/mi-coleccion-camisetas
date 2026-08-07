@@ -18,6 +18,11 @@
   --color-danger-600: #a33b3b;
   --color-danger-400: #e07a7a;
 
+  /* Chart marks. Validated against the dark chart surface for lightness band, chroma floor,
+     colour-vision separation and contrast; do not substitute by eye. */
+  --color-chart-1: #2f7fd4;
+  --color-chart-2: #c47a2c;
+
   --radius-card: 10px;
   --radius-control: 6px;
 
