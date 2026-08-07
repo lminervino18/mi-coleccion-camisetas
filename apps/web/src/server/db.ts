@@ -24,12 +24,8 @@ const connect = (): Database => {
  * the provider's free tier.
  */
 const resolveDatabase = (): Database => {
-  const existing = globalThis.__camisetasDb;
-  if (existing !== undefined) return existing;
-
-  const created = connect();
-  if (env.NODE_ENV !== 'production') globalThis.__camisetasDb = created;
-  return created;
+  globalThis.__camisetasDb ??= connect();
+  return globalThis.__camisetasDb;
 };
 
 export const db: Database = new Proxy({} as Database, {

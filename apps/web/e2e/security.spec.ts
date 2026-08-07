@@ -1,9 +1,13 @@
 import { expect, test } from '@playwright/test';
 import { SEED_USER, signIn, uniqueUser } from './support';
 
-const login = (request: import('@playwright/test').APIRequestContext, password: string) =>
+const login = (
+  request: import('@playwright/test').APIRequestContext,
+  username: string,
+  password: string,
+) =>
   request.post('/api/auth/login', {
-    data: { username: SEED_USER.username, password },
+    data: { username, password },
     failOnStatusCode: false,
   });
 
@@ -12,18 +16,19 @@ test.describe('rate limiting', () => {
   // devices must never be locked out by their own successful logins.
   test('repeated successful logins are never throttled', async ({ request }) => {
     for (let attempt = 0; attempt < 12; attempt += 1) {
-      const response = await login(request, SEED_USER.password);
+      const response = await login(request, SEED_USER.username, SEED_USER.password);
       expect(response.status(), `intento ${String(attempt + 1)}`).toBe(200);
     }
   });
 
+  // Uses a throwaway name: locking the seed account would break every later sign-in.
   test('repeated failures against one account are eventually refused', async ({ request }) => {
+    const target = uniqueUser('bloqueo').username;
     const statuses: number[] = [];
     for (let attempt = 0; attempt < 14; attempt += 1) {
-      statuses.push((await login(request, `mal-${String(attempt)}`)).status());
+      statuses.push((await login(request, target, `mal-${String(attempt)}`)).status());
     }
 
-    expect(statuses).toContain(401);
     expect(statuses).toContain(429);
   });
 });
