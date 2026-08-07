@@ -9,7 +9,8 @@
     "start": "next start",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run --passWithNoTests",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1105.0",
@@ -27,6 +28,7 @@
   "devDependencies": {
     "@camisetas/eslint-config": "workspace:*",
     "@camisetas/typescript-config": "workspace:*",
+    "@playwright/test": "^1.62.1",
     "@tailwindcss/postcss": "^4.0.0",
     "@types/node": "^26.1.2",
     "@types/react": "^19.0.8",

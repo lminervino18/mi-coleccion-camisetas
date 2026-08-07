@@ -10,12 +10,22 @@ const windows = new Map<string, Window>();
  * rather than globally; it is a speed bump against credential stuffing, not a hard quota.
  * Swap for a shared store if the traffic ever justifies it.
  */
-export const enforceRateLimit = (key: string, limit: number, windowMs: number): void => {
+export const enforceRateLimit = (
+  key: string,
+  limit: number,
+  windowMs: number,
+  { increment = true }: { increment?: boolean } = {},
+): void => {
   const now = Date.now();
   const current = windows.get(key);
 
   if (current === undefined || current.resetAt <= now) {
-    windows.set(key, { count: 1, resetAt: now + windowMs });
+    if (increment) windows.set(key, { count: 1, resetAt: now + windowMs });
+    return;
+  }
+
+  if (!increment) {
+    if (current.count >= limit) throw rateLimited();
     return;
   }
 

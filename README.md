@@ -1,144 +1,97 @@
 # Mi Colección de Camisetas
 
-**Mi Colección de Camisetas** es una aplicación web diseñada para gestionar un inventario personalizado de camisetas de fútbol. La plataforma permite a los usuarios almacenar y organizar su colección personal, con características como subir imágenes, añadir información detallada de cada camiseta y realizar consultas de manera eficiente.
+Aplicación web para catalogar, organizar y compartir una colección personal de camisetas de
+fútbol.
 
-![Imagen de ejemplo de la aplicación](./frontend/public/sample.png)
-![Imagen de ejemplo de la aplicación](./frontend/public/sample2.png)
-![Imagen de ejemplo de la aplicación](./frontend/public/sample3.png)
+## Stack
 
-## Tecnologías utilizadas
+- **Next.js 15** con App Router y TypeScript en modo estricto (interfaz y API en un solo proyecto)
+- **PostgreSQL** con **Drizzle** y migraciones versionadas
+- **Zod** como fuente única de tipos y validación entre cliente y servidor
+- **Tailwind CSS 4**
+- **Vitest** y **Playwright**
 
-### Frontend
+## Arquitectura
 
-- **React**: Usado para construir una interfaz de usuario moderna y responsiva
-- **CSS**: Para estilizar y diseñar la interfaz
+Monorepo con `pnpm`:
 
-### Backend
+```
+apps/web           Interfaz y API
+packages/contracts Esquemas Zod: tipos y validación compartidos
+packages/core      Dominio: cuentas, sesiones, camisetas, estadísticas, enlaces
+packages/db        Esquema y migraciones
+```
 
-- **Spring Boot**: Framework de Java para construir aplicaciones backend escalables y seguras
-- **Maven**: Para gestión de dependencias y construcción del proyecto
+El dominio no depende de Next.js. Las decisiones y sus motivos están en
+[`docs/adr/`](docs/adr/); la visión general, en [`docs/architecture.md`](docs/architecture.md).
 
-### Base de datos
+## Requisitos
 
-- **MySQL**: Base de datos relacional para almacenar usuarios y camisetas
+- Node.js 20.11 o superior
+- pnpm 10
+- Docker (para PostgreSQL local)
 
-## Modelo de Base de Datos
-
-El siguiente diagrama muestra la estructura de la base de datos:
-
-![Modelo de la base de datos](./frontend/public/bdd.png)
-
-### Estructura de Tablas
-
-#### Usuarios
-
-- `id`: Identificador único
-- `username`: Nombre de usuario (único)
-- `email`: Correo electrónico (único)
-- `password`: Contraseña encriptada
-- `role`: Rol del usuario (ADMIN/USER)
-- `created_at`: Fecha de creación
-- `updated_at`: Fecha de última actualización
-- `foto_perfil`: Foto de perfil en formato base64
-
-#### Camisetas
-
-- `id`: Identificador único
-- `usuario_id`: ID del usuario propietario
-- `imagen_completa`: Imagen completa de la camiseta
-- `imagen_recortada`: Miniatura de la camiseta
-- `tipo_de_camiseta`: Club o Selección
-- `liga`: Liga a la que pertenece (opcional)
-- `club`: Nombre del club (opcional)
-- `pais`: País de la camiseta
-- `dorsal`: Número de la camiseta (opcional)
-- `nombre`: Nombre en la camiseta (opcional)
-- `talle`: Talle de la camiseta
-- `numero_equipacion`: Tipo de equipación
-- `temporada`: Temporada de la camiseta
-- `comentarios`: Comentarios adicionales
-
-#### Enlaces Compartidos
-
-- `id`: Identificador único
-- `token`: Token único para compartir
-- `usuario_id`: ID del usuario que comparte
-- `fecha_creacion`: Fecha de creación del enlace
-- `fecha_expiracion`: Fecha de expiración del enlace
-
-## Funcionalidades principales
-
-### Gestión de Usuarios
-
-- Registro y autenticación
-- Actualización de perfil
-- Gestión de foto de perfil
-
-### Gestión de Camisetas
-
-- Agregar nuevas camisetas con imágenes
-- Editar información de camisetas existentes
-- Eliminar camisetas
-- Filtrar y ordenar camisetas
-- Visualización en formato grilla
-
-### Estadísticas y Análisis
-
-La funcionalidad estrella de la aplicación es su sección de estadísticas, que proporciona:
-
-- Distribución de camisetas por liga/país
-- Análisis temporal de la colección
-- Gráficos interactivos de composición de la colección
-- Tendencias de colores y equipaciones
-
-Esta sección permite a los usuarios obtener insights valiosos sobre su colección y comprender mejor sus preferencias y patrones de coleccionismo.
-
-## Configuración y Ejecución
-
-### Requisitos previos
-
-- Java 17 o superior
-- Node.js y npm
-- MySQL
-
-### Ejecución Automática
+## Puesta en marcha
 
 ```bash
-./run_all.sh
+pnpm install
+docker compose up -d
+cp env.example apps/web/.env.local
+pnpm db:migrate
+pnpm db:seed        # datos de ejemplo, solo desarrollo
+pnpm dev
 ```
 
-Este script inicia automáticamente:
+En `http://localhost:3000`. El seed crea el usuario `coleccionista` con la contraseña
+`una-contrasena-larga`.
 
-- Servidor MySQL local
-- Backend Spring Boot
-- Frontend React
+## Variables de entorno
 
-### Ejecución Manual
+Las obligatorias son `DATABASE_URL` y `APP_URL`. Sin credenciales de Cloudflare R2 ni de Brevo la
+aplicación funciona igual: guarda las imágenes en disco y escribe los correos en el log. Detalle
+completo en [`docs/deployment/environment.md`](docs/deployment/environment.md).
 
-Backend
-BASH
+## Base de datos
 
-```
-cd backend
-mvn spring-boot:run
-```
-
-Frontend
-BASH
-
-```
-cd frontend
-npm install
-npm start
+```bash
+pnpm db:generate    # genera una migración a partir del esquema
+pnpm db:migrate     # aplica las migraciones pendientes
 ```
 
-Base de datos
+El esquema nunca se sincroniza de forma automática: las migraciones son archivos SQL versionados
+que se aplican de forma explícita.
 
-- Crear una base de datos MySQL
-- Configurar las credenciales en application.properties
+## Tests
 
-### Notas de seguridad
+```bash
+pnpm test           # unitarios e integración
+pnpm test:e2e       # end to end con Playwright
+```
 
-- Contraseñas encriptadas
-- Autenticación mediante JWT
-- Validación de datos en frontend y backend
+Los tests de integración usan una base PostgreSQL real, no mocks. Necesitan
+`TEST_DATABASE_URL` apuntando a una base separada. Detalle en
+[`docs/testing.md`](docs/testing.md).
+
+## Verificación
+
+```bash
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm build
+```
+
+## Despliegue
+
+Pensado para funcionar sin coste en Vercel, Neon, Cloudflare R2 y Brevo. Comparación de planes y
+procedimiento en [`docs/deployment/`](docs/deployment/).
+
+## Documentación
+
+- [`docs/audit.md`](docs/audit.md) — auditoría del sistema anterior
+- [`docs/architecture.md`](docs/architecture.md) — arquitectura
+- [`docs/adr/`](docs/adr/) — decisiones y sus motivos
+- [`docs/testing.md`](docs/testing.md) — estrategia de pruebas
+- [`docs/deployment/`](docs/deployment/) — entorno, despliegue, backup y rollback
+- [`SECURITY.md`](SECURITY.md) — modelo de seguridad
+- [`CONTRIBUTING.md`](CONTRIBUTING.md) — convenciones
