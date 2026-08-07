@@ -30,14 +30,12 @@ export const endSession = async (): Promise<void> => {
   store.delete(SESSION_COOKIE);
 };
 
-/** Returns the signed-in user, or null for anonymous visitors. */
 export const getCurrentUser = async (): Promise<AuthenticatedUser | null> => {
   const token = (await cookies()).get(SESSION_COOKIE)?.value;
   if (token === undefined) return null;
   return resolveSession(db, token);
 };
 
-/** Use in any route that must not serve anonymous visitors. */
 export const requireUser = async (): Promise<AuthenticatedUser> => {
   const user = await getCurrentUser();
   if (user === null) throw unauthenticated();
